@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pemetaan Profil Pola Pikir (Growth Mindset)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Arial', sans-serif; line-height: 1.15; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen py-8 px-4">
+    <div class="max-w-4xl mx-auto bg-white shadow-lg rounded-xl overflow-hidden">
+        <!-- Header -->
+        <div class="bg-indigo-700 text-white p-6 text-center">
+            <h1 class="text-2xl font-bold">PEMETAAN PROFIL POLA PIKIR (GROWTH MINDSET)</h1>
+            <p class="text-indigo-200 mt-1">Instrumen Paket 20 Soal untuk Guru dan Murid SMKN 1 SAMPIT</p>
+        </div>
+
+        <!-- Form Utama -->
+        <form id="surveyForm" class="p-6 md:p-8 space-y-8">
+            <div class="bg-indigo-50 p-6 rounded-lg border border-indigo-100">
+                <h2 class="text-lg font-semibold text-indigo-900 mb-4">Identitas Peserta</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Nama Lengkap *</label>
+                        <input type="text" id="nama" required class="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white" placeholder="Masukkan nama">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">NIP / NIK / Nomor Induk *</label>
+                        <input type="text" id="nip" required class="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white" placeholder="Masukkan NIP / NIK / NIS">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Jabatan / Peran *</label>
+                        <select id="jabatan" required class="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white">
+                            <option value="" disabled selected>-- Pilih Peran --</option>
+                            <option value="Guru">Guru</option>
+                            <option value="Murid">Murid</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-slate-100 p-4 rounded-md text-sm text-slate-600">
+                <p class="font-semibold text-slate-700">Petunjuk:</p>
+                <p>Berikan tanda pilih pada setiap pernyataan di bawah ini yang SESUAI atau paling mendekati pendapat Anda. Poin skor disembunyikan selama pengisian untuk menjaga objektivitas.</p>
+            </div>
+
+            <!-- Daftar Pertanyaan -->
+            <div id="questionsContainer" class="space-y-6">
+                <!-- Pertanyaan akan digenerate secara otomatis melalui Javascript -->
+            </div>
+
+            <div class="text-center pt-4">
+                <button type="submit" id="submitBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-8 py-3 rounded-lg shadow transition duration-200 flex items-center justify-center mx-auto gap-2">
+                    <span id="btnText">Kirim & Lihat Hasil</span>
+                    <svg id="loadingSpinner" class="hidden animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                </button>
+            </div>
+        </form>
+
+        <div id="resultSection" class="hidden p-6 md:p-8 bg-slate-50 border-t border-slate-200">
+            <div class="bg-white p-6 rounded-xl shadow-md border border-slate-200 max-w-2xl mx-auto text-center space-y-4">
+                <h2 class="text-2xl font-bold text-indigo-900">Hasil Pemetaan Profil Pola Pikir</h2>
+                <div class="text-left bg-slate-50 p-4 rounded-lg space-y-2 text-sm">
+                    <p><strong>Nama:</strong> <span id="resNama"></span></p>
+                    <p><strong>NIP / NIK / Nomor Induk:</strong> <span id="resNip"></span></p>
+                    <p><strong>Jabatan / Peran:</strong> <span id="resJabatan"></span></p>
+                    <p><strong>Waktu Pengisian (WIB):</strong> <span id="resWaktu"></span></p>
+                </div>
+                <div class="py-4">
+                    <p class="text-slate-600">Total Skor Anda:</p>
+                    <p id="resTotal" class="text-4xl font-extrabold text-indigo-600 mt-1">0</p>
+                </div>
+                <div class="bg-indigo-50 p-4 rounded-lg">
+                    <p class="text-sm text-indigo-900 font-medium">Kategori Mindset Anda:</p>
+                    <p id="resKategori" class="text-2xl font-bold text-indigo-700 mt-1">-</p>
+                </div>
+                <div id="syncStatus" class="text-xs text-slate-500 italic"></div>
+                <div class="pt-4 flex justify-center gap-4">
+                    <button onclick="window.print()" class="bg-slate-600 hover:bg-slate-700 text-white px-5 py-2 rounded-md text-sm transition">Cetak / Simpan PDF</button>
+                    <button onclick="location.reload()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2 rounded-md text-sm transition">Ulangi Survei</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const statements = [
+            "Kemampuan Anda adalah sesuatu yang sangat mendasar yang tidak banyak dapat Anda ubah lagi.",
+            "Tidak peduli seberapapun tingkat kemampuan Anda saat ini, Anda bisa mengubahnya walaupun sedikit.",
+            "Anda akan selalu dapat mengubah kemampuan Anda.",
+            "Anda adalah seseorang yang unik, tidak banyak yang dapat dilakukan untuk mengubahnya.",
+            "Anda akan selalu dapat mengubah diri Anda sendiri.",
+            "Kemampuan dalam bidang seni dan musik dapat dipelajari oleh siapapun.",
+            "Hanya sedikit orang yang benar-benar mahir dalam olahraga, Anda harus membawa bakat ini sejak lahir.",
+            "Matematika lebih mudah dipelajari oleh pria atau seseorang yang berada dalam lingkungan yang menyukainya.",
+            "Makin keras Anda mengerjakan sesuatu makin mahir Anda dalam hal ini.",
+            "Tidak peduli tipe apapun Anda saat ini, Anda akan selalu dapat mengubahnya.",
+            "Mencoba sesuatu yang baru akan sangat menyulitkan Anda sehingga Anda ingin menghindarinya.",
+            "Sebagian orang baik dan pintar, sebagian lagi tidak. Tidak banyak yang dapat berubah.",
+            "Saya sangat menghargai kritik dan saran dari siapapun juga terkait dengan kinerja saya saat ini.",
+            "Saya kurang senang bila ada kritik dan saran dari orang lain.",
+            "Semua orang yang tidak memiliki hambatan kognitif memiliki kemampuan yang sama dalam belajar.",
+            "Anda bisa mempelajari sesuatu yang baru, tapi Anda tidak bisa mengubah kemampuan Anda.",
+            "Anda dapat melakukan sesuatu secara berbeda, tapi sebenarnya Anda tetap tidak dapat mengubah kemampuan Anda.",
+            "Semua orang pada dasarnya baik, tapi kadang-kadang membuat keputusan yang salah.",
+            "Alasan terpenting mengapa Anda melakukan pekerjaan Anda adalah keinginan untuk mempelajari sesuatu yang baru.",
+            "Orang yang benar-benar cerdas, tidak perlu bekerja keras."
+        ];
+
+        const scoringRules = {
+            1: [0, 1, 2, 3],
+            2: [3, 2, 1, 0],
+            3: [3, 2, 1, 0],
+            4: [0, 1, 2, 3],
+            5: [3, 2, 1, 0],
+            6: [3, 2, 1, 0],
+            7: [0, 1, 2, 3],
+            8: [0, 1, 2, 3],
+            9: [3, 2, 1, 0],
+            10: [3, 2, 1, 0],
+            11: [0, 1, 2, 3],
+            12: [0, 1, 2, 3],
+            13: [3, 2, 1, 0],
+            14: [0, 1, 2, 3],
+            15: [3, 2, 1, 0],
+            16: [0, 1, 2, 3],
+            17: [0, 1, 2, 3],
+            18: [3, 2, 1, 0],
+            19: [3, 2, 1, 0],
+            20: [0, 1, 2, 3]
+        };
+
+        const optionsText = ["Sangat Setuju", "Setuju", "Tidak Setuju", "Sangat Tidak Setuju"];
+        const container = document.getElementById('questionsContainer');
+
+        statements.forEach((stmt, index) => {
+            let qNum = index + 1;
+            let div = document.createElement('div');
+            div.className = "p-4 bg-white border border-slate-200 rounded-lg shadow-sm";
+
+            let htmlOptions = '';
+            optionsText.forEach((opt, optIdx) => {
+                htmlOptions += `
+                    <label class="flex items-center space-x-2 cursor-pointer text-sm">
+                        <input type="radio" name="q_${qNum}" value="${optIdx}" required class="text-indigo-600 focus:ring-indigo-500">
+                        <span>${opt}</span>
+                    </label>
+                `;
+            });
+
+            div.innerHTML = `
+                <p class="font-medium text-slate-800 mb-3">${qNum}. ${stmt}</p>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+                    ${htmlOptions}
+                </div>
+            `;
+            container.appendChild(div);
+        });
+
+        document.getElementById('surveyForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            // Mengaktifkan indikator loading pada tombol kirim
+            const submitBtn = document.getElementById('submitBtn');
+            const btnText = document.getElementById('btnText');
+            const loadingSpinner = document.getElementById('loadingSpinner');
+
+            submitBtn.disabled = true;
+            submitBtn.classList.add('opacity-75', 'cursor-not-allowed');
+            btnText.innerText = "Memproses & Menyimpan...";
+            loadingSpinner.classList.remove('hidden');
+
+            let nama = document.getElementById('nama').value.trim();
+            let nip = document.getElementById('nip').value.trim();
+            let jabatan = document.getElementById('jabatan').value;
+
+            let totalScore = 0;
+            for (let i = 1; i <= 20; i++) {
+                let radios = document.getElementsByName(`q_${i}`);
+                for (let r of radios) {
+                    if (r.checked) {
+                        let optIdx = parseInt(r.value);
+                        totalScore += scoringRules[i][optIdx];
+                    }
+                }
+            }
+
+            // Penentuan Kategori Mindset
+            let kategori = "-";
+            if (totalScore >= 0 && totalScore <= 20) {
+                kategori = "F (Fixed Mindset)";
+            } else if (totalScore >= 21 && totalScore <= 33) {
+                kategori = "FG (Fixed-Leaning Growth Mindset)";
+            } else if (totalScore >= 34 && totalScore <= 44) {
+                kategori = "GF (Growth-Leaning Fixed Mindset)";
+            } else if (totalScore >= 45 && totalScore <= 60) {
+                kategori = "G (Growth Mindset)";
+            }
+
+            // Mendapatkan Tanggal & Waktu dalam format WIB (Waktu Indonesia Barat 24 Jam)
+            const now = new Date();
+            const optionsDate = { timeZone: 'Asia/Jakarta', year: 'numeric', month: '2-digit', day: '2-digit' };
+            const optionsTime = { timeZone: 'Asia/Jakarta', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
+
+            const dateFormatter = new Intl.DateTimeFormat('id-ID', optionsDate);
+            const timeFormatter = new Intl.DateTimeFormat('id-ID', optionsTime);
+
+            const tanggalPengisian = dateFormatter.format(now);
+            const waktuPengisian = timeFormatter.format(now).replace(/\./g, ':');
+            const timestampWIB = `${tanggalPengisian} ${waktuPengisian} WIB`;
+
+            // Tampilkan di halaman hasil
+            document.getElementById('resNama').innerText = nama;
+            document.getElementById('resNip').innerText = nip;
+            document.getElementById('resJabatan').innerText = jabatan;
+            document.getElementById('resWaktu').innerText = timestampWIB;
+            document.getElementById('resTotal').innerText = totalScore;
+            document.getElementById('resKategori').innerText = kategori;
+
+            // Kirim ke Google Sheets via Apps Script Web App (Sheet: arsip kurikulum)
+            const scriptURL = 'https://script.google.com/macros/s/AKfycbwwnDiwCZxLK5yT_lrNt1V9cnrOvFBXRd_kDCnMWlrhMKrNWai7u7yHJf2W-xx-VOJt7Q/exec';
+            const syncStatus = document.getElementById('syncStatus');
+            syncStatus.innerText = "Menyimpan data ke arsip kurikulum...";
+
+            const payload = {
+                timestamp: timestampWIB,
+                nama: nama,
+                nip: nip,
+                jabatan: jabatan,
+                total: totalScore,
+                kategori: kategori
+            };
+
+            fetch(scriptURL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            }).then(() => {
+                syncStatus.innerText = "Data berhasil direkap ke spreadsheet (arsip kurikulum)!";
+                syncStatus.className = "text-xs text-emerald-600 font-medium italic";
+                tampilkanHasil();
+            }).catch(error => {
+                console.error('Error!', error.message);
+                syncStatus.innerText = "Gagal mengirim otomatis ke spreadsheet, namun hasil Anda sudah tampil.";
+                syncStatus.className = "text-xs text-amber-600 italic";
+                tampilkanHasil();
+            });
+
+            function tampilkanHasil() {
+                document.getElementById('surveyForm').classList.add('hidden');
+                document.getElementById('resultSection').classList.remove('hidden');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        });
+    </script>
+</body>
+</html>
