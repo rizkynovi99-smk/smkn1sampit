@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="id" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pemetaan Profil Pola Pikir (Growth Mindset)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 h-full flex flex-col">
+
+    <header class="bg-indigo-600 text-white shadow-md py-6 px-4">
+        <div class="max-w-4xl mx-auto text-center">
+            <h1 class="text-2xl md:text-3xl font-bold">Pemetaan Profil Pola Pikir (Mindset Profile)</h1>
+            <p class="text-indigo-100 text-sm md:text-base mt-2">Instrumen Paket 20 Soal untuk Guru & Murid SMA</p>
+        </div>
+    </header>
+
+    <main class="flex-grow max-w-4xl w-full mx-auto p-4 md:p-6">
+        
+        <div id="intro-card" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8 mb-6">
+            <h2 class="text-xl font-semibold text-slate-900 mb-3">Petunjuk Pengisian & Identitas</h2>
+            <p class="text-slate-600 leading-relaxed mb-4">
+                Silakan isi identitas Anda terlebih dahulu, kemudian pilih salah satu opsi jawaban yang paling sesuai dengan pendapat Anda pada setiap pernyataan. Kegiatan ini dirancang memakan waktu sekitar 20 menit.
+            </p>
+
+            <!-- Identity Input Form Section -->
+            <div class="bg-slate-50 border border-slate-200 p-4 md:p-5 rounded-xl mb-6 space-y-4">
+                <h3 class="font-medium text-slate-900 text-sm md:text-base">Informasi Peserta</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Nama Lengkap</label>
+                        <input type="text" id="input-nama" required placeholder="Masukkan nama..." class="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">NIP / NIS / ID</label>
+                        <input type="text" id="input-nip" required placeholder="Masukkan NIP atau NIS..." class="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Jabatan / Peran</label>
+                        <select id="input-jabatan" class="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            <option value="Guru">Guru / Pendidik</option>
+                            <option value="Murid SMA">Murid SMA</option>
+                            <option value="Lainnya">Lainnya</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-indigo-50 border border-indigo-100 p-4 rounded-xl text-indigo-900 text-sm mb-6">
+                <strong>Opsi Jawaban:</strong> Sangat Setuju, Setuju, Tidak Setuju, Sangat Tidak Setuju. (Poin skor per jawaban disembunyikan selama pengisian untuk menjaga objektivitas).
+            </div>
+            <button onclick="mulaiSurvei()" class="w-full md:w-auto bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-6 py-3 rounded-xl transition-all shadow-sm">
+                Mulai Mengisi Kuesioner
+            </button>
+        </div>
+
+        <form id="survey-form" class="hidden space-y-6" onsubmit="hitungHasil(event)">
+            <div id="questions-container" class="space-y-6">
+                <!-- Pertanyaan akan di-generate via JavaScript -->
+            </div>
+
+            <div class="pt-4 pb-12">
+                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-4 px-6 rounded-2xl shadow-lg transition-all text-lg">
+                    Selesai & Lihat Hasil Pemetaan
+                </button>
+            </div>
+        </form>
+
+        <div id="result-section" class="hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8 space-y-6">
+            <div class="text-center border-b border-slate-100 pb-6">
+                <span class="text-xs uppercase tracking-wider font-semibold text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full">Hasil Analisis Pemetaan Pola Pikir</span>
+                
+                <!-- Identitas Peserta di Hasil -->
+                <div class="my-4 bg-slate-50 border border-slate-200 rounded-xl p-4 text-left max-w-lg mx-auto text-sm space-y-1">
+                    <p><strong class="text-slate-500 w-28 inline-block">Nama:</strong> <span id="res-nama" class="font-medium text-slate-800">-</span></p>
+                    <p><strong class="text-slate-500 w-28 inline-block">NIP / NIS:</strong> <span id="res-nip" class="font-medium text-slate-800">-</span></p>
+                    <p><strong class="text-slate-500 w-28 inline-block">Jabatan:</strong> <span id="res-jabatan" class="font-medium text-slate-800">-</span></p>
+                    <p><strong class="text-slate-500 w-28 inline-block">Status DB:</strong> <span id="res-db-status" class="font-medium text-slate-600">Lokal Saja</span></p>
+                </div>
+
+                <h2 id="result-category" class="text-2xl md:text-3xl font-extrabold text-slate-900 mt-3">-</h2>
+                <p class="text-slate-500 mt-1">Grand Total Skor Anda: <span id="result-score" class="font-bold text-slate-800">0</span> dari 60</p>
+            </div>
+
+            <div class="space-y-4">
+                <h3 class="font-semibold text-slate-900 text-lg">Deskripsi Kategori Mindset:</h3>
+                <div id="result-description" class="p-4 rounded-xl bg-slate-50 border border-slate-200 text-slate-700 text-sm md:text-base leading-relaxed">
+                    <!-- Deskripsi kategori hasil -->
+                </div>
+            </div>
+
+            <!-- Rekapitulasi Skor Per Soal -->
+            <div class="space-y-3">
+                <h3 class="font-semibold text-slate-900 text-lg">Rekapitulasi Skor per Nomor (1 - 20):</h3>
+                <div class="overflow-x-auto border border-slate-200 rounded-xl">
+                    <table class="w-full text-left border-collapse text-xs md:text-sm">
+                        <thead>
+                            <tr class="bg-slate-100 text-slate-700 border-b border-slate-200">
+                                <th class="p-2.5 text-center">No</th>
+                                <th class="p-2.5">Opsi Dipilih</th>
+                                <th class="p-2.5 text-center">Skor</th>
+                            </tr>
+                        </thead>
+                        <tbody id="rekap-table-body" class="divide-y divide-slate-100">
+                            <!-- Diisi via Javascript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="bg-amber-50 border border-amber-200 p-4 rounded-xl text-amber-900 text-sm">
+                <strong>Kategori Acuan Skor:</strong>
+                <ul class="mt-2 space-y-1 list-disc list-inside">
+                    <li><strong>F (Fixed Mindset):</strong> 0 - 20</li>
+                    <li><strong>FG (Mostly Fixed Mindset):</strong> 21 - 33</li>
+                    <li><strong>GF (Mostly Growth Mindset):</strong> 34 - 44</li>
+                    <li><strong>G (Growth Mindset):</strong> 45 - 60</li>
+                </ul>
+            </div>
+
+            <div class="flex gap-4 pt-2">
+                <button onclick="resetSurvei()" class="flex-1 bg-slate-200 hover:bg-slate-300 text-slate-700 font-medium py-3 rounded-xl transition-all">
+                    Ulangi Survei
+                </button>
+                <button onclick="window.print()" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 rounded-xl transition-all">
+                    Cetak Hasil
+                </button>
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="text-center py-4 text-xs text-slate-400 border-t border-slate-200">
+        &copy; 2026 Lembar Kerja Pemetaan Profil Pola Pikir
+    </footer>
+
+    <!-- Custom Modal for Alerts -->
+    <div id="custom-modal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-xl space-y-4">
+            <h3 id="modal-title" class="font-bold text-lg text-slate-900">Perhatian</h3>
+            <p id="modal-message" class="text-sm text-slate-600 leading-relaxed"></p>
+            <button onclick="tutupModal()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 rounded-xl transition-all text-sm">
+                Mengerti
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // URL Google Apps Script yang disembunyikan di balik layar
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwwnDiwCZxLK5yT_lrNt1V9cnrOvFBXRd_kDCnMWlrhMKrNWai7u7yHJf2W-xx-VOJt7Q/exec";
+
+        const dataSoal = [
+            { no: 1, text: "Kemampuan Anda adalah sesuatu yang sangat mendasar yang tidak banyak dapat Anda ubah lagi.", bobot: [0, 1, 2, 3] },
+            { no: 2, text: "Tidak peduli seberapapun tingkat kemampuan Anda saat ini, Anda bisa mengubahnya walaupun sedikit.", bobot: [3, 2, 1, 0] },
+            { no: 3, text: "Anda akan selalu dapat mengubah kemampuan Anda.", bobot: [3, 2, 1, 0] },
+            { no: 4, text: "Anda adalah seseorang yang unik, tidak banyak yang dapat dilakukan untuk mengubahnya.", bobot: [0, 1, 2, 3] },
+            { no: 5, text: "Anda akan selalu dapat mengubah diri Anda sendiri.", bobot: [3, 2, 1, 0] },
+            { no: 6, text: "Kemampuan dalam bidang seni dan musik dapat dipelajari oleh siapapun.", bobot: [3, 2, 1, 0] },
+            { no: 7, text: "Hanya sedikit orang yang benar-benar mahir dalam olahraga, Anda harus membawa bakat ini sejak lahir.", bobot: [0, 1, 2, 3] },
+            { no: 8, text: "Matematika lebih mudah dipelajari oleh pria atau seseorang yang berada dalam lingkungan yang menyukainya.", bobot: [0, 1, 2, 3] },
+            { no: 9, text: "Makin keras Anda mengerjakan sesuatu makin mahir Anda dalam hal ini.", bobot: [3, 2, 1, 0] },
+            { no: 10, text: "Tidak peduli tipe apapun Anda saat ini, Anda akan selalu dapat mengubahnya.", bobot: [3, 2, 1, 0] },
+            { no: 11, text: "Mencoba sesuatu yang baru akan sangat menyulitkan Anda sehingga Anda ingin menghindarinya.", bobot: [0, 1, 2, 3] },
+            { no: 12, text: "Sebagian orang baik dan pintar, sebagian lagi tidak. Tidak banyak yang dapat berubah.", bobot: [0, 1, 2, 3] },
+            { no: 13, text: "Saya sangat menghargai kritik dan saran dari siapapun juga terkait dengan kinerja saya saat ini.", bobot: [3, 2, 1, 0] },
+            { no: 14, text: "Saya kurang senang bila ada kritik dan saran dari orang lain.", bobot: [0, 1, 2, 3] },
+            { no: 15, text: "Semua orang yang tidak memiliki hambatan kognitif memiliki kemampuan yang sama dalam belajar.", bobot: [3, 2, 1, 0] },
+            { no: 16, text: "Anda bisa mempelajari sesuatu yang baru, tapi Anda tidak bisa mengubah kemampuan Anda.", bobot: [0, 1, 2, 3] },
+            { no: 17, text: "Anda dapat melakukan sesuatu secara berbeda, tapi sebenarnya Anda tetap tidak dapat mengubah kemampuan Anda.", bobot: [0, 1, 2, 3] },
+            { no: 18, text: "Semua orang pada dasarnya baik, tapi kadang-kadang membuat keputusan yang salah.", bobot: [3, 2, 1, 0] },
+            { no: 19, text: "Alasan terpenting mengapa Anda melakukan pekerjaan Anda adalah keinginan untuk mempelajari sesuatu yang baru.", bobot: [3, 2, 1, 0] },
+            { no: 20, text: "Orang yang benar-benar cerdas, tidak perlu bekerja keras.", bobot: [0, 1, 2, 3] }
+        ];
+
+        const opsiLabel = ["Sangat Setuju", "Setuju", "Tidak Setuju", "Sangat Tidak Setuju"];
+
+        function showModal(pesan, judul = "Perhatian") {
+            document.getElementById('modal-title').innerText = judul;
+            document.getElementById('modal-message').innerText = pesan;
+            document.getElementById('custom-modal').classList.remove('hidden');
+            document.getElementById('custom-modal').classList.add('flex');
+        }
+
+        function tutupModal() {
+            document.getElementById('custom-modal').classList.remove('flex');
+            document.getElementById('custom-modal').classList.add('hidden');
+        }
+
+        function mulaiSurvei() {
+            const nama = document.getElementById('input-nama').value.trim();
+            const nip = document.getElementById('input-nip').value.trim();
+
+            if (!nama || !nip) {
+                showModal('Mohon isi Nama Lengkap dan NIP/NIS terlebih dahulu!');
+                return;
+            }
+
+            document.getElementById('intro-card').classList.add('hidden');
+            document.getElementById('survey-form').classList.remove('hidden');
+            renderSoal();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function renderSoal() {
+            const container = document.getElementById('questions-container');
+            let html = '';
+
+            dataSoal.forEach((item) => {
+                html += `
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 md:p-6">
+                        <p class="font-medium text-slate-900 mb-4 text-sm md:text-base">
+                            <span class="text-indigo-600 font-semibold mr-2">${item.no}.</span>${item.text}
+                        </p>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+                `;
+
+                opsiLabel.forEach((label, optIndex) => {
+                    const skor = item.bobot[optIndex];
+                    html += `
+                        <label class="flex items-center space-x-3 p-3 rounded-xl border border-slate-200 hover:border-indigo-400 hover:bg-indigo-50/30 cursor-pointer transition-all">
+                            <input type="radio" name="soal_${item.no}" value="${skor}" data-label="${label}" required class="text-indigo-600 focus:ring-indigo-500 h-4 w-4">
+                            <span class="text-sm text-slate-700">${label}</span>
+                        </label>
+                    `;
+                });
+
+                html += `
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        async function hitungHasil(event) {
+            event.preventDefault();
+            let grandTotal = 0;
+            let rekapHtml = '';
+
+            const nama = document.getElementById('input-nama').value.trim();
+            const nip = document.getElementById('input-nip').value.trim();
+            const jabatan = document.getElementById('input-jabatan').value;
+
+            dataSoal.forEach(item => {
+                const selected = document.querySelector(`input[name="soal_${item.no}"]:checked`);
+                if (selected) {
+                    const skor = parseInt(selected.value);
+                    const labelOpsi = selected.getAttribute('data-label');
+                    grandTotal += skor;
+
+                    rekapHtml += `
+                        <tr class="hover:bg-slate-50">
+                            <td class="p-2.5 text-center font-medium text-slate-600">${item.no}</td>
+                            <td class="p-2.5 text-slate-800">${labelOpsi}</td>
+                            <td class="p-2.5 text-center font-bold text-indigo-600">${skor}</td>
+                        </tr>
+                    `;
+                }
+            });
+
+            let kategoriKode = '';
+            let kategoriNama = '';
+            let deskripsi = '';
+
+            if (grandTotal >= 0 && grandTotal <= 20) {
+                kategoriKode = 'F';
+                kategoriNama = 'Fixed Mindset (Pola Pikir Tetap)';
+                deskripsi = 'Anda cenderung memiliki keyakinan bahwa kemampuan dan kecerdasan adalah sifat bawaan yang tetap dan sulit diubah. Anda mungkin menghindari tantangan atau merasa terancam dengan kritik.';
+            } else if (grandTotal >= 21 && grandTotal <= 33) {
+                kategoriKode = 'FG';
+                kategoriNama = 'Mostly Fixed Mindset (Cenderung Pola Pikir Tetap)';
+                deskripsi = 'Anda lebih dominan memiliki pola pikir tetap, meskipun pada beberapa aspek Anda mulai terbuka terhadap perubahan kecil melalui usaha.';
+            } else if (grandTotal >= 34 && grandTotal <= 44) {
+                kategoriKode = 'GF';
+                kategoriNama = 'Mostly Growth Mindset (Cenderung Pola Pikir Berkembang)';
+                deskripsi = 'Anda memiliki kecenderungan kuat ke arah pola pikir berkembang. Anda percaya bahwa usaha dan latihan dapat meningkatkan kemampuan, serta cukup terbuka terhadap pembelajaran baru.';
+            } else {
+                kategoriKode = 'G';
+                kategoriNama = 'Growth Mindset (Pola Pikir Berkembang)';
+                deskripsi = 'Luar biasa! Anda meyakini bahwa kemampuan dan kecerdasan dapat terus dikembangkan melalui kerja keras, ketekunan, pembelajaran, serta umpan balik dan kritik yang membangun.';
+            }
+
+            let dbStatusText = "Tersimpan Lokal";
+
+            if (GOOGLE_SCRIPT_URL) {
+                try {
+                    const payload = {
+                        sheetName: "arsip kurikulum",
+                        nama: nama,
+                        nip: nip,
+                        jabatan: jabatan,
+                        total: grandTotal,
+                        kategori: `${kategoriNama} (${kategoriKode})`,
+                        timestamp: new Date().toISOString()
+                    };
+
+                    await fetch(GOOGLE_SCRIPT_URL, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    dbStatusText = "Tersimpan ke Spreadsheet (arsip kurikulum) ☁️";
+                } catch (err) {
+                    console.error("Gagal mengirim ke spreadsheet:", err);
+                    dbStatusText = "Gagal kirim ke Spreadsheet (Lokal Saja)";
+                }
+            }
+
+            document.getElementById('survey-form').classList.add('hidden');
+            document.getElementById('result-section').classList.remove('hidden');
+            
+            document.getElementById('res-nama').innerText = nama;
+            document.getElementById('res-nip').innerText = nip;
+            document.getElementById('res-jabatan').innerText = jabatan;
+            document.getElementById('res-db-status').innerText = dbStatusText;
+
+            document.getElementById('result-score').innerText = grandTotal;
+            document.getElementById('result-category').innerText = `${kategoriNama} (${kategoriKode})`;
+            document.getElementById('result-description').innerText = deskripsi;
+            document.getElementById('rekap-table-body').innerHTML = rekapHtml;
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function resetSurvei() {
+            document.getElementById('survey-form').reset();
+            document.getElementById('input-nama').value = '';
+            document.getElementById('input-nip').value = '';
+            document.getElementById('result-section').classList.add('hidden');
+            document.getElementById('intro-card').classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
