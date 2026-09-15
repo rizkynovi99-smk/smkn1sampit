@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clash of Champions: Computational Thinking Quiz</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Poppins', sans-serif; }
+        .gradient-bg { background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #31103f 100%); }
+        .card-glass { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.6); }
+        ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); border-radius: 4px; }
+    </style>
+</head>
+<body class="gradient-bg min-h-screen text-slate-100 flex flex-col justify-between">
+
+    <header class="w-full max-w-5xl mx-auto p-4 flex justify-between items-center border-b border-white/10">
+        <div class="flex items-center space-x-2">
+            <span class="text-2xl">⚔️</span>
+            <h1 class="font-extrabold text-xl tracking-wider text-amber-400">CLASH OF CHAMPIONS</h1>
+        </div>
+        <div id="game-status-header" class="hidden flex items-center space-x-4 text-sm">
+            <span class="px-3 py-1 bg-amber-500/20 border border-amber-500/40 text-amber-300 rounded-full font-semibold">⚔️ Mode 4 Tim</span>
+        </div>
+    </header>
+
+    <main class="w-full max-w-4xl mx-auto p-4 my-auto flex-grow flex items-center justify-center">
+
+        <!-- Screen 1: Registration for 4 Teams -->
+        <div id="screen-welcome" class="card-glass w-full p-8 rounded-2xl shadow-2xl text-center space-y-6">
+            <div class="inline-block p-4 bg-amber-500/10 rounded-full text-amber-400 text-5xl mb-2">🛡️</div>
+            <h2 class="text-3xl font-extrabold text-white">Multiplayer 4 Tim Arena</h2>
+            <p class="text-slate-300 max-w-lg mx-auto">Masukkan nama untuk 4 tim yang bertarung. Setiap memilih nomor soal, tentukan tim mana yang akan menjawab!</p>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-lg mx-auto">
+                <div>
+                    <label class="block text-xs font-semibold text-amber-400 mb-1 text-left">Tim Alpha</label>
+                    <input type="text" id="team-name-0" placeholder="Nama Tim Alpha" value="Tim Alpha" class="w-full px-4 py-3 bg-slate-900/60 border border-slate-700 rounded-xl focus:outline-none focus:border-amber-500 text-white placeholder-slate-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-amber-400 mb-1 text-left">Tim Beta</label>
+                    <input type="text" id="team-name-1" placeholder="Nama Tim Beta" value="Tim Beta" class="w-full px-4 py-3 bg-slate-900/60 border border-slate-700 rounded-xl focus:outline-none focus:border-amber-500 text-white placeholder-slate-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-amber-400 mb-1 text-left">Tim Gamma</label>
+                    <input type="text" id="team-name-2" placeholder="Nama Tim Gamma" value="Tim Gamma" class="w-full px-4 py-3 bg-slate-900/60 border border-slate-700 rounded-xl focus:outline-none focus:border-amber-500 text-white placeholder-slate-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-amber-400 mb-1 text-left">Tim Delta</label>
+                    <input type="text" id="team-name-3" placeholder="Nama Tim Delta" value="Tim Delta" class="w-full px-4 py-3 bg-slate-900/60 border border-slate-700 rounded-xl focus:outline-none focus:border-amber-500 text-white placeholder-slate-500">
+                </div>
+            </div>
+
+            <div class="pt-2">
+                <button onclick="startGame()" class="px-8 py-3 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-bold rounded-xl shadow-lg transition transform active:scale-95">Mulai Pertarungan 4 Tim 🚀</button>
+            </div>
+        </div>
+
+        <!-- Screen 2: Dashboard Grid Soal (1-100) & Scoreboard Tim -->
+        <div id="screen-dashboard" class="hidden w-full space-y-6">
+            <!-- Scoreboard Tim saat ini -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <div id="card-t0" class="card-glass p-4 rounded-xl border border-slate-700 text-center transition">
+                    <p id="label-t0" class="text-xs font-bold text-amber-400 truncate">Tim Alpha</p>
+                    <p id="score-t0" class="text-2xl font-extrabold text-white mt-1">0</p>
+                    <span id="badge-t0" class="text-[10px] px-2 py-0.5 bg-slate-800 text-slate-300 rounded-full mt-2 inline-block">Score</span>
+                </div>
+                <div id="card-t1" class="card-glass p-4 rounded-xl border border-slate-700 text-center transition">
+                    <p id="label-t1" class="text-xs font-bold text-cyan-400 truncate">Tim Beta</p>
+                    <p id="score-t1" class="text-2xl font-extrabold text-white mt-1">0</p>
+                    <span id="badge-t1" class="text-[10px] px-2 py-0.5 bg-slate-800 text-slate-300 rounded-full mt-2 inline-block">Score</span>
+                </div>
+                <div id="card-t2" class="card-glass p-4 rounded-xl border border-slate-700 text-center transition">
+                    <p id="label-t2" class="text-xs font-bold text-emerald-400 truncate">Tim Gamma</p>
+                    <p id="score-t2" class="text-2xl font-extrabold text-white mt-1">0</p>
+                    <span id="badge-t2" class="text-[10px] px-2 py-0.5 bg-slate-800 text-slate-300 rounded-full mt-2 inline-block">Score</span>
+                </div>
+                <div id="card-t3" class="card-glass p-4 rounded-xl border border-slate-700 text-center transition">
+                    <p id="label-t3" class="text-xs font-bold text-purple-400 truncate">Tim Delta</p>
+                    <p id="score-t3" class="text-2xl font-extrabold text-white mt-1">0</p>
+                    <span id="badge-t3" class="text-[10px] px-2 py-0.5 bg-slate-800 text-slate-300 rounded-full mt-2 inline-block">Score</span>
+                </div>
+            </div>
+
+            <!-- Pemilihan Giliran Tim & Grid Soal -->
+            <div class="card-glass p-6 rounded-2xl shadow-xl space-y-4">
+                <div class="flex flex-col md:flex-row justify-between items-center gap-4 bg-slate-900/40 p-4 rounded-xl border border-slate-800">
+                    <div>
+                        <h3 class="text-sm font-bold text-white">Giliran Tim Menjawab:</h3>
+                        <p class="text-xs text-slate-400">Pilih tim mana yang akan mengambil soal sebelum mengklik nomor di bawah.</p>
+                    </div>
+                    <div id="team-selector-buttons" class="flex flex-wrap gap-2">
+                        <!-- Tombol pemilihan tim dinamis -->
+                    </div>
+                </div>
+
+                <div class="flex flex-col sm:flex-row justify-between items-center gap-2">
+                    <div>
+                        <h3 class="text-base font-bold text-white">Grid Soal (1 - 100)</h3>
+                        <p class="text-xs text-slate-400">Soal yang sudah dijawab akan ditandai dengan warna tim yang menjawab.</p>
+                    </div>
+                    <button onclick="finishQuizConfirmation()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-lg shadow transition">Selesai & Lihat Papan Skor 🏁</button>
+                </div>
+
+                <!-- Legenda Status Grid -->
+                <div class="flex flex-wrap gap-4 text-xs text-slate-300 bg-slate-900/40 p-3 rounded-xl border border-slate-800">
+                    <div class="flex items-center space-x-1.5"><span class="w-3 h-3 rounded bg-slate-800 border border-slate-700 inline-block"></span><span>Belum</span></div>
+                    <div class="flex items-center space-x-1.5"><span class="w-3 h-3 rounded bg-amber-500/40 border border-amber-500 inline-block"></span><span>Alpha</span></div>
+                    <div class="flex items-center space-x-1.5"><span class="w-3 h-3 rounded bg-cyan-500/40 border border-cyan-500 inline-block"></span><span>Beta</span></div>
+                    <div class="flex items-center space-x-1.5"><span class="w-3 h-3 rounded bg-emerald-500/40 border border-emerald-500 inline-block"></span><span>Gamma</span></div>
+                    <div class="flex items-center space-x-1.5"><span class="w-3 h-3 rounded bg-purple-500/40 border border-purple-500 inline-block"></span><span>Delta</span></div>
+                </div>
+
+                <!-- Grid Box 1-100 -->
+                <div id="question-grid" class="grid grid-cols-5 sm:grid-cols-10 gap-2 max-h-64 overflow-y-auto p-2 bg-slate-900/60 rounded-xl border border-slate-800">
+                    <!-- Dinamis via JS -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Screen 3: Quiz Arena -->
+        <div id="screen-quiz" class="hidden w-full space-y-6">
+            <!-- Navigasi Atas Quiz -->
+            <div class="flex justify-between items-center text-sm px-1">
+                <button onclick="backToDashboard()" class="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-semibold transition flex items-center space-x-1">
+                    <span>⬅️ Kembali ke Grid</span>
+                </button>
+                <span id="active-answering-team" class="px-3 py-1 bg-amber-500/20 border border-amber-500/40 text-amber-300 rounded-lg text-xs font-bold">Tim: -</span>
+                <span id="question-category" class="px-2.5 py-1 bg-indigo-500/20 text-indigo-300 rounded-lg text-xs font-semibold">Kategori</span>
+            </div>
+
+            <!-- Question Box -->
+            <div class="card-glass p-6 md:p-8 rounded-2xl shadow-xl space-y-6 relative">
+                <div class="flex justify-between items-center">
+                    <h3 id="question-title-num" class="text-amber-400 font-bold text-sm">Soal #1</h3>
+                </div>
+                <h3 id="question-text" class="text-lg md:text-xl font-semibold text-white leading-relaxed">Pertanyaan akan muncul di sini...</h3>
+
+                <!-- Options List -->
+                <div id="options-container" class="space-y-3">
+                    <!-- Dinamis via JS -->
+                </div>
+
+                <!-- Explanation Box (Hidden initially) -->
+                <div id="explanation-box" class="hidden p-4 rounded-xl bg-slate-900/80 border border-slate-700 space-y-2">
+                    <h4 class="font-bold text-amber-400 text-sm flex items-center"><span class="mr-1">💡</span> Pembahasan:</h4>
+                    <p id="explanation-text" class="text-sm text-slate-300 leading-relaxed"></p>
+                    <div class="flex space-x-3 mt-3">
+                        <button onclick="backToDashboard()" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-lg transition">Simpan & Pilih Soal Lain ➡️</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Power-ups Toolbar -->
+            <div class="grid grid-cols-3 gap-3">
+                <button onclick="usePowerupFifty()" id="btn-power-50" class="card-glass p-3 rounded-xl hover:bg-white/10 text-center transition flex flex-col items-center justify-center space-y-1">
+                    <span class="text-xl">⚡</span>
+                    <span class="text-xs font-medium text-slate-300">50:50 (<span id="count-50">2</span>)</span>
+                </button>
+                <button onclick="usePowerupHint()" id="btn-power-hint" class="card-glass p-3 rounded-xl hover:bg-white/10 text-center transition flex flex-col items-center justify-center space-y-1">
+                    <span class="text-xl">💡</span>
+                    <span class="text-xs font-medium text-slate-300">Petunjuk (<span id="count-hint">2</span>)</span>
+                </button>
+                <button onclick="usePowerupSkip()" id="btn-power-skip" class="card-glass p-3 rounded-xl hover:bg-white/10 text-center transition flex flex-col items-center justify-center space-y-1">
+                    <span class="text-xl">🏃</span>
+                    <span class="text-xs font-medium text-slate-300">Lewati (<span id="count-skip">2</span>)</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Screen 4: Final Scoreboard Screen -->
+        <div id="screen-result" class="hidden card-glass w-full p-8 rounded-2xl shadow-2xl text-center space-y-6">
+            <div class="text-6xl mb-2">🏆</div>
+            <h2 class="text-3xl font-extrabold text-white">Papan Skor Akhir Antar Tim</h2>
+            <p class="text-slate-300 text-sm">Pertarungan Computational Thinking Fase E telah usai!</p>
+            
+            <div id="final-leaderboard" class="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-lg mx-auto my-4 text-left">
+                <!-- Dinamis Leaderboard via JS -->
+            </div>
+
+            <button onclick="restartGame()" class="px-8 py-3 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-bold rounded-xl shadow-lg transition">Mulai Pertarungan Baru 🔄</button>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="w-full text-center py-4 text-xs text-slate-500 border-t border-white/5">
+        Clash of Champions • Multiplayer Computational Thinking Edition
+    </footer>
+
+    <script>
+        const rawQuestionsData = [
+            { id: 1, cat: "Studi Kasus & Pilar", q: "Seorang kurir harus mengantarkan 8 paket ke lokasi berbeda. Sebelum menentukan rute, ia mencatat alamat, jarak, batas waktu, kondisi jalan, dan prioritas setiap paket. Langkah tersebut terutama menunjukkan penerapan ...", options: ["Abstraksi", "Dekomposisi", "Algoritma", "Pengenalan pola"], correct: 1, exp: "Pencatatan dan pemecahan elemen masalah sebelum merancang rute menunjukkan tahap dekomposisi." },
+            { id: 2, cat: "Studi Kasus & Pilar", q: "Sebuah masalah besar berupa 'mengatur sistem pengiriman 100 paket' dipecah menjadi pengelompokan paket, penentuan prioritas, penentuan rute, dan pencatatan pengiriman. Tujuan utama proses tersebut adalah ...", options: ["Menghilangkan seluruh informasi", "Menemukan pola dari data", "Membuat masalah kompleks lebih mudah diselesaikan", "Membuat algoritma menjadi lebih panjang"], correct: 2, exp: "Dekomposisi bertujuan memecah masalah kompleks menjadi bagian-bagian kecil agar lebih mudah dikelola." },
+            { id: 3, cat: "Studi Kasus & Pilar", q: "Dari data perjalanan seorang kurir ditemukan bahwa setiap kali mengantar ke kawasan pasar pada pukul 16.00, waktu tempuh meningkat. Kesimpulan tersebut merupakan penerapan ...", options: ["Dekomposisi", "Abstraksi", "Pengenalan pola", "Algoritma"], correct: 2, exp: "Menemukan keteraturan atau tren berulang dari data adalah esensi pengenalan pola." },
+            { id: 4, cat: "Studi Kasus & Pilar", q: "Dalam menentukan rute, seorang kurir mengabaikan warna rumah pelanggan karena informasi tersebut tidak memengaruhi jarak maupun waktu perjalanan. Tindakan tersebut merupakan ...", options: ["Dekomposisi", "Pengenalan pola", "Algoritma", "Abstraksi"], correct: 3, exp: "Menyaring informasi penting dan membuang detail tak relevan adalah definisi abstraksi." },
+            { id: 5, cat: "Studi Kasus & Pilar", q: "Urutan yang paling tepat dalam menyelesaikan masalah kompleks menggunakan empat pilar Berpikir Komputasional adalah ...", options: ["Algoritma → abstraksi → pola → dekomposisi", "Dekomposisi → pola → abstraksi → algoritma", "Pola → algoritma → dekomposisi → abstraksi", "Abstraksi → algoritma → pola → dekomposisi"], correct: 1, exp: "Secara runtut, kita memecah masalah (dekomposisi), mencari hubungan (pola), menyaring data (abstraksi), lalu menyusun langkah (algoritma)." },
+            { id: 6, cat: "Studi Kasus & Pilar", q: "Seorang siswa ingin membuat aplikasi peminjaman buku. Ia membagi masalah menjadi pencatatan anggota, pencatatan buku, proses peminjaman, proses pengembalian, dan laporan. Pilar yang paling dominan adalah ...", options: ["Abstraksi", "Algoritma", "Dekomposisi", "Pengenalan pola"], correct: 2, exp: "Membagi sistem aplikasi ke dalam modul-modul fungsional adalah wujud nyata dekomposisi." },
+            { id: 7, cat: "Studi Kasus & Pilar", q: "Dari 50 data peminjaman perpustakaan ditemukan bahwa buku teknologi paling banyak dipinjam pada hari Senin. Informasi tersebut dapat digunakan untuk ...", options: ["Menemukan kecenderungan yang berulang", "Menghapus seluruh data", "Memecah sistem menjadi bagian kecil", "Menentukan langkah algoritma secara otomatis"], correct: 0, exp: "Analisis data peminjaman mengungkap kecenderungan tren berulang (pola)." },
+            { id: 8, cat: "Studi Kasus & Pilar", q: "Dalam membuat peta sederhana untuk permainan kurir, guru hanya menampilkan gudang, jalan, toko, rumah, dan jalan tertutup. Bangunan lain tidak ditampilkan. Hal ini merupakan ...", options: ["Algoritma", "Dekomposisi", "Abstraksi", "Pengenalan pola"], correct: 2, exp: "Penyederhanaan objek nyata menjadi model representasi esensial disebut abstraksi." },
+            { id: 9, cat: "Studi Kasus & Pilar", q: "Manakah aktivitas yang paling jelas menunjukkan algoritma?", options: ["Mengelompokkan masalah", "Mengamati kesamaan data", "Menghilangkan informasi yang tidak relevan", "Menyusun langkah penyelesaian secara berurutan"], correct: 3, exp: "Algoritma adalah urutan langkah logis yang jelas untuk mencapai tujuan." },
+            { id: 10, cat: "Studi Kasus & Pilar", q: "Seorang siswa menemukan bahwa tiga masalah berbeda memiliki pola penyelesaian yang hampir sama. Ia kemudian menggunakan strategi yang sama untuk ketiganya. Pilar yang digunakan adalah ...", options: ["Pengenalan pola", "Abstraksi", "Dekomposisi", "Algoritma"], correct: 0, exp: "Identifikasi kesamaan struktur antar masalah memanfaatkan pengenalan pola." },
+            { id: 11, cat: "Studi Kasus & Pilar", q: "Sebuah sekolah mengalami keterlambatan pengumpulan tugas. Guru membagi penyebab menjadi masalah jaringan, perangkat, siswa, guru, dan sistem pengumpulan. Setelah itu setiap bagian dianalisis. Proses tersebut merupakan ...", options: ["Algoritma", "Dekomposisi", "Abstraksi", "Pengenalan pola"], correct: 1, exp: "Memecah masalah utama ke dalam berbagai sub-faktor penyebab adalah dekomposisi." },
+            { id: 12, cat: "Studi Kasus & Pilar", q: "Data menunjukkan bahwa setiap kali jumlah pengguna meningkat di atas 500 orang, server menjadi lambat. Seorang siswa menyimpulkan bahwa beban pengguna berkaitan dengan penurunan performa server. Ini merupakan ...", options: ["Dekomposisi", "Algoritma", "Pengenalan pola", "Abstraksi"], correct: 2, exp: "Keterkaitan antara lonjakan pengguna dan penurunan performa ditemukan lewat pengenalan pola." },
+            { id: 13, cat: "Studi Kasus & Pilar", q: "Ketika membuat algoritma pencarian rute, informasi yang paling tidak relevan adalah ...", options: ["Jarak antar lokasi", "Kondisi jalan", "Warna helm kurir", "Jalan yang ditutup"], correct: 2, exp: "Warna helm kurir sama sekali tidak berdampak pada kalkulasi navigasi rute." },
+            { id: 14, cat: "Studi Kasus & Pilar", q: "Sebuah algoritma memiliki langkah:\n1. Masukan data\n2. Periksa data\n3. Jika data benar, simpan\n4. Jika salah, perbaiki\n5. Tampilkan hasil\nKeunggulan utama algoritma tersebut adalah ...", options: ["Memiliki langkah yang terstruktur", "Menghilangkan semua informasi", "Tidak membutuhkan keputusan", "Selalu menghasilkan rute terpendek"], correct: 0, exp: "Struktur instruksi yang logis, bercabang, dan runtut memastikan kejelasan proses." },
+            { id: 15, cat: "Studi Kasus & Pilar", q: "Seorang siswa memecah tugas membuat website menjadi desain, database, halaman utama, formulir, pengujian, dan publikasi. Setelah itu ia menyusun urutan pengerjaannya. Kombinasi pilar yang paling tepat adalah ...", options: ["Abstraksi dan pola", "Dekomposisi dan algoritma", "Pola dan abstraksi", "Algoritma dan pola"], correct: 1, exp: "Membagi tugas adalah dekomposisi, sedangkan menyusun urutan kerja adalah algoritma." },
+            { id: 16, cat: "Studi Kasus & Pilar", q: "Perhatikan data berikut:\nSenin: 20 pengunjung, Selasa: 22, Rabu: 21, Kamis: 23, Jumat: 22.\nSeorang siswa menyimpulkan bahwa jumlah pengunjung relatif stabil. Proses tersebut merupakan ...", options: ["Dekomposisi", "Algoritma", "Abstraksi", "Pengenalan pola"], correct: 3, exp: "Menarik kesimpulan kestabilan dari deret angka harian adalah pengenalan pola." },
+            { id: 17, cat: "Studi Kasus & Pilar", q: "Dalam menyelesaikan masalah, seorang siswa memilih hanya data yang berhubungan langsung dengan tujuan penyelesaian. Prinsip tersebut disebut ...", options: ["Generalisasi", "Abstraksi", "Dekomposisi", "Iterasi"], correct: 1, exp: "Memilih informasi inti dan mengabaikan detail tak relevan adalah abstraksi." },
+            { id: 18, cat: "Studi Kasus & Pilar", q: "Apa risiko jika dekomposisi dilakukan secara tidak tepat?", options: ["Masalah menjadi lebih mudah", "Semua informasi menjadi relevan", "Bagian masalah dapat saling terlepas sehingga solusi tidak lengkap", "Algoritma selalu menjadi lebih pendek"], correct: 2, exp: "Dekomposisi yang salah membuat sub-masalah terputus sehingga solusi akhir cacat." },
+            { id: 19, cat: "Studi Kasus & Pilar", q: "Seorang kurir memiliki lima paket. Paket D memiliki batas waktu paling dekat, sedangkan paket A memiliki jarak paling dekat. Jika kurir memutuskan berdasarkan deadline, ia sedang menggunakan ...", options: ["Pola dan abstraksi", "Dekomposisi dan pola", "Abstraksi dan algoritma", "Dekomposisi dan abstraksi"], correct: 2, exp: "Abstraksi menyaring prioritas deadline, lalu algoritma menentukan urutan eksekusi." },
+            { id: 20, cat: "Studi Kasus & Pilar", q: "Mengapa abstraksi diperlukan setelah data dikumpulkan?", options: ["Agar seluruh data dibuang", "Agar hanya informasi yang relevan digunakan dalam penyelesaian", "Agar masalah menjadi lebih kompleks", "Agar algoritma tidak membutuhkan input"], correct: 1, exp: "Abstraksi menyaring noise data agar model fokus pada variabel penentu solusi." },
+            { id: 21, cat: "Studi Kasus & Pilar", q: "Sebuah toko online menerima ratusan pesanan. Sistem mengelompokkan pesanan berdasarkan wilayah sebelum menentukan rute pengiriman. Pengelompokan tersebut terutama merupakan ...", options: ["Dekomposisi", "Abstraksi", "Algoritma", "Pengenalan pola"], correct: 0, exp: "Membagi pesanan massal ke dalam kelompok wilayah adalah bentuk dekomposisi logistik." },
+            { id: 22, cat: "Studi Kasus & Pilar", q: "Jika setiap pesanan dari Kecamatan X selalu memiliki tujuan yang berdekatan, maka informasi tersebut dapat dimanfaatkan untuk ...", options: ["Menemukan pola lokasi", "Menghapus data lokasi", "Memecah database", "Membuat input menjadi tidak diperlukan"], correct: 0, exp: "Keteraturan geografis pesanan terdeteksi melalui pengenalan pola lokasi." },
+            { id: 23, cat: "Studi Kasus & Pilar", q: "Setelah menemukan bahwa pelanggan di wilayah yang sama dapat dikirim dalam satu perjalanan, kurir mengabaikan detail yang tidak berhubungan dengan pengelompokan wilayah. Ini merupakan kombinasi ...", options: ["Dekomposisi dan algoritma", "Pola dan abstraksi", "Algoritma dan pola", "Dekomposisi dan abstraksi"], correct: 1, exp: "Menemukan keteraturan adalah pola, mengabaikan detail tak penting adalah abstraksi." },
+            { id: 24, cat: "Studi Kasus & Pilar", q: "Manakah urutan yang paling logis?", options: ["Menentukan langkah → mengabaikan masalah → mencari pola", "Memecah masalah → mencari hubungan → memilih informasi penting → menyusun langkah", "Menghapus data → membuat algoritma → memecah masalah", "Mencari pola → mengabaikan tujuan → menjalankan algoritma"], correct: 1, exp: "Urutan komputasional ideal: Dekomposisi → Pola → Abstraksi → Algoritma." },
+            { id: 25, cat: "Studi Kasus & Pilar", q: "Seorang siswa membuat algoritma memasak nasi:\n1. Masukan beras\n2. Cuci beras\n3. Masukan air\n4. Masak\n5. Tunggu matang\nKesalahan algoritma tersebut adalah ...", options: ["Tidak memiliki pola", "Tidak melakukan dekomposisi", "Urutan langkahnya tidak tepat", "Menggunakan terlalu sedikit informasi"], correct: 2, exp: "Memasukkan air sebelum mencuci beras atau urutan teknis penanak nasi bisa keliru jika tidak runtut." },
+            { id: 26, cat: "Studi Kasus & Pilar", q: "Jika langkah algoritma dapat dilakukan dalam urutan berbeda tanpa mengubah hasil, maka sifat tersebut menunjukkan ...", options: ["Urutan tidak selalu bergantung", "Algoritma tidak diperlukan", "Abstraksi gagal", "Dekomposisi tidak diperlukan"], correct: 0, exp: "Beberapa instruksi independen dalam algoritma dapat dieksekusi secara paralel atau acak." },
+            { id: 27, cat: "Studi Kasus & Pilar", q: "Sebuah aplikasi sekolah memiliki fitur login, absensi, nilai, jadwal, dan pengumuman. Untuk mempermudah pengembangan, setiap fitur dibuat sebagai bagian terpisah. Pendekatan ini merupakan ...", options: ["Pengenalan pola", "Abstraksi", "Dekomposisi", "Algoritma"], correct: 2, exp: "Pemecahan sistem monolitik ke dalam fitur terpisah adalah dekomposisi." },
+            { id: 28, cat: "Studi Kasus & Pilar", q: "Guru melihat bahwa kesalahan siswa dalam tiga tugas berbeda memiliki penyebab yang sama, yaitu tidak membaca instruksi. Guru kemudian memberikan strategi penyelesaian yang sama. Ini merupakan ...", options: ["Abstraksi", "Pengenalan pola", "Algoritma", "Dekomposisi"], correct: 1, exp: "Menemukan kesamaan akar penyebab dari beberapa tugas berbeda adalah pengenalan pola." },
+            { id: 29, cat: "Studi Kasus & Pilar", q: "Ketika membuat diagram rute, guru hanya menampilkan persimpangan dan tujuan penting, bukan seluruh detail lingkungan sekitar. Tujuannya adalah ...", options: ["Membuat informasi lebih relevan", "Menambah kompleksitas", "Menghilangkan algoritma", "Mengubah pola menjadi data mentah"], correct: 0, exp: "Abstraksi menyajikan informasi esensial agar relevan bagi navigasi." },
+            { id: 30, cat: "Studi Kasus & Pilar", q: "Pilar yang paling erat hubungannya dengan 'langkah pertama, langkah kedua, langkah ketiga' adalah ...", options: ["Abstraksi", "Pengenalan pola", "Algoritma", "Dekomposisi"], correct: 2, exp: "Urutan instruksi bernomor merupakan karakteristik utama algoritma." },
+            { id: 31, cat: "Studi Kasus & Pilar", q: "Seorang kurir mencatat bahwa rute A-B-C membutuhkan 20 menit, sedangkan A-D-C membutuhkan 15 menit. Jika kondisi tersebut berulang, ia dapat ...", options: ["Mengenali pola efisiensi rute", "Menghapus semua rute", "Mengabaikan waktu", "Membagi kurir menjadi beberapa bagian"], correct: 0, exp: "Perbandingan waktu yang konsisten berulang membentuk pengenalan pola efisiensi." },
+            { id: 32, cat: "Studi Kasus & Pilar", q: "Kurir kemudian hanya mempertimbangkan jarak dan waktu tempuh karena warna jalan pada peta tidak relevan. Ini adalah ...", options: ["Dekomposisi", "Algoritma", "Abstraksi", "Pengenalan pola"], correct: 2, exp: "Membuang atribut warna dan fokus pada variabel jarak/waktu adalah abstraksi." },
+            { id: 33, cat: "Studi Kasus & Pilar", q: "Setelah memilih rute terbaik, kurir menuliskan: Gudang → Jalan A → Persimpangan B → Jalan D → Toko → Rumah C. Pilar yang paling dominan adalah ...", options: ["Algoritma", "Pengenalan pola", "Abstraksi", "Dekomposisi"], correct: 0, exp: "Rangkaian instruksi navigasi runtut dari awal hingga akhir adalah algoritma." },
+            { id: 34, cat: "Studi Kasus & Pilar", q: "Manakah kondisi yang paling membutuhkan pengenalan pola?", options: ["Menentukan langkah pertama", "Menemukan kejadian yang berulang dalam data", "Memecah pekerjaan", "Menghilangkan informasi yang tidak penting"], correct: 1, exp: "Pengenalan pola berfokus pada deteksi keteraturan atau pengulangan data." },
+            { id: 35, cat: "Studi Kasus & Pilar", q: "Manakah kondisi yang paling membutuhkan abstraksi?", options: ["Menentukan hubungan yang berulang", "Menyusun urutan instruksi", "Memilih informasi penting dari banyak informasi", "Memecah masalah menjadi bagian kecil"], correct: 2, exp: "Abstraksi berfungsi menyaring informasi esensial dari tumpukan data." },
+            { id: 36, cat: "Studi Kasus & Pilar", q: "Manakah kondisi yang paling membutuhkan dekomposisi?", options: ["Memecah masalah besar menjadi beberapa bagian", "Menemukan kecenderungan", "Menentukan informasi penting", "Susunan urutan langkah"], correct: 0, exp: "Dekomposisi adalah proses pemecahan masalah besar menjadi sub-masalah." },
+            { id: 37, cat: "Studi Kasus & Pilar", q: "Manakah kondisi yang paling membutuhkan algoritma?", options: ["Menentukan informasi penting", "Menemukan kesamaan", "Membuat langkah penyelesaian", "Membagi masalah"], correct: 2, exp: "Algoritma bertugas menyusun langkah prosedural untuk mengeksekusi solusi." },
+            { id: 38, cat: "Studi Kasus & Pilar", q: "Sebuah sistem parkir memiliki masalah kendaraan menumpuk. Masalah tersebut dipecah menjadi pintu masuk, pembayaran, tempat parkir, dan pintu keluar. Setelah itu ditemukan bahwa antrean selalu terjadi pada pembayaran. Tahap tersebut menggunakan ...", options: ["Abstraksi saja", "Dekomposisi dan pengenalan pola", "Algoritma saja", "Abstraksi dan algoritma"], correct: 1, exp: "Memecah masalah adalah dekomposisi, menemukan lokasi antrean berulang adalah pola." },
+            { id: 39, cat: "Studi Kasus & Pilar", q: "Setelah mengetahui sumber antrean adalah pembayaran, pengelola hanya memperhatikan jumlah loket, jumlah kendaraan, dan waktu transaksi. Informasi seperti warna kendaraan diabaikan. Ini merupakan ...", options: ["Dekomposisi", "Pengenalan pola", "Abstraksi", "Algoritma"], correct: 2, exp: "Mengabaikan detail tak penting seperti warna kendaraan merupakan abstraksi." },
+            { id: 40, cat: "Studi Kasus & Pilar", q: "Pengelola kemudian membuat aturan: Jika antrean > 10 kendaraan, buka loket tambahan. Aturan tersebut merupakan bagian dari ...", options: ["Algoritma", "Dekomposisi", "Abstraksi", "Pengenalan pola"], correct: 0, exp: "Aturan kondisional operasional (if-else) adalah bagian dari algoritma." },
+            { id: 41, cat: "Studi Kasus & Pilar", q: "Sebuah masalah memiliki 100 informasi. Setelah dianalisis, hanya 15 informasi yang berpengaruh terhadap keputusan. Proses memilih 15 informasi tersebut merupakan ...", options: ["Algoritma", "Dekomposisi", "Abstraksi", "Pengenalan pola"], correct: 2, exp: "Mereduksi 100 informasi menjadi 15 informasi inti adalah abstraksi." },
+            { id: 42, cat: "Studi Kasus & Pilar", q: "Jika pola yang ditemukan ternyata tidak selalu berlaku, tindakan paling tepat adalah ...", options: ["Menganggap pola selalu benar", "Menguji pola pada data lain", "Menghapus seluruh data", "Mengabaikan pola tersebut tanpa pengujian"], correct: 1, exp: "Validasi pola terhadap data lain diperlukan untuk memastikan keakuratannya." },
+            { id: 43, cat: "Studi Kasus & Pilar", q: "Sebuah algoritma dikatakan kurang efektif apabila ...", options: ["Langkahnya jelas", "Langkahnya dapat diikuti", "Memiliki langkah tidak perlu yang memperpanjang proses", "Menghasilkan keluaran"], correct: 2, exp: "Algoritma yang baik harus efisien tanpa langkah mubazir yang memperlambat." },
+            { id: 44, cat: "Studi Kasus & Pilar", q: "Dalam permainan kurir, terdapat 10 rumah tetapi hanya 4 rumah yang harus dikunjungi. Informasi yang paling relevan untuk menentukan rute adalah ...", options: ["Warna semua rumah", "Nama seluruh penghuni", "Lokasi empat rumah tujuan", "Bentuk atap setiap rumah"], correct: 2, exp: "Lokasi empat tujuan adalah satu-satunya informasi spasial yang esensial." },
+            { id: 45, cat: "Studi Kasus & Pilar", q: "Jika sebuah jalan selalu menjadi jalur tercepat pada kondisi lalu lintas normal, informasi tersebut merupakan hasil ...", options: ["Pengenalan pola", "Abstraksi", "Dekomposisi", "Algoritma"], correct: 0, exp: "Konsistensi kecepatan di jalur tersebut ditemukan melalui pengamatan pola." },
+            { id: 46, cat: "Studi Kasus & Pilar", q: "Kurir membagi perjalanan menjadi beberapa segmen: gudang ke toko, toko ke rumah A, rumah A ke rumah B, dan rumah B kembali ke gudang. Ini merupakan ...", options: ["Dekomposisi", "Pola", "Abstraksi", "Algoritma"], correct: 0, exp: "Memecah perjalanan utuh ke dalam beberapa segmen rute adalah dekomposisi." },
+            { id: 47, cat: "Studi Kasus & Pilar", q: "Setelah perjalanan dibagi menjadi beberapa segmen, kurir menemukan bahwa setiap segmen yang melewati jalan utama membutuhkan waktu lebih lama pada jam sibuk. Ini merupakan ...", options: ["Abstraksi", "Pengenalan pola", "Dekomposisi", "Algoritma"], correct: 1, exp: "Menemukan keteraturan waktu macet di segmen tertentu adalah pengenalan pola." },
+            { id: 48, cat: "Studi Kasus & Pilar", q: "Kurir menghapus informasi 'jenis musik yang sedang didengarkan' dari data perencanaan rute. Ini merupakan ...", options: ["Algoritma", "Dekomposisi", "Abstraksi", "Pola"], correct: 2, exp: "Membuang data audio yang tidak relevan dengan navigasi adalah abstraksi." },
+            { id: 49, cat: "Studi Kasus & Pilar", q: "Kurir menyusun langkah:\n1. Periksa paket\n2. Urutkan berdasarkan deadline\n3. Periksa kondisi jalan\n4. Pilih rute\n5. Kirim paket\n6. Tandai terkirim\nIni merupakan contoh ...", options: ["Abstraksi", "Algoritma", "Dekomposisi", "Pengenalan pola"], correct: 1, exp: "Serangkaian instruksi kerja kronologis bernomor adalah sebuah algoritma." },
+            { id: 50, cat: "Studi Kasus & Pilar", q: "Keempat pilar tersebut dapat saling mendukung karena ...", options: ["Setiap pilar harus digunakan secara terpisah", "Penyelesaian masalah kompleks sering membutuhkan beberapa cara berpikir sekaligus", "Algoritma selalu lebih penting daripada pilar lain", "Abstraksi menggantikan seluruh pilar lainnya"], correct: 1, exp: "Dalam problem solving nyata, keempat pilar saling beririsan dan melengkapi." },
+            { id: 51, cat: "Studi Kasus & Pilar", q: "Seorang siswa diminta menyelesaikan masalah 'mengurangi waktu antrean kantin'. Langkah pertama yang paling tepat adalah ...", options: ["Langsung membuat solusi", "Membuat algoritma final", "Memecah masalah menjadi komponen penyebab antrean", "Menghapus data antrean"], correct: 2, exp: "Langkah awal pemecahan masalah dimulai dari dekomposisi komponen penyebab." },
+            { id: 52, cat: "Studi Kasus & Pilar", q: "Setelah masalah dipecah, ditemukan bahwa antrean panjang terjadi pada jam istirahat pertama. Kesimpulan tersebut merupakan ...", options: ["Pengenalan pola", "Abstraksi", "Algoritma", "Dekomposisi"], correct: 0, exp: "Menemukan keteraturan waktu puncak antrean adalah pengenalan pola." },
+            { id: 53, cat: "Studi Kasus & Pilar", q: "Dari seluruh data kantin, siswa hanya menggunakan jumlah pembeli, jumlah kasir, waktu transaksi, dan waktu antre. Ini menunjukkan ...", options: ["Dekomposisi", "Abstraksi", "Algoritma", "Pola"], correct: 1, exp: "Memilih variabel operasional penting dan mengabaikan detail lain adalah abstraksi." },
+            { id: 54, cat: "Studi Kasus & Pilar", q: "Siswa kemudian membuat prosedur: Jika antrean lebih dari 15 orang → tambah satu petugas. Prosedur tersebut merupakan ...", options: ["Pengenalan pola", "Dekomposisi", "Algoritma", "Abstraksi"], correct: 2, exp: "Pernyataan kondisional aksi operasional merupakan bagian dari algoritma." },
+            { id: 55, cat: "Studi Kasus & Pilar", q: "Jika prosedur tersebut dibuat berdasarkan hasil pengamatan antrean yang berulang, proses berpikir yang menghubungkan keduanya adalah ...", options: ["Pola → algoritma", "Abstraksi → dekomposisi", "Algoritma → pola", "Dekomposisi → abstraksi"], correct: 0, exp: "Temuan berulang (pola) diterjemahkan menjadi aturan instruksi (algoritma)." },
+            { id: 56, cat: "Studi Kasus & Pilar", q: "Seorang siswa menganggap semua informasi sama penting sehingga algoritmanya menggunakan 50 variabel yang sebenarnya tidak berhubungan. Pilar yang kurang diterapkan adalah ...", options: ["Algoritma", "Dekomposisi", "Abstraksi", "Pengenalan pola"], correct: 2, exp: "Gagal menyaring data tak relevan menunjukkan kurangnya penerapan abstraksi." },
+            { id: 57, cat: "Studi Kasus & Pilar", q: "Seorang siswa menemukan pola tetapi tidak menggunakannya untuk menyelesaikan masalah. Kekurangan utama berada pada tahap ...", options: ["Implementasi solusi", "Dekomposisi", "Abstraksi", "Pengumpulan pola"], correct: 0, exp: "Pola harus ditindaklanjuti ke tahap perumusan langkah solusi (implementasi)." },
+            { id: 58, cat: "Studi Kasus & Pilar", q: "Algoritma yang baik seharusnya ...", options: ["Selalu memiliki sebanyak mungkin langkah", "Tidak memiliki kondisi", "Jelas, terurut, dan dapat dijalankan", "Menggunakan seluruh informasi yang tersedia"], correct: 2, exp: "Syarat mutlak algoritma adalah kejelasan, keterurutan, dan bisa dieksekusi." },
+            { id: 59, cat: "Studi Kasus & Pilar", q: "Jika suatu masalah terlalu kompleks untuk diselesaikan sekaligus, pendekatan yang paling tepat adalah ...", options: ["Mengabaikannya", "Menggunakan dekomposisi", "Menghapus informasi", "Menebak hasil"], correct: 1, exp: "Kompleksitas diatasi dengan memecah masalah melalui dekomposisi." },
+            { id: 60, cat: "Studi Kasus & Pilar", q: "Jika dua kasus berbeda memiliki struktur masalah yang sama, siswa dapat menggunakan solusi serupa. Ini merupakan penerapan ...", options: ["Pengenalan pola", "Abstraksi", "Algoritma", "Dekomposisi"], correct: 0, exp: "Menemukan kesamaan struktur antar kasus berbeda adalah pengenalan pola." },
+            { id: 61, cat: "Studi Kasus & Pilar", q: "Dalam permainan kurir, guru memberikan peta dengan 50 bangunan, tetapi hanya 8 yang merupakan tujuan. Siswa menghapus 42 bangunan dari peta permainan. Pilar yang paling dominan adalah ...", options: ["Pola", "Abstraksi", "Algoritma", "Dekomposisi"], correct: 1, exp: "Penyederhanaan peta dengan membuang bangunan tak penting adalah abstraksi." },
+            { id: 62, cat: "Studi Kasus & Pilar", q: "Setelah menyederhanakan peta, siswa mengelompokkan tujuan yang berada pada kawasan yang sama. Ini menunjukkan ...", options: ["Abstraksi dan pola", "Algoritma dan dekomposisi", "Dekomposisi dan algoritma", "Pola dan algoritma"], correct: 0, exp: "Peta disederhanakan (abstraksi), lalu tujuannya dikelompokkan berdasarkan kesamaan wilayah (pola)." },
+            { id: 63, cat: "Studi Kasus & Pilar", q: "Siswa kemudian menentukan bahwa paket dengan deadline paling dekat harus diprioritaskan. Ia membuat urutan pengiriman berdasarkan aturan tersebut. Ini merupakan ...", options: ["Pola → algoritma", "Abstraksi → dekomposisi", "Dekomposisi → pola", "Algoritma → abstraksi"], correct: 0, exp: "Aturan prioritas ditemukan dari analisis pola, lalu disusun menjadi urutan (algoritma)." },
+            { id: 64, cat: "Studi Kasus & Pilar", q: "Jika siswa menentukan urutan hanya berdasarkan jarak tanpa mempertimbangkan deadline, kelemahan solusi tersebut adalah ...", options: ["Algoritma terlalu sederhana untuk seluruh kondisi", "Dekomposisi terlalu banyak", "Pola tidak mungkin ditemukan", "Abstraksi tidak pernah digunakan"], correct: 0, exp: "Algoritma gagal mengakomodasi variabel krusial (deadline) sehingga kurang tepat." },
+            { id: 65, cat: "Studi Kasus & Pilar", q: "Mengapa pengenalan pola dapat membantu algoritma?", options: ["Karena pola dapat memberikan dasar untuk membuat aturan atau keputusan", "Karena pola menghapus kebutuhan algoritma", "Karena pola selalu menghasilkan jawaban", "Karena pola menggantikan dekomposisi"], correct: 0, exp: "Keteraturan dari pola menjadi landasan logis dalam merumuskan aturan algoritma." },
+            { id: 66, cat: "Studi Kasus & Pilar", q: "Mengapa dekomposisi dapat membantu abstraksi?", options: ["Karena masalah yang lebih kecil lebih mudah dianalisis untuk menentukan informasi penting", "Karena dekomposisi menghilangkan semua informasi", "Karena abstraksi hanya digunakan setelah algoritma selesai", "Karena keduanya memiliki fungsi yang sama"], correct: 0, exp: "Bagian masalah yang lebih kecil memudahkan penyaringan informasi penting (abstraksi)." },
+            { id: 67, cat: "Studi Kasus & Pilar", q: "Jika seorang siswa langsung membuat langkah penyelesaian tanpa memahami masalah, risiko terbesar adalah ...", options: ["Algoritma dapat menyelesaikan masalah yang keliru", "Pola menjadi terlalu banyak", "Informasi menjadi otomatis relevan", "Dekomposisi tidak diperlukan"], correct: 0, exp: "Tanpa pemahaman awal, algoritma yang dibuat bisa menyelesaikan persoalan yang salah." },
+            { id: 68, cat: "Studi Kasus & Pilar", q: "Seorang kurir menemukan tiga rute:\nRute A: 5 km, 15 menit\nRute B: 7 km, 12 menit\nRute C: 4 km, 25 menit\nJika tujuan utama adalah meminimalkan waktu, rute yang dipilih adalah ...", options: ["A", "B", "C", "Semua sama"], correct: 1, exp: "Rute B memiliki waktu tempuh terendah (12 menit) di antara ketiganya." },
+            { id: 69, cat: "Studi Kasus & Pilar", q: "Keputusan pada soal sebelumnya terutama menggunakan ...", options: ["Abstraksi dan algoritma", "Dekomposisi saja", "Pola saja", "Dekomposisi dan pola"], correct: 0, exp: "Mengabaikan jarak fisik demi fokus pada waktu tempuh (abstraksi) lalu memilih nilai minimal (algoritma)." },
+            { id: 70, cat: "Studi Kasus & Pilar", q: "Jika kondisi jalan berubah dan algoritma lama tidak lagi menghasilkan rute terbaik, tindakan yang paling tepat adalah ...", options: ["Tetap menjalankan algoritma tanpa perubahan", "Mengevaluasi kembali informasi, pola, dan langkah algoritma", "Menghapus tujuan", "Mengabaikan kondisi jalan"], correct: 1, exp: "Sistem yang adaptif harus mengevaluasi ulang data, pola, dan langkah instruksinya." },
+            { id: 71, cat: "Studi Kasus & Pilar", q: "Dalam sebuah sistem, masalah utama adalah keterlambatan pengiriman. Setelah dipecah ditemukan faktor jarak, kemacetan, proses sortir, dan kesalahan alamat. Ini adalah contoh ...", options: ["Abstraksi", "Algoritma", "Dekomposisi", "Pengenalan pola"], correct: 2, exp: "Memecah masalah keterlambatan ke dalam berbagai faktor penyebab adalah dekomposisi." },
+            { id: 72, cat: "Studi Kasus & Pilar", q: "Jika dari 100 pengiriman ditemukan 80% keterlambatan terjadi karena kesalahan alamat, maka langkah selanjutnya yang paling rasional adalah ...", options: ["Mengabaikan alamat", "Meneliti pola kesalahan alamat", "Menghapus seluruh pengiriman", "Mengubah semua rute tanpa analisis"], correct: 1, exp: "Persentase tinggi pada satu faktor menuntut analisis pola penyebab kesalahan alamat." },
+            { id: 73, cat: "Studi Kasus & Pilar", q: "Jika guru hanya memasukkan 'alamat benar/salah', 'waktu tempuh', dan 'status pengiriman' ke dalam model, guru sedang melakukan ...", options: ["Dekomposisi", "Algoritma", "Abstraksi", "Pola"], correct: 2, exp: "Penyaringan variabel kunci ke dalam model operasional adalah abstraksi." },
+            { id: 74, cat: "Studi Kasus & Pilar", q: "Guru membuat aturan: Jika alamat salah → hubungi pelanggan → perbaiki alamat → lanjutkan pengiriman. Aturan tersebut merupakan ...", options: ["Algoritma", "Pola", "Abstraksi", "Dekomposisi"], correct: 0, exp: "Urutan penanganan kesalahan alamat berwujud instruksi prosedural (algoritma)." },
+            { id: 75, cat: "Studi Kasus & Pilar", q: "Rangkaian yang paling tepat adalah ...", options: ["Pola ditemukan → informasi relevan dipilih → langkah solusi dibuat", "Algoritma dibuat → masalah ditemukan → pola diabaikan", "Informasi dihapus → masalah selesai", "Dekomposisi dilakukan → masalah tidak perlu dianalisis"], correct: 0, exp: "Alur logis: Temukan tren/pola, saring data relevan (abstraksi), susun langkah (algoritma)." },
+            { id: 76, cat: "Studi Kasus & Pilar", q: "Dalam permainan kurir terdapat 6 paket. Paket A dan B memiliki tujuan berdekatan, sedangkan C dan D juga berdekatan. Kurir mengelompokkan A-B dan C-D sebelum menentukan rute. Pilar yang digunakan adalah ...", options: ["Pengenalan pola dan dekomposisi", "Abstraksi dan algoritma", "Algoritma dan pola", "Abstraksi dan dekomposisi"], correct: 0, exp: "Membagi paket (dekomposisi) berdasarkan kedekatan wilayah tujuan (pola)." },
+            { id: 77, cat: "Studi Kasus & Pilar", q: "Kurir mengabaikan warna paket, tetapi mempertahankan nomor paket, tujuan, deadline, dan prioritas. Tindakan tersebut paling tepat disebut ...", options: ["Pengenalan pola", "Abstraksi", "Dekomposisi", "Algoritma"], correct: 1, exp: "Membuang atribut fisik seperti warna dan fokus pada data esensial adalah abstraksi." },
+            { id: 78, cat: "Studi Kasus & Pilar", q: "Kurir menyusun: Prioritas → lokasi → kondisi jalan → rute → pengiriman. Jika salah satu langkah penting dilewati, kemungkinan yang terjadi adalah ...", options: ["Solusi menjadi lebih dapat diprediksi", "Algoritma dapat menghasilkan keputusan yang tidak tepat", "Pola otomatis menjadi benar", "Abstraksi tidak lagi dibutuhkan"], correct: 1, exp: "Langkah instruksi yang terlewat pada algoritma berisiko merusak hasil akhir." },
+            { id: 79, cat: "Studi Kasus & Pilar", q: "Sebuah perusahaan memiliki 1.000 data pengiriman. Daripada menganalisis semuanya sekaligus, data dibagi berdasarkan wilayah. Pendekatan tersebut terutama merupakan ...", options: ["Dekomposisi", "Abstraksi", "Algoritma", "Pola"], correct: 0, exp: "Memecah dataset besar berdasarkan wilayah geografis adalah bentuk dekomposisi." },
+            { id: 80, cat: "Studi Kasus & Pilar", q: "Setelah data dibagi berdasarkan wilayah, ditemukan bahwa wilayah tertentu selalu memiliki keterlambatan pada jam tertentu. Ini merupakan ...", options: ["Algoritma", "Dekomposisi", "Pengenalan pola", "Abstraksi"], correct: 2, exp: "Keteraturan waktu keterlambatan di wilayah tertentu terdeteksi lewat pengenalan pola." },
+            { id: 81, cat: "Studi Kasus & Pilar", q: "Manajemen kemudian hanya mempertimbangkan wilayah, waktu, dan jumlah keterlambatan. Informasi lain tidak digunakan. Ini merupakan ...", options: ["Dekomposisi", "Abstraksi", "Pengenalan pola", "Algoritma"], correct: 1, exp: "Penyaringan informasi ke dalam tiga parameter utama adalah abstraksi." },
+            { id: 82, cat: "Studi Kasus & Pilar", q: "Berdasarkan analisis tersebut dibuat aturan: Jika wilayah X dan pukul 16.00, gunakan rute alternatif. Aturan tersebut merupakan ...", options: ["Algoritma", "Dekomposisi", "Pola", "Abstraksi"], correct: 0, exp: "Aturan kondisional keputusan pengalihan rute merupakan bagian dari algoritma." },
+            { id: 83, cat: "Studi Kasus & Pilar", q: "Pada kasus sebelumnya, hubungan antarpilar yang paling tepat adalah ...", options: ["Dekomposisi → pola → abstraksi → algoritma", "Algoritma → pola → dekomposisi → abstraksi", "Abstraksi → algoritma → pola → dekomposisi", "Pola → algoritma → abstraksi → dekomposisi"], correct: 0, exp: "Urutan kerja: Memecah data (dekomposisi) → menemukan tren (pola) → menyaring variabel (abstraksi) → membuat aturan (algoritma)." },
+            { id: 84, cat: "Studi Kasus & Pilar", q: "Sebuah algoritma memiliki kondisi: Jika jalan A macet, gunakan jalan B. Jika jalan B juga macet, gunakan jalan C. Struktur tersebut menunjukkan bahwa algoritma ...", options: ["Tidak dapat beradaptasi", "Memiliki pengambilan keputusan berdasarkan kondisi", "Tidak membutuhkan input", "Hanya menggunakan abstraksi"], correct: 1, exp: "Penggunaan percabangan bersyarat membuat algoritma mampu menangani berbagai kondisi." },
+            { id: 85, cat: "Studi Kasus & Pilar", q: "Mengapa algoritma tidak selalu menghasilkan solusi terbaik?", options: ["Karena algoritma dapat dibuat berdasarkan informasi atau tujuan yang tidak tepat", "Karena algoritma tidak memiliki langkah", "Karena semua algoritma pasti salah", "Karena algoritma tidak boleh menggunakan kondisi"], correct: 0, exp: "Jika fondasi informasi atau tujuan awalnya keliru, eksekusi algoritma pun menghasilkan output yang salah." },
+            { id: 86, cat: "Studi Kasus & Pilar", q: "Jika tujuan berubah dari 'rute tercepat' menjadi 'rute paling hemat bahan bakar', maka yang harus berubah terutama adalah ...", options: ["Tujuan dan kriteria algoritma", "Nama kurir", "Warna kendaraan", "Nomor paket"], correct: 0, exp: "Perubahan objektif penentu mewajibkan penyesuaian kriteria di dalam algoritma." },
+            { id: 87, cat: "Studi Kasus & Pilar", q: "Perubahan tujuan tersebut menunjukkan pentingnya ...", options: ["Abstraksi terhadap informasi yang relevan dengan tujuan", "Menghapus dekomposisi", "Mengabaikan pola", "Menambah langkah secara acak"], correct: 0, exp: "Abstraksi harus disesuaikan ulang agar fokus pada variabel yang relevan dengan tujuan baru." },
+            { id: 88, cat: "Studi Kasus & Pilar", q: "Dua algoritma menghasilkan tujuan yang sama. Algoritma X membutuhkan 10 langkah, sedangkan algoritma Y membutuhkan 5 langkah dan tetap menghasilkan hasil yang benar. Secara umum, Y lebih ...", options: ["Kompleks", "Efisien", "Abstrak", "Terdekomposisi"], correct: 1, exp: "Lebih sedikit langkah dengan hasil sama menunjukkan tingkat efisiensi yang lebih tinggi." },
+            { id: 89, cat: "Studi Kasus & Pilar", q: "Namun, algoritma Y tidak mempertimbangkan kondisi jalan. Kesimpulan yang paling tepat adalah ...", options: ["Y selalu lebih baik karena lebih pendek", "X selalu lebih baik karena lebih panjang", "Efisiensi harus dinilai bersama kesesuaian terhadap masalah", "Jumlah langkah tidak pernah penting"], correct: 2, exp: "Efisiensi langkah harus seimbang dengan kelengkapan penanganan masalah riil." },
+            { id: 90, cat: "Studi Kasus & Pilar", q: "Seorang siswa menemukan bahwa solusi yang berhasil pada satu kasus juga berhasil pada lima kasus lain dengan struktur serupa. Ia sedang melakukan ...", options: ["Dekomposisi", "Pengenalan pola", "Abstraksi", "Algoritma"], correct: 1, exp: "Mengenali kesamaan solusi di berbagai kasus dengan struktur serupa adalah pengenalan pola." },
+            { id: 91, cat: "Studi Kasus & Pilar", q: "Jika siswa kemudian menyederhanakan kelima kasus tersebut menjadi satu model umum, ia menerapkan ...", options: ["Abstraksi", "Algoritma", "Dekomposisi", "Pola"], correct: 0, exp: "Menyaring esensi umum dari berbagai kasus spesifik adalah abstraksi." },
+            { id: 92, cat: "Studi Kasus & Pilar", q: "Setelah model umum dibuat, siswa menyusun prosedur yang dapat diterapkan pada semua kasus tersebut. Ia menerapkan ...", options: ["Algoritma", "Dekomposisi", "Pola", "Abstraksi"], correct: 0, exp: "Penyusunan prosedur operasional standar untuk model umum adalah algoritma." },
+            { id: 93, cat: "Studi Kasus & Pilar", q: "Kasus di atas memperlihatkan bahwa ...", options: ["Satu pilar dapat mendukung pilar lainnya", "Setiap pilar tidak berhubungan", "Algoritma harus selalu dilakukan pertama", "Abstraksi tidak berguna jika pola ditemukan"], correct: 0, exp: "Keempat pilar saling bahu-membahu dalam menyelesaikan persoalan kompleks." },
+            { id: 94, cat: "Studi Kasus & Pilar", q: "Manakah contoh yang paling kuat menunjukkan keempat pilar sekaligus?", options: ["Menghafalkan definisi berpikir komputasional", "Membagi masalah pengiriman, menemukan pola keterlambatan, memilih data penting, lalu membuat prosedur rute", "Menggambar peta tanpa tujuan", "Mengikuti rute tanpa perencanaan"], correct: 1, exp: "Contoh tersebut mencakup dekomposisi, pola, abstraksi, dan algoritma secara utuh." },
+            { id: 95, cat: "Studi Kasus & Pilar", q: "Seorang siswa memiliki data yang sangat banyak tetapi belum mengetahui informasi apa yang harus digunakan. Pilar yang paling dibutuhkan terlebih dahulu adalah ...", options: ["Abstraksi", "Algoritma", "Dekomposisi", "Pengenalan pola"], correct: 0, exp: "Abstraksi menyaring tumpukan data besar untuk memunculkan informasi yang benar-benar esensial." },
+            { id: 96, cat: "Studi Kasus & Pilar", q: "Seorang siswa mengetahui informasi yang relevan tetapi belum mengetahui hubungan antar data. Pilar yang paling dibutuhkan adalah ...", options: ["Abstraksi", "Pengenalan pola", "Algoritma", "Dekomposisi"], correct: 1, exp: "Untuk menemukan korelasi atau hubungan antar data, siswa memerlukan pengenalan pola." },
+            { id: 97, cat: "Studi Kasus & Pilar", q: "Seorang siswa sudah menemukan pola dan menentukan informasi penting, tetapi belum memiliki langkah penyelesaian. Pilar yang dibutuhkan selanjutnya adalah ...", options: ["Algoritma", "Dekomposisi", "Pengenalan pola", "Abstraksi"], correct: 0, exp: "Tahap akhir setelah pola dan data disaring adalah menyusun instruksi melalui algoritma." },
+            { id: 98, cat: "Studi Kasus & Pilar", q: "Seorang siswa menghadapi masalah yang terdiri dari banyak bagian yang saling berkaitan. Strategi awal yang paling tepat adalah ...", options: ["Membuat keputusan berdasarkan tebakan", "Melakukan dekomposisi", "Menghapus data", "Langsung menjalankan algoritma"], correct: 1, exp: "Masalah besar yang rumit wajib diurai terlebih dahulu melalui dekomposisi." },
+            { id: 99, cat: "Studi Kasus & Pilar", q: "Pernyataan yang paling tepat tentang hubungan empat pilar Berpikir Komputasional adalah ...", options: ["Dekomposisi hanya digunakan dalam pemrograman", "Pengenalan pola hanya digunakan untuk angka", "Abstraksi hanya digunakan dalam desain", "Keempatnya dapat digunakan bersama untuk memahami dan menyelesaikan masalah"], correct: 3, exp: "Keempat pilar adalah kerangka holistik untuk memecahkan berbagai jenis masalah." },
+            { id: 100, cat: "Studi Kasus & Pilar", q: "Dalam simulasi 'Saya adalah Kurir', siswa membagi masalah pengiriman menjadi beberapa bagian, menemukan bahwa paket dengan deadline pendek harus diprioritaskan, memilih informasi lokasi dan waktu sebagai informasi utama, kemudian menyusun langkah pengiriman. Urutan penerapan empat pilar yang paling tepat adalah ...", options: ["Algoritma → abstraksi → pola → dekomposisi", "Pola → dekomposisi → algoritma → abstraksi", "Dekomposisi → pengenalan pola → abstraksi → algoritma", "Abstraksi → pola → algoritma → dekomposisi"], correct: 2, exp: "Urutan runtut: Memecah masalah (dekomposisi) → menemukan prioritas (pola) → menyaring info (abstraksi) → menyusun langkah (algoritma)." }
+        ];
+
+        let state = {
+            teams: [
+                { name: "Tim Alpha", score: 0, color: "border-amber-500", bg: "bg-amber-500/20", badgeBg: "bg-amber-500 text-slate-950" },
+                { name: "Tim Beta", score: 0, color: "border-cyan-500", bg: "bg-cyan-500/20", badgeBg: "bg-cyan-500 text-slate-950" },
+                { name: "Tim Gamma", score: 0, color: "border-emerald-500", bg: "bg-emerald-500/20", badgeBg: "bg-emerald-500 text-slate-950" },
+                { name: "Tim Delta", score: 0, color: "border-purple-500", bg: "bg-purple-500/20", badgeBg: "bg-purple-500 text-slate-950" }
+            ],
+            activeTeamIndex: 0,
+            currentIndex: 0,
+            power50: 2,
+            powerHint: 2,
+            powerSkip: 2,
+            // userAnswers menyimpan objek: { teamIndex: number, isCorrect: boolean } atau null
+            userAnswers: new Array(100).fill(null),
+            selectedOption: null,
+            isAnswered: false
+        };
+
+        const teamColorsGrid = [
+            "bg-amber-500/40 border-amber-500 text-amber-200",
+            "bg-cyan-500/40 border-cyan-500 text-cyan-200",
+            "bg-emerald-500/40 border-emerald-500 text-emerald-200",
+            "bg-purple-500/40 border-purple-500 text-purple-200"
+        ];
+
+        function startGame() {
+            for (let i = 0; i < 4; i++) {
+                const val = document.getElementById(`team-name-${i}`).value.trim();
+                if (val) {
+                    state.teams[i].name = val;
+                }
+            }
+            
+            document.getElementById("game-status-header").classList.remove("hidden");
+            document.getElementById("screen-welcome").classList.add("hidden");
+            showDashboard();
+        }
+
+        function showDashboard() {
+            document.getElementById("screen-quiz").classList.add("hidden");
+            document.getElementById("screen-result").classList.add("hidden");
+            document.getElementById("screen-dashboard").classList.remove("hidden");
+
+            updateScoreboardUI();
+            renderTeamSelector();
+            renderQuestionGrid();
+        }
+
+        function updateScoreboardUI() {
+            for (let i = 0; i < 4; i++) {
+                document.getElementById(`label-t${i}`).innerText = state.teams[i].name;
+                document.getElementById(`score-t${i}`).innerText = state.teams[i].score;
+                
+                const card = document.getElementById(`card-t${i}`);
+                if (state.activeTeamIndex === i) {
+                    card.className = `card-glass p-4 rounded-xl border-2 ${state.teams[i].color} ${state.teams[i].bg} text-center transition shadow-lg scale-105`;
+                } else {
+                    card.className = `card-glass p-4 rounded-xl border border-slate-700 text-center transition opacity-80`;
+                }
+            }
+        }
+
+        function renderTeamSelector() {
+            const container = document.getElementById("team-selector-buttons");
+            container.innerHTML = "";
+
+            state.teams.forEach((team, idx) => {
+                const btn = document.createElement("button");
+                const isActive = (state.activeTeamIndex === idx);
+                let btnClass = isActive 
+                    ? "px-4 py-2 bg-amber-500 text-slate-950 font-bold rounded-xl shadow-lg text-xs transition transform scale-105" 
+                    : "px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold rounded-xl text-xs transition border border-slate-700";
+                
+                btn.className = btnClass;
+                btn.innerHTML = `${team.name} ${isActive ? '👑' : ''}`;
+                btn.onclick = () => {
+                    state.activeTeamIndex = idx;
+                    renderTeamSelector();
+                    updateScoreboardUI();
+                };
+                container.appendChild(btn);
+            });
+        }
+
+        function renderQuestionGrid() {
+            const gridContainer = document.getElementById("question-grid");
+            gridContainer.innerHTML = "";
+
+            rawQuestionsData.forEach((q, i) => {
+                const btn = document.createElement("button");
+                let statusClass = "bg-slate-800 border-slate-700 text-slate-300 hover:border-amber-500";
+                
+                const ans = state.userAnswers[i];
+                if (ans !== null) {
+                    statusClass = teamColorsGrid[ans.teamIndex];
+                }
+
+                btn.className = `p-3 rounded-xl border text-xs font-bold transition flex flex-col items-center justify-center ${statusClass}`;
+                btn.innerText = i + 1;
+                btn.onclick = () => openQuestion(i);
+                gridContainer.appendChild(btn);
+            });
+        }
+
+        function openQuestion(index) {
+            state.currentIndex = index;
+            state.selectedOption = null;
+            state.isAnswered = false;
+            document.getElementById("explanation-box").classList.add("hidden");
+            document.getElementById("screen-dashboard").classList.add("hidden");
+            document.getElementById("screen-quiz").classList.remove("hidden");
+
+            const q = rawQuestionsData[index];
+            const activeTeam = state.teams[state.activeTeamIndex];
+            const existingAnswer = state.userAnswers[index];
+            
+            document.getElementById("question-title-num").innerText = `Soal #${index + 1} dari 100`;
+            document.getElementById("question-category").innerText = q.cat;
+            document.getElementById("question-text").innerText = q.q;
+
+            const optionsContainer = document.getElementById("options-container");
+            optionsContainer.innerHTML = "";
+
+            if (existingAnswer !== null) {
+                // Jika soal sudah dikerjakan tim lain, kunci soal dan tampilkan informasi
+                const answeredTeamName = state.teams[existingAnswer.teamIndex].name;
+                document.getElementById("active-answering-team").innerText = `Sudah dikerjakan oleh: ${answeredTeamName}`;
+                
+                const noticeDiv = document.createElement("div");
+                noticeDiv.className = "p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-sm font-semibold text-center mb-4";
+                noticeDiv.innerHTML = `⚠️ Soal ini sudah dikunci karena telah dijawab oleh <strong>${answeredTeamName}</strong>. Anda tidak dapat mengubah atau menjawab ulang soal ini.`;
+                optionsContainer.appendChild(noticeDiv);
+
+                q.options.forEach((opt, idx) => {
+                    const btn = document.createElement("button");
+                    let btnStyle = "bg-slate-800/40 border-slate-800 opacity-60 cursor-not-allowed";
+                    if (idx === q.correct) {
+                        btnStyle = "bg-emerald-600/30 border-emerald-500 text-emerald-200 font-semibold";
+                    } else if (idx === existingAnswer.selectedOption && !existingAnswer.isCorrect) {
+                        btnStyle = "bg-rose-600/30 border-rose-500 text-rose-200";
+                    }
+                    btn.className = `option-btn w-full text-left p-4 rounded-xl border ${btnStyle} text-sm md:text-base flex items-center justify-between pointer-events-none`;
+                    btn.innerHTML = `<span><strong class="mr-2 text-amber-400">${String.fromCharCode(65 + idx)}.</strong> ${opt}</span>`;
+                    optionsContainer.appendChild(btn);
+                });
+
+                document.getElementById("explanation-text").innerText = q.exp;
+                document.getElementById("explanation-box").classList.remove("hidden");
+            } else {
+                document.getElementById("active-answering-team").innerText = `Giliran Menjawab: ${activeTeam.name}`;
+                q.options.forEach((opt, idx) => {
+                    const btn = document.createElement("button");
+                    btn.className = "option-btn w-full text-left p-4 rounded-xl bg-slate-800/60 border border-slate-700 hover:border-amber-500/50 hover:bg-slate-800 transition text-slate-200 text-sm md:text-base flex items-center justify-between";
+                    btn.innerHTML = `<span><strong class="mr-2 text-amber-400">${String.fromCharCode(65 + idx)}.</strong> ${opt}</span>`;
+                    btn.onclick = () => selectOption(idx);
+                    btn.id = `option-${idx}`;
+                    optionsContainer.appendChild(btn);
+                });
+            }
+
+            updatePowerupUI();
+        }
+
+        function selectOption(idx) {
+            if (state.isAnswered) return;
+            state.isAnswered = true;
+            state.selectedOption = idx;
+
+            const q = rawQuestionsData[state.currentIndex];
+            const options = document.querySelectorAll(".option-btn");
+            const points = (q.id <= 25) ? 10 : (q.id <= 50) ? 15 : (q.id <= 75) ? 20 : 30;
+            const currentTeamIdx = state.activeTeamIndex;
+
+            if (idx === q.correct) {
+                options[idx].classList.remove("bg-slate-800/60", "border-slate-700");
+                options[idx].classList.add("bg-emerald-600/30", "border-emerald-500", "text-emerald-200");
+                
+                state.teams[currentTeamIdx].score += points;
+                state.userAnswers[state.currentIndex] = { teamIndex: currentTeamIdx, isCorrect: true, selectedOption: idx };
+            } else {
+                options[idx].classList.remove("bg-slate-800/60", "border-slate-700");
+                options[idx].classList.add("bg-rose-600/30", "border-rose-500", "text-rose-200");
+                
+                options[q.correct].classList.remove("bg-slate-800/60", "border-slate-700");
+                options[q.correct].classList.add("bg-emerald-600/30", "border-emerald-500", "text-emerald-200");
+                
+                state.userAnswers[state.currentIndex] = { teamIndex: currentTeamIdx, isCorrect: false, selectedOption: idx };
+            }
+
+            document.getElementById("explanation-text").innerText = q.exp;
+            document.getElementById("explanation-box").classList.remove("hidden");
+        }
+
+        function backToDashboard() {
+            showDashboard();
+        }
+
+        function usePowerupFifty() {
+            if (state.power50 <= 0 || state.isAnswered) return;
+            state.power50--;
+            const q = rawQuestionsData[state.currentIndex];
+            const options = document.querySelectorAll(".option-btn");
+            let hiddenCount = 0;
+
+            options.forEach((btn, idx) => {
+                if (idx !== q.correct && hiddenCount < 2) {
+                    btn.style.opacity = "0.3";
+                    btn.style.pointerEvents = "none";
+                    hiddenCount++;
+                }
+            });
+            updatePowerupUI();
+        }
+
+        function usePowerupHint() {
+            if (state.powerHint <= 0 || state.isAnswered) return;
+            state.powerHint--;
+            const q = rawQuestionsData[state.currentIndex];
+            alert(`💡 Petunjuk: Pertanyaan ini berkaitan dengan konsep "${q.cat}". Pilihlah opsi yang paling sistematis dan logis!`);
+            updatePowerupUI();
+        }
+
+        function usePowerupSkip() {
+            if (state.powerSkip <= 0 || state.isAnswered) return;
+            state.powerSkip--;
+            updatePowerupUI();
+            showDashboard();
+        }
+
+        function updatePowerupUI() {
+            document.getElementById("count-50").innerText = state.power50;
+            document.getElementById("count-hint").innerText = state.powerHint;
+            document.getElementById("count-skip").innerText = state.powerSkip;
+        }
+
+        function finishQuizConfirmation() {
+            const answeredCount = state.userAnswers.filter(a => a !== null).length;
+            if (answeredCount < 100) {
+                if (!confirm(`Baru ${answeredCount} dari 100 soal terjawab. Yakin ingin mengakhiri dan menampilkan papan skor akhir?`)) {
+                    return;
+                }
+            }
+            endGame();
+        }
+
+        function endGame() {
+            document.getElementById("screen-dashboard").classList.add("hidden");
+            document.getElementById("screen-quiz").classList.add("hidden");
+            document.getElementById("screen-result").classList.remove("hidden");
+
+            // Urutkan tim berdasarkan skor tertinggi (Leaderboard)
+            const sortedTeams = [...state.teams].sort((a, b) => b.score - a.score);
+            const leaderboardContainer = document.getElementById("final-leaderboard");
+            leaderboardContainer.innerHTML = "";
+
+            sortedTeams.forEach((team, rank) => {
+                const card = document.createElement("div");
+                let rankBadge = `🏅 Peringkat #${rank + 1}`;
+                if (rank === 0) rankBadge = `👑 JUARA 1`;
+                else if (rank === 1) rankBadge = `🥈 JUARA 2`;
+                else if (rank === 2) rankBadge = `🥉 JUARA 3`;
+
+                card.className = "card-glass p-4 rounded-xl border border-slate-700 flex justify-between items-center bg-slate-900/60";
+                card.innerHTML = `
+                    <div class="space-y-1">
+                        <span class="text-xs font-bold text-amber-400">${rankBadge}</span>
+                        <h4 class="font-extrabold text-lg text-white">${team.name}</h4>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-2xl font-black text-white">${team.score}</span>
+                        <p class="text-[10px] text-slate-400">Total Poin</p>
+                    </div>
+                `;
+                leaderboardContainer.appendChild(card);
+            });
+        }
+
+        function restartGame() {
+            state.teams.forEach(t => t.score = 0);
+            state.activeTeamIndex = 0;
+            state.currentIndex = 0;
+            state.power50 = 2;
+            state.powerHint = 2;
+            state.powerSkip = 2;
+            state.userAnswers = new Array(100).fill(null);
+
+            document.getElementById("screen-result").classList.add("hidden");
+            document.getElementById("screen-welcome").classList.remove("hidden");
+            document.getElementById("game-status-header").classList.add("hidden");
+        }
+    </script>
+</body>
+</html>
