@@ -1,0 +1,999 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sorting Challenge: Kurir Pintar (10 Level) - Berpikir Komputasional</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .card-pop { transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1); }
+        .card-pop:hover { transform: translateY(-2px); }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col justify-between selection:bg-indigo-500 selection:text-white">
+
+    <header class="bg-slate-800/90 backdrop-blur border-b border-slate-700 sticky top-0 z-40 px-4 py-3">
+        <div class="max-w-5xl mx-auto flex flex-wrap justify-between items-center gap-3">
+            <div class="flex items-center space-x-3">
+                <div class="bg-gradient-to-tr from-amber-500 to-orange-500 p-2.5 rounded-2xl shadow-lg shadow-orange-500/20 text-2xl">📦</div>
+                <div>
+                    <h1 class="font-extrabold text-white text-base sm:text-lg leading-tight">Kurir Pintar: Multi-Team 10 Level</h1>
+                    <p class="text-xs text-amber-300 font-medium">Laboratorium 4 Pilar Berpikir Komputasional</p>
+                </div>
+            </div>
+
+            <!-- Stats Bar -->
+            <div id="stats-bar" class="hidden flex items-center space-x-2 sm:space-x-3">
+                <div class="bg-slate-700/60 px-3 py-1.5 rounded-xl text-xs font-semibold border border-slate-600 flex items-center space-x-1.5">
+                    <span>👥</span> <span id="display-team-badge" class="text-indigo-300 font-bold">Tim</span>
+                </div>
+                <div class="bg-slate-700/60 px-3 py-1.5 rounded-xl text-xs font-semibold border border-slate-600 flex items-center space-x-1.5">
+                    <span>👤</span> <span id="display-courier-name" class="text-emerald-300 font-bold">Kurir</span>
+                </div>
+                <div class="bg-slate-700/60 px-3 py-1.5 rounded-xl text-xs font-semibold border border-slate-600 flex items-center space-x-1.5">
+                    <span>⭐</span> <span id="display-score" class="font-bold text-amber-400">0</span> Poin
+                </div>
+                <div class="bg-slate-700/60 px-3 py-1.5 rounded-xl text-xs font-semibold border border-slate-600 flex items-center space-x-1.5">
+                    <span>❤️</span> <span id="display-lives" class="font-bold text-rose-400">███</span>
+                </div>
+                <div class="bg-slate-700/60 px-3 py-1.5 rounded-xl text-xs font-mono border border-slate-600 flex items-center space-x-1">
+                    <span>⏱️</span> <span id="timer" class="font-bold text-emerald-400">05:00</span>
+                </div>
+                <button onclick="openLeaderboardModal()" class="bg-amber-600/30 hover:bg-amber-600/50 text-amber-300 px-3 py-1.5 rounded-xl text-xs font-bold border border-amber-500/40 transition-all flex items-center space-x-1">
+                    <span>🏆</span> <span>Papan Peringkat</span>
+                </button>
+                <button onclick="openTeacherMode()" class="bg-slate-700 hover:bg-slate-600 px-3 py-1.5 rounded-xl text-xs font-bold text-indigo-300 border border-slate-600 transition-all flex items-center space-x-1">
+                    <span>👨‍🏫</span> <span>Mode Guru</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-4xl w-full mx-auto px-4 py-6 flex-grow flex flex-col items-center justify-center">
+
+        <!-- SCREEN 1: WELCOME & TEAM REGISTRATION -->
+        <div id="screen-welcome" class="w-full max-w-xl bg-slate-800/90 border border-slate-700 rounded-3xl p-6 sm:p-8 shadow-2xl text-center backdrop-blur">
+            <div class="inline-block bg-amber-500/20 text-amber-400 p-4 rounded-3xl text-4xl mb-4 border border-amber-500/30 shadow-inner">🚚</div>
+            <h2 class="text-2xl sm:text-3xl font-extrabold text-white mb-2">Simulasi Kurir Pintar (Multi-Tim 4 Tim)</h2>
+            <p class="text-slate-400 text-sm mb-6 leading-relaxed">
+                Pilih Tim Anda (Tim Alpha, Beta, Gamma, atau Delta) & kuasai 10 Level Berpikir Komputasional (Timer 5 Menit per Level)!
+            </p>
+
+            <div class="space-y-4 mb-6 text-left">
+                <div>
+                    <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">1. Pilih Tim:</label>
+                    <div class="grid grid-cols-2 gap-2.5">
+                        <button type="button" onclick="selectTeam('Tim Alpha', 'bg-indigo-500/20 text-indigo-300 border-indigo-500')" id="btn-team-Alpha" class="team-option-btn bg-slate-900 border border-slate-700 p-3 rounded-2xl text-xs font-bold text-slate-300 hover:border-indigo-500 transition-all flex items-center space-x-2">
+                            <span>🛡️</span> <span>Tim Alpha</span>
+                        </button>
+                        <button type="button" onclick="selectTeam('Tim Beta', 'bg-emerald-500/20 text-emerald-300 border-emerald-500')" id="btn-team-Beta" class="team-option-btn bg-slate-900 border border-slate-700 p-3 rounded-2xl text-xs font-bold text-slate-300 hover:border-emerald-500 transition-all flex items-center space-x-2">
+                            <span>⚡</span> <span>Tim Beta</span>
+                        </button>
+                        <button type="button" onclick="selectTeam('Tim Gamma', 'bg-amber-500/20 text-amber-300 border-amber-500')" id="btn-team-Gamma" class="team-option-btn bg-slate-900 border border-slate-700 p-3 rounded-2xl text-xs font-bold text-slate-300 hover:border-amber-500 transition-all flex items-center space-x-2">
+                            <span>🔥</span> <span>Tim Gamma</span>
+                        </button>
+                        <button type="button" onclick="selectTeam('Tim Delta', 'bg-rose-500/20 text-rose-300 border-rose-500')" id="btn-team-Delta" class="team-option-btn bg-slate-900 border border-slate-700 p-3 rounded-2xl text-xs font-bold text-slate-300 hover:border-rose-500 transition-all flex items-center space-x-2">
+                            <span>💎</span> <span>Tim Delta</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">2. Nama Anggota / Perwakilan:</label>
+                    <input type="text" id="input-courier-name" placeholder="Contoh: Rina Amalia (Ketua Tim)" class="w-full bg-slate-900 border border-slate-700 rounded-2xl px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition-all font-medium">
+                </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row gap-3">
+                <button onclick="startTutorial()" class="flex-1 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-white font-bold py-3.5 px-6 rounded-2xl shadow-lg shadow-orange-600/30 transition-all text-sm uppercase tracking-wider">
+                    Mulai Petualangan Tim 🚀
+                </button>
+                <button onclick="openTeacherMode()" class="bg-slate-700 hover:bg-slate-600 text-indigo-300 font-bold py-3.5 px-4 rounded-2xl border border-slate-600 transition-all text-xs uppercase tracking-wider flex items-center justify-center space-x-1.5">
+                    <span>👨‍🏫</span> <span>Mode Guru</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- SCREEN 2: TUTORIAL / BRIEFING -->
+        <div id="screen-tutorial" class="hidden w-full max-w-xl bg-slate-800/90 border border-slate-700 rounded-3xl p-6 sm:p-8 shadow-2xl backdrop-blur">
+            <div class="flex items-center space-x-3 mb-4">
+                <div class="bg-indigo-500/20 text-indigo-400 p-3 rounded-2xl text-2xl border border-indigo-500/30">📖</div>
+                <div>
+                    <h3 id="tutorial-team-title" class="text-lg font-bold text-white">Panduan Berpikir Komputasional</h3>
+                    <p class="text-xs text-indigo-300">Persiapan menyelesaikan 10 Level Kurir Pintar (Batas Waktu: 5 Menit / Level)</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
+                <div class="bg-slate-900/60 border border-slate-700 p-3.5 rounded-2xl">
+                    <h4 class="text-xs font-bold text-emerald-400 mb-1">🔨 Dekomposisi</h4>
+                    <p class="text-xs text-slate-400">Pecah atribut paket: Tujuan, Jarak, Prioritas, & Deadline.</p>
+                </div>
+                <div class="bg-slate-900/60 border border-slate-700 p-3.5 rounded-2xl">
+                    <h4 class="text-xs font-bold text-amber-400 mb-1">🔎 Pengenalan Pola</h4>
+                    <p class="text-xs text-slate-400">Identifikasi urutan angka naik, prioritas, atau waktu.</p>
+                </div>
+                <div class="bg-slate-900/60 border border-slate-700 p-3.5 rounded-2xl">
+                    <h4 class="text-xs font-bold text-orange-400 mb-1">🎯 Abstraksi</h4>
+                    <p class="text-xs text-slate-400">Abaikan atribut non-esensial, fokus pada kriteria utama.</p>
+                </div>
+                <div class="bg-slate-900/60 border border-slate-700 p-3.5 rounded-2xl">
+                    <h4 class="text-xs font-bold text-rose-400 mb-1">📋 Algoritma</h4>
+                    <p class="text-xs text-slate-400">Langkah sistematis: bandingkan, pilih, letakkan di slot.</p>
+                </div>
+            </div>
+
+            <div class="flex gap-3">
+                <button onclick="openLevelSelectModal()" class="flex-1 bg-slate-700 hover:bg-slate-600 text-slate-200 font-bold py-3.5 px-4 rounded-2xl border border-slate-600 transition-all text-xs uppercase tracking-wider flex items-center justify-center space-x-2">
+                    <span>🗺️</span> <span>Pilih Level</span>
+                </button>
+                <button onclick="launchGameLevel(1)" class="flex-[2] bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3.5 px-6 rounded-2xl shadow-lg shadow-indigo-600/30 transition-all text-xs uppercase tracking-wider flex items-center justify-center space-x-2">
+                    <span>🎮</span> <span>Mulai Level 1</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- SCREEN 3: GAMEPLAY SCREEN -->
+        <div id="screen-game" class="hidden w-full max-w-2xl flex flex-col items-center">
+            
+            <!-- Level Banner & Rule Box -->
+            <div class="w-full bg-slate-800 border border-slate-700 rounded-2xl p-4 mb-4 shadow-lg flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                <div>
+                    <div class="flex items-center space-x-2">
+                        <span id="level-badge" class="text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">🟢 Level 1</span>
+                        <button onclick="openLevelSelectModal()" class="bg-slate-700 hover:bg-slate-600 text-slate-200 px-2.5 py-1 rounded-lg text-xs font-bold border border-slate-600 transition-all flex items-center space-x-1">
+                            <span>🗺️ Ganti Level</span>
+                        </button>
+                    </div>
+                    <h4 id="level-title" class="font-bold text-white text-sm mt-1">Judul Level</h4>
+                    <p id="level-rule-desc" class="text-xs text-slate-400 mt-0.5">Aturan pengurutan...</p>
+                </div>
+                <div id="event-alert" class="hidden bg-rose-500/20 border border-rose-500/40 text-rose-300 text-xs px-3 py-2 rounded-xl font-semibold flex items-center space-x-1">
+                    <span>🚨</span> <span id="event-text">Event Khusus!</span>
+                </div>
+            </div>
+
+            <!-- Paket Pool (Unsorted items) -->
+            <div class="w-full bg-slate-800/80 border border-slate-700 p-4 rounded-3xl shadow-xl mb-4">
+                <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 flex items-center justify-between">
+                    <span>📦 Daftar Paket Tersedia</span>
+                    <span class="text-[10px] text-indigo-300">Klik paket untuk memasukkan ke slot kosong</span>
+                </div>
+                <div id="packet-pool" class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                    <!-- Dynamic packets -->
+                </div>
+            </div>
+
+            <!-- Delivery Order Slot (Drop Target) -->
+            <div class="w-full bg-slate-800/80 border border-slate-700 p-4 rounded-3xl shadow-xl mb-6">
+                <div class="text-xs font-bold text-amber-400 uppercase tracking-wider mb-3 flex items-center justify-between">
+                    <span>🚚 Urutan Pengiriman (Klik slot untuk mengembalikan)</span>
+                    <span id="slot-counter" class="text-[10px] text-slate-400">0 / 4 Terisi</span>
+                </div>
+                <div id="delivery-slots" class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 min-h-[90px] bg-slate-900/50 p-3 rounded-2xl border border-slate-700/60">
+                    <!-- Dynamic slots -->
+                </div>
+            </div>
+
+            <!-- Action Controls -->
+            <div class="flex items-center justify-between w-full gap-3">
+                <button onclick="resetCurrentLevel()" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 px-5 py-3 rounded-xl text-xs font-bold transition-all flex items-center space-x-1">
+                    <span>🔄</span> <span>Reset Slot</span>
+                </button>
+                <button onclick="submitDeliveryOrder()" class="flex-grow bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold py-3 px-6 rounded-xl text-xs shadow-lg shadow-emerald-600/30 transition-all uppercase tracking-wider flex items-center justify-center space-x-2">
+                    <span>🚚</span> <span>Berangkat Mengantar!</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- SCREEN 4: REFLECTION & 4 PILLARS ANALYSIS MODAL -->
+        <div id="screen-reflection" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <div class="bg-slate-800 border border-slate-700 rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl max-h-[90vh] overflow-y-auto">
+                <div class="text-center mb-5">
+                    <div class="inline-block bg-emerald-500/20 text-emerald-400 p-3.5 rounded-2xl text-3xl mb-2 border border-emerald-500/30">🎉</div>
+                    <h3 id="reflection-header-title" class="text-xl font-bold text-white">Misi Level Berhasil!</h3>
+                    <p class="text-xs text-slate-400 mt-1">Skor Tim Diperoleh: <span id="reflection-score-gain" class="text-amber-400 font-bold">+300</span> poin</p>
+                </div>
+
+                <!-- 4 Pillars Breakdown -->
+                <div class="bg-slate-900/70 border border-slate-700 rounded-2xl p-4 mb-5 space-y-3">
+                    <div class="text-xs font-bold text-indigo-300 uppercase tracking-wider flex items-center space-x-1">
+                        <span>🧠</span> <span>Analisis 4 Pilar Berpikir Komputasional</span>
+                    </div>
+                    <div class="space-y-2 text-xs">
+                        <div class="bg-slate-800/80 p-2.5 rounded-xl border border-slate-700">
+                            <span class="font-bold text-emerald-400">🔨 Dekomposisi:</span> <span id="analysis-decom" class="text-slate-300">Memecah paket berdasarkan atribut data.</span>
+                        </div>
+                        <div class="bg-slate-800/80 p-2.5 rounded-xl border border-slate-700">
+                            <span class="font-bold text-amber-400">🔎 Pengenalan Pola:</span> <span id="analysis-pattern" class="text-slate-300">Menemukan pola urutan data.</span>
+                        </div>
+                        <div class="bg-slate-800/80 p-2.5 rounded-xl border border-slate-700">
+                            <span class="font-bold text-orange-400">🎯 Abstraksi:</span> <span id="analysis-abstrac" class="text-slate-300">Mengabaikan atribut tidak penting.</span>
+                        </div>
+                        <div class="bg-slate-800/80 p-2.5 rounded-xl border border-slate-700">
+                            <span class="font-bold text-rose-400">📋 Algoritma:</span> <span id="analysis-algo" class="text-slate-300">Mengikuti prosedur sistematis.</span>
+                        </div>
+                    </div>
+                </div>
+
+                <button onclick="proceedNextLevel()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 px-4 rounded-xl text-xs shadow-lg shadow-indigo-600/30 transition-all uppercase tracking-wider">
+                    Lanjut ke Level Berikutnya 🚀
+                </button>
+            </div>
+        </div>
+
+        <!-- SCREEN 5: FINAL VICTORY & REFLECTION -->
+        <div id="screen-victory" class="hidden w-full max-w-xl bg-slate-800/95 border border-slate-700 rounded-3xl p-6 sm:p-8 shadow-2xl backdrop-blur text-center">
+            <div class="inline-block bg-amber-500/20 text-amber-400 p-4 rounded-3xl text-4xl mb-3 border border-amber-500/30">👑</div>
+            <h2 class="text-2xl font-extrabold text-white mb-1">Tim Menamatkan 10 Level!</h2>
+            <p id="victory-badge-title" class="text-xs text-amber-300 font-bold mb-4 uppercase tracking-wider">Gelar: Tim Kurir Legend</p>
+
+            <div class="bg-slate-900/60 border border-slate-700 rounded-2xl p-4 mb-5 text-left space-y-2">
+                <div class="text-xs font-bold text-indigo-300 uppercase tracking-wider">📊 Rekapitulasi Tim:</div>
+                <div class="flex justify-between text-xs text-slate-300">
+                    <span>Tim & Ketua:</span> <span id="vic-team-name" class="font-bold text-white">Tim Alpha (Budi)</span>
+                </div>
+                <div class="flex justify-between text-xs text-slate-300">
+                    <span>Total Skor Tim:</span> <span id="vic-score" class="font-bold text-amber-400">3,500</span>
+                </div>
+                <div class="flex justify-between text-xs text-slate-300">
+                    <span>Total Kesalahan:</span> <span id="vic-errors" class="font-bold text-rose-400">0</span>
+                </div>
+            </div>
+
+            <div class="bg-slate-900/60 border border-slate-700 rounded-2xl p-4 mb-6 text-left space-y-3">
+                <div class="text-xs font-bold text-emerald-400 uppercase tracking-wider">🎓 Refleksi Kelompok:</div>
+                <p class="text-xs text-slate-300 italic">"Strategi apa yang digunakan tim dalam pembagian tugas mengurutkan paket di level tinggi?"</p>
+                <textarea id="refract-1" rows="2" placeholder="Tulis jawaban refleksi tim..." class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 resize-none"></textarea>
+            </div>
+
+            <div class="flex gap-2">
+                <button onclick="openLeaderboardModal()" class="flex-1 bg-slate-700 hover:bg-slate-600 text-white font-bold py-3 px-4 rounded-2xl text-xs uppercase tracking-wider">
+                    🏆 Papan Peringkat
+                </button>
+                <button onclick="finishAllAndRestart()" class="flex-[2] bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold py-3 px-4 rounded-2xl text-xs uppercase tracking-wider shadow-lg">
+                    Mainkan Lagi 🌟
+                </button>
+            </div>
+        </div>
+
+        <!-- LEADERBOARD MODAL -->
+        <div id="modal-leaderboard" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <div class="bg-slate-800 border border-slate-700 rounded-3xl max-w-md w-full p-6 shadow-2xl">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="font-bold text-white text-base flex items-center space-x-2">
+                        <span>🏆</span> <span>Papan Peringkat 4 Tim</span>
+                    </h3>
+                    <button onclick="closeLeaderboardModal()" class="text-slate-400 hover:text-white text-sm font-bold">✕</button>
+                </div>
+                <p class="text-xs text-slate-400 mb-4">Akumulasi skor terbaik dari ke-4 tim dalam menyelesaikan 10 Level:</p>
+                
+                <div id="leaderboard-list" class="space-y-2.5 mb-6">
+                    <!-- Dynamic team scores -->
+                </div>
+
+                <button onclick="closeLeaderboardModal()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2.5 px-4 rounded-xl text-xs shadow-lg">
+                    Tutup Peringkat 👍
+                </button>
+            </div>
+        </div>
+
+        <!-- TEACHER MODE MODAL -->
+        <div id="modal-teacher" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <div class="bg-slate-800 border border-slate-700 rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl max-h-[90vh] overflow-y-auto">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="font-bold text-white text-base flex items-center space-x-2">
+                        <span>👨‍🏫</span> <span>Dashboard Asesmen & Pembebasan Level Guru</span>
+                    </h3>
+                    <button onclick="closeTeacherMode()" class="text-slate-400 hover:text-white text-sm font-bold">✕</button>
+                </div>
+                <p class="text-xs text-slate-400 mb-4">
+                    Dalam Mode Guru, seluruh batasan level terbuka. Guru dapat memilih level berapa pun secara instan untuk uji coba atau demonstrasi kelas.
+                </p>
+
+                <div class="space-y-3 text-xs mb-6">
+                    <div class="bg-slate-900/80 p-3 rounded-xl border border-slate-700 flex justify-between">
+                        <span class="text-slate-400">Tim Aktif:</span>
+                        <span id="teach-team" class="font-bold text-indigo-400">Tim Alpha</span>
+                    </div>
+                    <div class="bg-slate-900/80 p-3 rounded-xl border border-slate-700 flex justify-between">
+                        <span class="text-slate-400">Nama Perwakilan:</span>
+                        <span id="teach-name" class="font-bold text-white">-</span>
+                    </div>
+                    <div class="bg-slate-900/80 p-3 rounded-xl border border-slate-700 flex justify-between">
+                        <span class="text-slate-400">Total Kesalahan Tim:</span>
+                        <span id="teach-errors" class="font-bold text-rose-400">0</span>
+                    </div>
+                </div>
+
+                <div class="mb-5">
+                    <label class="block text-xs font-bold text-indigo-300 uppercase tracking-wider mb-2">Pilih Level Bebas untuk Langsung Dimainkan:</label>
+                    <div id="teacher-level-grid" class="grid grid-cols-2 sm:grid-cols-5 gap-2">
+                        <!-- Dynamic teacher level jump buttons -->
+                    </div>
+                </div>
+
+                <div class="flex gap-2">
+                    <button onclick="teacherUnlockAllLevels()" class="flex-1 bg-amber-600 hover:bg-amber-500 text-white font-bold py-2.5 px-4 rounded-xl text-xs shadow-lg transition-all">
+                        🔓 Buka Semua Level untuk Tim
+                    </button>
+                    <button onclick="closeTeacherMode()" class="bg-slate-700 hover:bg-slate-600 text-slate-200 font-bold py-2.5 px-4 rounded-xl text-xs shadow-lg transition-all">
+                        Tutup 👍
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- LEVEL SELECTOR MODAL -->
+        <div id="modal-level-select" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <div class="bg-slate-800 border border-slate-700 rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl max-h-[90vh] overflow-y-auto">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="font-bold text-white text-base flex items-center space-x-2">
+                        <span>🗺️</span> <span>Pilih Level Permainan (1 - 10)</span>
+                    </h3>
+                    <button onclick="closeLevelSelectModal()" class="text-slate-400 hover:text-white text-sm font-bold">✕</button>
+                </div>
+                <p class="text-xs text-slate-400 mb-4">Pilih level yang ingin dimainkan oleh tim (Batas waktu 5 menit per level):</p>
+                <div id="level-grid-buttons" class="grid grid-cols-2 sm:grid-cols-5 gap-2.5 mb-6">
+                    <!-- Dynamic level buttons -->
+                </div>
+                <button onclick="closeLevelSelectModal()" class="w-full bg-slate-700 hover:bg-slate-600 text-slate-200 font-bold py-2.5 px-4 rounded-xl text-xs shadow-lg transition-all">
+                    Kembali
+                </button>
+            </div>
+        </div>
+
+        <!-- MESSAGE MODAL -->
+        <div id="modal-msg" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <div class="bg-slate-800 border border-slate-700 rounded-3xl max-w-sm w-full p-6 text-center shadow-2xl">
+                <div id="modal-icon" class="text-4xl mb-3">⚠️</div>
+                <h4 id="modal-title" class="text-lg font-bold text-white mb-2">Peringatan</h4>
+                <p id="modal-desc" class="text-xs text-slate-300 mb-6 leading-relaxed">Keterangan pesan.</p>
+                <button onclick="closeMsgModal()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2.5 px-4 rounded-xl text-xs shadow-lg transition-all">
+                    Mengerti 👍
+                </button>
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="bg-slate-800/40 border-t border-slate-800 py-3 text-center text-xs text-slate-500">
+        Sorting Challenge: Kurir Pintar (Multi-Team Edition) • Laboratorium CT 🧠📦
+    </footer>
+
+    <!-- GAME ENGINE SCRIPT -->
+    <script>
+        // Multi-Team state storage
+        let teamsData = {
+            "Tim Alpha": { name: "Tim Alpha", score: 0, errors: 0, levelReached: 1, color: "text-indigo-400", badgeBg: "bg-indigo-500/20 border-indigo-500" },
+            "Tim Beta": { name: "Tim Beta", score: 0, errors: 0, levelReached: 1, color: "text-emerald-400", badgeBg: "bg-emerald-500/20 border-emerald-500" },
+            "Tim Gamma": { name: "Tim Gamma", score: 0, errors: 0, levelReached: 1, color: "text-amber-400", badgeBg: "bg-amber-500/20 border-amber-500" },
+            "Tim Delta": { name: "Tim Delta", score: 0, errors: 0, levelReached: 1, color: "text-rose-400", badgeBg: "bg-rose-500/20 border-rose-500" }
+        };
+
+        let gameState = {
+            selectedTeam: "Tim Alpha",
+            courierName: "Ketua Tim",
+            currentLevel: 1,
+            lives: 3,
+            comboCount: 0,
+            secondsElapsed: 0,
+            timerInterval: null
+        };
+
+        const LEVEL_TIME_LIMIT = 300; // 5 minutes in seconds
+
+        // Team-specific distinct dataset generators preserving exact logical patterns for all 10 levels
+        function getLevelsForTeam(teamName) {
+            let offset = 0;
+            if(teamName === "Tim Beta") offset = 10;
+            if(teamName === "Tim Gamma") offset = 20;
+            if(teamName === "Tim Delta") offset = 30;
+
+            return {
+                1: {
+                    badge: "🟢 Level 1: Pemula Jarak",
+                    title: "Urutan Jarak Terdekat",
+                    rule: "Urutkan 4 paket berdasarkan jarak dari yang paling dekat ke paling jauh.",
+                    packets: [
+                        { id: 'p1', name: 'Paket A', dist: `${5 + offset} km`, val: 5 + offset },
+                        { id: 'p2', name: 'Paket B', dist: `${2 + offset} km`, val: 2 + offset },
+                        { id: 'p3', name: 'Paket C', dist: `${8 + offset} km`, val: 8 + offset },
+                        { id: 'p4', name: 'Paket D', dist: `${4 + offset} km`, val: 4 + offset }
+                    ],
+                    solution: ['p2', 'p4', 'p1', 'p3'],
+                    analysis: {
+                        decom: "Memecah paket menjadi atribut Jarak.",
+                        pattern: "Mengenali deret angka naik: terkecil ke terbesar.",
+                        abstrac: "Mengabaikan nama, fokus pada angka kilometer.",
+                        algo: "Bandingkan jarak terkecil dan letakkan berurutan."
+                    }
+                },
+                2: {
+                    badge: "🟢 Level 2: Prioritas Dasar",
+                    title: "Pengelompokan Prioritas",
+                    rule: "Urutkan berdasarkan Prioritas (Tinggi ➔ Sedang ➔ Rendah). Jika sama, jarak terdekat.",
+                    packets: [
+                        { id: 'p1', name: 'Paket A', dist: `${6 + offset} km`, priority: 'Rendah', pVal: 1, dVal: 6 + offset },
+                        { id: 'p2', name: 'Paket B', dist: `${3 + offset} km`, priority: 'Tinggi', pVal: 3, dVal: 3 + offset },
+                        { id: 'p3', name: 'Paket C', dist: `${2 + offset} km`, priority: 'Sedang', pVal: 2, dVal: 2 + offset },
+                        { id: 'p4', name: 'Paket D', dist: `${1 + offset} km`, priority: 'Tinggi', pVal: 3, dVal: 1 + offset }
+                    ],
+                    solution: ['p4', 'p2', 'p3', 'p1'],
+                    analysis: {
+                        decom: "Memisahkan atribut Prioritas dan Jarak.",
+                        pattern: "Kelompok Tinggi diutamakan sebelum Sedang dan Rendah.",
+                        abstrac: "Mengabstraksi warna kemasan.",
+                        algo: "Pilih Tinggi jarak terkecil, lalu Sedang, lalu Rendah."
+                    }
+                },
+                3: {
+                    badge: "🟡 Level 3: Siaga Deadline",
+                    title: "Kronologi Waktu (Deadline)",
+                    rule: "Urutkan 4 paket berdasarkan Deadline waktu tercepat ke terlambat.",
+                    packets: [
+                        { id: 'p1', name: 'Paket A', deadline: '11.00', tVal: 11.00 },
+                        { id: 'p2', name: 'Paket B', deadline: '09.30', tVal: 9.30 },
+                        { id: 'p3', name: 'Paket C', deadline: '10.15', tVal: 10.15 },
+                        { id: 'p4', name: 'Paket D', deadline: '12.00', tVal: 12.00 }
+                    ],
+                    solution: ['p2', 'p3', 'p1', 'p4'],
+                    analysis: {
+                        decom: "Fokus pada variabel waktu deadline.",
+                        pattern: "Kronologi jam dari pagi ke siang.",
+                        abstrac: "Mengabaikan berat paket.",
+                        algo: "Bandingkan jam deadline dan susun menaik."
+                    }
+                },
+                4: {
+                    badge: "🟡 Level 4: Multi-Atribut",
+                    title: "Prioritas + Deadline",
+                    rule: "Aturan: Prioritas Tinggi didahulukan. Jika prioritas sama, pilih deadline tercepat.",
+                    packets: [
+                        { id: 'p1', name: 'Paket A', priority: 'Sedang', deadline: '10.00', pVal: 2, tVal: 10.00 },
+                        { id: 'p2', name: 'Paket B', priority: 'Tinggi', deadline: '11.00', pVal: 3, tVal: 11.00 },
+                        { id: 'p3', name: 'Paket C', priority: 'Tinggi', deadline: '09.30', pVal: 3, tVal: 9.30 },
+                        { id: 'p4', name: 'Paket D', priority: 'Rendah', deadline: '09.00', pVal: 1, tVal: 9.00 }
+                    ],
+                    solution: ['p3', 'p2', 'p1', 'p4'],
+                    analysis: {
+                        decom: "Menggabungkan evaluasi Prioritas dan Deadline.",
+                        pattern: "Filter prioritas tertinggi lebih dulu, urutkan deadline di dalamnya.",
+                        abstrac: "Mengabaikan jenis tujuan.",
+                        algo: "Kondisional bertingkat IF-ELSE untuk menyusun urutan."
+                    }
+                },
+                5: {
+                    badge: "🟠 Level 5: Profesional Kompleks",
+                    title: "5 Paket: Tujuan & Jarak",
+                    rule: "Urutkan 5 paket berdasarkan jarak terdekat ke terjauh.",
+                    packets: [
+                        { id: 'p1', name: 'Paket A', dest: 'Toko', dist: `${7 + offset} km`, dVal: 7 + offset },
+                        { id: 'p2', name: 'Paket B', dest: 'Rumah', dist: `${2 + offset} km`, dVal: 2 + offset },
+                        { id: 'p3', name: 'Paket C', dest: 'Gudang', dist: `${9 + offset} km`, dVal: 9 + offset },
+                        { id: 'p4', name: 'Paket D', dest: 'Rumah', dist: `${3 + offset} km`, dVal: 3 + offset },
+                        { id: 'p5', name: 'Paket E', dest: 'Kantor', dist: `${5 + offset} km`, dVal: 5 + offset }
+                    ],
+                    solution: ['p2', 'p4', 'p5', 'p1', 'p3'],
+                    analysis: {
+                        decom: "Mengurai 5 data paket dengan tujuan bervariasi.",
+                        pattern: "Pola kenaikan nilai jarak numerik.",
+                        abstrac: "Mengabaikan jenis tempat tujuan (Rumah/Toko).",
+                        algo: "Pencarian nilai minimum berulang (Selection Sort)."
+                    }
+                },
+                6: {
+                    badge: "🟠 Level 6: Rute Tertutup",
+                    title: "Pengecualian Rute (Exception)",
+                    rule: "🚨 Jalan ke Paket B (Toko) ditutup! Urutkan 4 paket tersisa berdasarkan jarak terdekat.",
+                    eventMsg: "🚨 Rute Toko ditutup sementara!",
+                    packets: [
+                        { id: 'p1', name: 'Paket A', dist: `${4 + offset} km`, status: 'Lancar' },
+                        { id: 'p2', name: 'Paket B', dist: `${1 + offset} km`, status: 'Tutup' },
+                        { id: 'p3', name: 'Paket C', dist: `${6 + offset} km`, status: 'Lancar' },
+                        { id: 'p4', name: 'Paket D', dist: `${3 + offset} km`, status: 'Lancar' }
+                    ],
+                    solution: ['p4', 'p1', 'p3', 'p2'],
+                    analysis: {
+                        decom: "Mengecualikan paket dengan status rute bermasalah.",
+                        pattern: "Mengenali parameter status jalan (Tutup vs Lancar).",
+                        abstrac: "Fokus pada kelayakan jalan.",
+                        algo: "Tambahkan pengecualian IF status == Tutup letakkan di akhir."
+                    }
+                },
+                7: {
+                    badge: "🔴 Level 7: Master Jadwal",
+                    title: "6 Paket: Deadline & Prioritas",
+                    rule: "Urutkan 6 paket berdasarkan deadline tercepat ke terlambat.",
+                    packets: [
+                        { id: 'p1', name: 'Paket 1', deadline: '10.30', tVal: 10.30 },
+                        { id: 'p2', name: 'Paket 2', deadline: '09.00', tVal: 9.00 },
+                        { id: 'p3', name: 'Paket 3', deadline: '11.15', tVal: 11.15 },
+                        { id: 'p4', name: 'Paket 4', deadline: '09.45', tVal: 9.45 },
+                        { id: 'p5', name: 'Paket 5', deadline: '12.00', tVal: 12.00 },
+                        { id: 'p6', name: 'Paket 6', deadline: '10.00', tVal: 10.00 }
+                    ],
+                    solution: ['p2', 'p4', 'p6', 'p1', 'p3', 'p5'],
+                    analysis: {
+                        decom: "Skala data lebih besar (6 paket).",
+                        pattern: "Kronologi waktu secara presisi.",
+                        abstrac: "Mengabaikan ID paket, fokus pada waktu.",
+                        algo: "Algoritma pengurutan waktu berurutan."
+                    }
+                },
+                8: {
+                    badge: "🔴 Level 8: Kondisi Lalu Lintas",
+                    title: "Prioritas dan Macet",
+                    rule: "Utamakan Tinggi ➔ Sedang ➔ Rendah. Paket dengan status 'Macet' dikirim paling akhir dalam kelompoknya.",
+                    eventMsg: "🚧 Waspada kemacetan di beberapa titik!",
+                    packets: [
+                        { id: 'p1', name: 'P-A', priority: 'Tinggi', road: 'Macet' },
+                        { id: 'p2', name: 'P-B', priority: 'Tinggi', road: 'Lancar' },
+                        { id: 'p3', name: 'P-C', priority: 'Sedang', road: 'Lancar' },
+                        { id: 'p4', name: 'P-D', priority: 'Rendah', road: 'Lancar' }
+                    ],
+                    solution: ['p2', 'p1', 'p3', 'p4'],
+                    analysis: {
+                        decom: "Evaluasi ganda: Prioritas + Kondisi Lalu Lintas.",
+                        pattern: "Pengaruh hambatan jalan terhadap urutan.",
+                        abstrac: "Mengabaikan nama paket ringkas.",
+                        algo: "Logika penalti rute macet pada penyusunan antrean."
+                    }
+                },
+                9: {
+                    badge: "🟣 Level 9: Grandmaster Kurir",
+                    title: "8 Paket: Kombinasi Kompleks",
+                    rule: "Urutkan 8 paket berdasarkan Prioritas (Tinggi ➔ Sedang ➔ Rendah) lalu jarak terdekat.",
+                    packets: [
+                        { id: 'p1', name: 'P-1', dist: `${5 + (offset%3)} km`, priority: 'Sedang' },
+                        { id: 'p2', name: 'P-2', dist: `${2 + (offset%3)} km`, priority: 'Tinggi' },
+                        { id: 'p3', name: 'P-3', dist: `${8 + (offset%3)} km`, priority: 'Rendah' },
+                        { id: 'p4', name: 'P-4', dist: `${1 + (offset%3)} km`, priority: 'Tinggi' },
+                        { id: 'p5', name: 'P-5', dist: `${3 + (offset%3)} km`, priority: 'Sedang' },
+                        { id: 'p6', name: 'P-6', dist: `${4 + (offset%3)} km`, priority: 'Tinggi' },
+                        { id: 'p7', name: 'P-7', dist: `${6 + (offset%3)} km`, priority: 'Rendah' },
+                        { id: 'p8', name: 'P-8', dist: `${2 + (offset%3)} km`, priority: 'Sedang' }
+                    ],
+                    solution: ['p4', 'p2', 'p6', 'p8', 'p5', 'p1', 'p7', 'p3'],
+                    analysis: {
+                        decom: "Pecah 8 data menjadi 3 kelompok prioritas dan sub-jarak.",
+                        pattern: "Pengelompokan hierarki bertingkat.",
+                        abstrac: "Fokus pada struktur data array multi-atribut.",
+                        algo: "Sorting multi-kunci (Multi-key sorting algorithm)."
+                    }
+                },
+                10: {
+                    badge: "👑 Level 10: Kurir Legend (Boss)",
+                    title: "Final Boss: 10 Paket Optimasi Penuh",
+                    rule: "Ujian Akhir: Urutkan 10 paket berdasarkan Deadline tercepat ke terlambat.",
+                    eventMsg: "👑 BOSS BATTLE: Selesaikan dengan algoritma secepat kilat!",
+                    packets: [
+                        { id: 'p1', name: 'Paket 01', deadline: '10.00' },
+                        { id: 'p2', name: 'Paket 02', deadline: '08.30' },
+                        { id: 'p3', name: 'Paket 03', deadline: '11.00' },
+                        { id: 'p4', name: 'Paket 04', deadline: '09.15' },
+                        { id: 'p5', name: 'Paket 05', deadline: '12.00' },
+                        { id: 'p6', name: 'Paket 06', deadline: '09.00' },
+                        { id: 'p7', name: 'Paket 07', deadline: '10.30' },
+                        { id: 'p8', name: 'Paket 08', deadline: '08.45' },
+                        { id: 'p9', name: 'Paket 09', deadline: '11.30' },
+                        { id: 'p10', name: 'Paket 10', deadline: '09.45' }
+                    ],
+                    solution: ['p2', 'p8', 'p6', 'p4', 'p10', 'p1', 'p7', 'p3', 'p9', 'p5'],
+                    analysis: {
+                        decom: "Sintesis penuh 4 Pilar Berpikir Komputasional pada skala 10 data.",
+                        pattern: "Mengenali kronologi waktu padat secara efisien.",
+                        abstrac: "Menyaring informasi dari dataset yang besar.",
+                        algo: "Penerapan algoritma pengurutan optimal tingkat lanjut."
+                    }
+                }
+            };
+        }
+
+        let currentLevelPool = [];
+        let currentSlots = [];
+        let levelTimer = null;
+
+        // Default team selection on load
+        window.onload = function() {
+            selectTeam('Tim Alpha', 'bg-indigo-500/20 text-indigo-300 border-indigo-500');
+        };
+
+        function selectTeam(teamName, activeStyleClass) {
+            gameState.selectedTeam = teamName;
+            document.querySelectorAll('.team-option-btn').forEach(btn => {
+                btn.className = "team-option-btn bg-slate-900 border border-slate-700 p-3 rounded-2xl text-xs font-bold text-slate-300 hover:border-slate-500 transition-all flex items-center space-x-2";
+            });
+            const activeBtn = document.getElementById(`btn-team-${teamName.split(' ')[1]}`);
+            if(activeBtn) {
+                activeBtn.className = `team-option-btn border p-3 rounded-2xl text-xs font-bold transition-all flex items-center space-x-2 ${activeStyleClass}`;
+            }
+        }
+
+        function startTutorial() {
+            const nameInput = document.getElementById('input-courier-name').value.trim();
+            if(!nameInput) {
+                showMsgModal("Nama Diperlukan", "Masukkan nama ketua atau perwakilan tim terlebih dahulu.", "👉");
+                return;
+            }
+            gameState.courierName = nameInput;
+            
+            document.getElementById('display-team-badge').innerText = gameState.selectedTeam;
+            document.getElementById('display-courier-name').innerText = gameState.courierName;
+            document.getElementById('tutorial-team-title').innerText = `Panduan ${gameState.selectedTeam} (${gameState.courierName})`;
+
+            document.getElementById('screen-welcome').classList.add('hidden');
+            document.getElementById('screen-tutorial').classList.remove('hidden');
+            document.getElementById('stats-bar').classList.remove('hidden');
+            updateHUDStats();
+        }
+
+        function openLevelSelectModal() {
+            const gridEl = document.getElementById('level-grid-buttons');
+            gridEl.innerHTML = '';
+
+            const currentTeamData = teamsData[gameState.selectedTeam];
+
+            for(let i=1; i<=10; i++) {
+                const btn = document.createElement('button');
+                const isCurrent = gameState.currentLevel === i;
+                const isUnlocked = i <= currentTeamData.levelReached;
+
+                btn.className = `p-3 rounded-2xl border text-xs font-bold transition-all flex flex-col items-center justify-center space-y-1 ${
+                    isCurrent 
+                    ? 'bg-indigo-600 border-indigo-400 text-white shadow-lg shadow-indigo-600/30 ring-2 ring-indigo-400' 
+                    : isUnlocked
+                    ? 'bg-slate-900/80 hover:bg-slate-900 border-slate-700 text-slate-300 hover:border-slate-500'
+                    : 'bg-slate-900/30 border-slate-800 text-slate-600'
+                }`;
+                btn.innerHTML = `
+                    <span class="text-sm font-extrabold">Level ${i}</span>
+                    <span class="text-[9px] text-slate-400">${isUnlocked ? (i <= 4 ? 'Dasar' : i <= 8 ? 'Menengah' : 'Master') : '🔒 Terkunci'}</span>
+                `;
+                btn.onclick = () => {
+                    if(!isUnlocked) {
+                        showMsgModal("Level Terkunci", "Selesaikan level sebelumnya atau gunakan Mode Guru untuk membuka level ini!", "🔒");
+                        return;
+                    }
+                    closeLevelSelectModal();
+                    document.getElementById('screen-tutorial').classList.add('hidden');
+                    document.getElementById('screen-reflection').classList.add('hidden');
+                    launchGameLevel(i);
+                };
+                gridEl.appendChild(btn);
+            }
+            document.getElementById('modal-level-select').classList.remove('hidden');
+        }
+
+        function closeLevelSelectModal() {
+            document.getElementById('modal-level-select').classList.add('hidden');
+        }
+
+        function launchGameLevel(lvlNum) {
+            gameState.currentLevel = lvlNum;
+            document.getElementById('screen-tutorial').classList.add('hidden');
+            document.getElementById('screen-reflection').classList.add('hidden');
+            document.getElementById('screen-game').classList.remove('hidden');
+
+            const teamLevels = getLevelsForTeam(gameState.selectedTeam);
+            const lvl = teamLevels[lvlNum];
+
+            document.getElementById('level-badge').innerText = lvl.badge;
+            document.getElementById('level-title').innerText = lvl.title;
+            document.getElementById('level-rule-desc').innerText = lvl.rule;
+
+            const eventAlert = document.getElementById('event-alert');
+            if(lvl.eventMsg) {
+                eventAlert.classList.remove('hidden');
+                document.getElementById('event-text').innerText = lvl.eventMsg;
+            } else {
+                eventAlert.classList.add('hidden');
+            }
+
+            currentLevelPool = [...lvl.packets];
+            currentSlots = new Array(lvl.packets.length).fill(null);
+
+            renderGamePoolAndSlots();
+            startLevelTimer(LEVEL_TIME_LIMIT);
+        }
+
+        function renderGamePoolAndSlots() {
+            const poolEl = document.getElementById('packet-pool');
+            poolEl.innerHTML = '';
+            currentLevelPool.forEach((pkt, idx) => {
+                const card = document.createElement('div');
+                card.className = `bg-slate-900/80 hover:bg-slate-900 border border-slate-700 hover:border-amber-500/60 p-2.5 sm:p-3 rounded-2xl cursor-pointer card-pop select-none shadow-md flex flex-col justify-between`;
+                card.onclick = () => selectPacketToSlot(idx);
+                
+                let detailsHTML = '';
+                if(pkt.dist) detailsHTML += `<span class="text-xs font-bold text-amber-400">📏 ${pkt.dist}</span> `;
+                if(pkt.priority) detailsHTML += `<span class="text-[10px] bg-indigo-500/20 text-indigo-300 px-1 py-0.5 rounded font-semibold">${pkt.priority}</span> `;
+                if(pkt.deadline) detailsHTML += `<span class="text-[10px] bg-rose-500/20 text-rose-300 px-1 py-0.5 rounded font-semibold">⏰ ${pkt.deadline}</span> `;
+                if(pkt.status) detailsHTML += `<span class="text-[10px] bg-amber-500/20 text-amber-300 px-1 py-0.5 rounded font-semibold">🚦 ${pkt.status}</span> `;
+                if(pkt.road) detailsHTML += `<span class="text-[10px] bg-teal-500/20 text-teal-300 px-1 py-0.5 rounded font-semibold">🛣️ ${pkt.road}</span>`;
+
+                card.innerHTML = `
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="text-xs font-extrabold text-white">${pkt.name}</span>
+                        <span class="text-[10px] text-slate-400">${pkt.dest || ''}</span>
+                    </div>
+                    <div>${detailsHTML}</div>
+                `;
+                poolEl.appendChild(card);
+            });
+
+            const slotsEl = document.getElementById('delivery-slots');
+            slotsEl.innerHTML = '';
+            let filledCount = 0;
+
+            currentSlots.forEach((slotItem, slotIdx) => {
+                const slotBox = document.createElement('div');
+                slotBox.className = `border-2 border-dashed rounded-2xl p-2 flex flex-col items-center justify-center cursor-pointer transition-all min-h-[70px] `;
+                
+                if(slotItem) {
+                    filledCount++;
+                    slotBox.className += ` bg-indigo-950/60 border-indigo-500/60 text-white`;
+                    slotBox.onclick = () => removePacketFromSlot(slotIdx);
+                    slotBox.innerHTML = `
+                        <span class="text-[10px] text-indigo-300 font-bold">#${slotIdx+1}</span>
+                        <span class="text-xs font-extrabold mt-0.5">${slotItem.name}</span>
+                        <span class="text-[10px] text-slate-400">${slotItem.dist || slotItem.deadline || ''}</span>
+                    `;
+                } else {
+                    slotBox.className += ` bg-slate-900/30 border-slate-700 hover:border-slate-500 text-slate-500`;
+                    slotBox.innerHTML = `
+                        <span class="text-xs font-bold">Slot ${slotIdx+1}</span>
+                        <span class="text-[10px]">Klik paket</span>
+                    `;
+                }
+                slotsEl.appendChild(slotBox);
+            });
+
+            document.getElementById('slot-counter').innerText = `${filledCount} / ${currentLevelPool.length + filledCount} Terisi`;
+        }
+
+        function selectPacketToSlot(poolIdx) {
+            const pkt = currentLevelPool[poolIdx];
+            if(!pkt) return;
+            const emptyIdx = currentSlots.findIndex(s => s === null);
+            if(emptyIdx === -1) return;
+
+            currentSlots[emptyIdx] = pkt;
+            currentLevelPool.splice(poolIdx, 1);
+            renderGamePoolAndSlots();
+        }
+
+        function removePacketFromSlot(slotIdx) {
+            const pkt = currentSlots[slotIdx];
+            if(!pkt) return;
+
+            currentSlots[slotIdx] = null;
+            currentLevelPool.push(pkt);
+            renderGamePoolAndSlots();
+        }
+
+        function resetCurrentLevel() {
+            launchGameLevel(gameState.currentLevel);
+        }
+
+        function startLevelTimer(seconds) {
+            clearInterval(levelTimer);
+            gameState.secondsElapsed = 0;
+            let timeLeft = seconds;
+
+            let initM = Math.floor(timeLeft / 60).toString().padStart(2, '0');
+            let initS = (timeLeft % 60).toString().padStart(2, '0');
+            document.getElementById('timer').innerText = `${initM}:${initS}`;
+
+            levelTimer = setInterval(() => {
+                gameState.secondsElapsed++;
+                timeLeft--;
+                let m = Math.floor(timeLeft / 60).toString().padStart(2, '0');
+                let s = (timeLeft % 60).toString().padStart(2, '0');
+                document.getElementById('timer').innerText = `${m}:${s}`;
+
+                if(timeLeft <= 0) {
+                    clearInterval(levelTimer);
+                    handleLevelTimeout();
+                }
+            }, 1000);
+        }
+
+        function handleLevelTimeout() {
+            gameState.lives--;
+            teamsData[gameState.selectedTeam].errors++;
+            updateHUDStats();
+            if(gameState.lives <= 0) {
+                showMsgModal("Game Over", `${gameState.selectedTeam} kehabisan nyawa karena waktu 5 menit habis!`, "💔");
+                restartGameCompletely();
+            } else {
+                showMsgModal("Waktu Habis", "Kehilangan 1 nyawa karena waktu 5 menit habis. Coba lagi level ini.", "⏱️");
+                resetCurrentLevel();
+            }
+        }
+
+        function submitDeliveryOrder() {
+            clearInterval(levelTimer);
+
+            if(currentSlots.some(s => s === null)) {
+                showMsgModal("Belum Lengkap", "Semua slot pengiriman harus terisi penuh sebelum berangkat!", "⚠️");
+                startLevelTimer(LEVEL_TIME_LIMIT - gameState.secondsElapsed);
+                return;
+            }
+
+            const teamLevels = getLevelsForTeam(gameState.selectedTeam);
+            const lvl = teamLevels[gameState.currentLevel];
+            let isCorrect = true;
+
+            currentSlots.forEach((slot, idx) => {
+                if(slot.id !== lvl.solution[idx]) isCorrect = false;
+            });
+
+            const team = teamsData[gameState.selectedTeam];
+
+            if(isCorrect) {
+                gameState.comboCount++;
+                let gain = 150 + (gameState.comboCount * 40);
+                team.score += gain;
+                if(gameState.currentLevel >= team.levelReached && gameState.currentLevel < 10) {
+                    team.levelReached = gameState.currentLevel + 1;
+                }
+                updateHUDStats();
+
+                document.getElementById('reflection-score-gain').innerText = `+${gain} Poin (Total Tim: ${team.score})`;
+                document.getElementById('analysis-decom').innerText = lvl.analysis.decom;
+                document.getElementById('analysis-pattern').innerText = lvl.analysis.pattern;
+                document.getElementById('analysis-abstrac').innerText = lvl.analysis.abstrac;
+                document.getElementById('analysis-algo').innerText = lvl.analysis.algo;
+
+                document.getElementById('screen-game').classList.add('hidden');
+                document.getElementById('screen-reflection').classList.remove('hidden');
+            } else {
+                gameState.comboCount = 0;
+                team.errors++;
+                gameState.lives--;
+                updateHUDStats();
+
+                if(gameState.lives <= 0) {
+                    showMsgModal("Misi Gagal", `Urutan salah dan ${gameState.selectedTeam} kehilangan seluruh nyawanya!`, "❌");
+                    restartGameCompletely();
+                } else {
+                    showMsgModal("Urutan Kurang Tepat", "Susunan paket belum sesuai aturan level ini. Silakan periksa kembali!", "❌");
+                    resetCurrentLevel();
+                }
+            }
+        }
+
+        function proceedNextLevel() {
+            if(gameState.currentLevel < 10) {
+                launchGameLevel(gameState.currentLevel + 1);
+            } else {
+                document.getElementById('screen-reflection').classList.add('hidden');
+                document.getElementById('screen-victory').classList.remove('hidden');
+                
+                const team = teamsData[gameState.selectedTeam];
+                document.getElementById('vic-team-name').innerText = `${gameState.selectedTeam} (${gameState.courierName})`;
+                document.getElementById('vic-score').innerText = team.score.toLocaleString();
+                document.getElementById('vic-errors').innerText = team.errors;
+
+                let badgeTitle = "👑 Tim Kurir Legend";
+                if(team.score < 1500) badgeTitle = "🥉 Tim Kurir Pemula";
+                else if(team.score < 2500) badgeTitle = "🥈 Tim Kurir Andal";
+                else if(team.score < 3500) badgeTitle = "🥇 Tim Kurir Profesional";
+                else badgeTitle = "👑 Tim Kurir Legend of Computational Thinking";
+                document.getElementById('victory-badge-title').innerText = `Gelar: ${badgeTitle}`;
+            }
+        }
+
+        function updateHUDStats() {
+            const team = teamsData[gameState.selectedTeam];
+            document.getElementById('display-score').innerText = team.score;
+            let hearts = "";
+            for(let i=0; i<gameState.lives; i++) hearts += "❤️ ";
+            document.getElementById('display-lives').innerText = hearts || "❌";
+        }
+
+        function openLeaderboardModal() {
+            const listEl = document.getElementById('leaderboard-list');
+            listEl.innerHTML = '';
+
+            const sortedTeams = Object.values(teamsData).sort((a,b) => b.score - a.score);
+
+            sortedTeams.forEach((t, idx) => {
+                const row = document.createElement('div');
+                row.className = `bg-slate-900/80 border border-slate-700 p-3 rounded-2xl flex items-center justify-between ${t.name === gameState.selectedTeam ? 'border-indigo-500 ring-1 ring-indigo-500' : ''}`;
+                
+                let medal = `#${idx+1}`;
+                if(idx === 0) medal = '🥇';
+                else if(idx === 1) medal = '🥈';
+                else if(idx === 2) medal = '🥉';
+
+                row.innerHTML = `
+                    <div class="flex items-center space-x-3">
+                        <span class="text-base font-extrabold w-6 text-center">${medal}</span>
+                        <div>
+                            <h4 class="text-xs font-bold text-white">${t.name}</h4>
+                            <p class="text-[10px] text-slate-400">Level Tercapai: ${t.levelReached}/10 | Error: ${t.errors}</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-sm font-extrabold text-amber-400">${t.score.toLocaleString()}</span>
+                        <span class="text-[10px] text-slate-400 block">Poin</span>
+                    </div>
+                `;
+                listEl.appendChild(row);
+            });
+
+            document.getElementById('modal-leaderboard').classList.remove('hidden');
+        }
+
+        function closeLeaderboardModal() {
+            document.getElementById('modal-leaderboard').classList.add('hidden');
+        }
+
+        function openTeacherMode() {
+            const team = teamsData[gameState.selectedTeam];
+            document.getElementById('teach-team').innerText = gameState.selectedTeam;
+            document.getElementById('teach-name').innerText = gameState.courierName || "Belum diisi";
+            document.getElementById('teach-errors').innerText = team.errors;
+            
+            const gridEl = document.getElementById('teacher-level-grid');
+            gridEl.innerHTML = '';
+            for(let i=1; i<=10; i++) {
+                const btn = document.createElement('button');
+                btn.className = `p-2.5 rounded-xl border text-xs font-bold transition-all flex items-center justify-center bg-slate-900 hover:bg-indigo-600 border-slate-700 hover:border-indigo-400 text-slate-200`;
+                btn.innerHTML = `<span>Level ${i}</span>`;
+                btn.onclick = () => {
+                    closeTeacherMode();
+                    document.getElementById('screen-welcome').classList.add('hidden');
+                    document.getElementById('screen-tutorial').classList.add('hidden');
+                    document.getElementById('screen-reflection').classList.add('hidden');
+                    document.getElementById('stats-bar').classList.remove('hidden');
+                    if(!gameState.courierName || gameState.courierName === "Ketua Tim") {
+                        gameState.courierName = "Guru / Peneliti";
+                    }
+                    document.getElementById('display-team-badge').innerText = gameState.selectedTeam;
+                    document.getElementById('display-courier-name').innerText = gameState.courierName;
+                    launchGameLevel(i);
+                };
+                gridEl.appendChild(btn);
+            }
+
+            document.getElementById('modal-teacher').classList.remove('hidden');
+        }
+
+        function closeTeacherMode() {
+            document.getElementById('modal-teacher').classList.add('hidden');
+        }
+
+        function teacherUnlockAllLevels() {
+            teamsData[gameState.selectedTeam].levelReached = 10;
+            showMsgModal("Level Terbuka", `Semua 10 level untuk ${gameState.selectedTeam} telah dibuka penuh oleh Mode Guru!`, "🔓");
+            closeTeacherMode();
+        }
+
+        function finishAllAndRestart() {
+            location.reload();
+        }
+
+        function restartGameCompletely() {
+            location.reload();
+        }
+
+        function showMsgModal(title, desc, icon) {
+            document.getElementById('modal-title').innerText = title;
+            document.getElementById('modal-desc').innerText = desc;
+            document.getElementById('modal-icon').innerText = icon;
+            document.getElementById('modal-msg').classList.remove('hidden');
+        }
+
+        function closeMsgModal() {
+            document.getElementById('modal-msg').classList.add('hidden');
+        }
+    </script>
+</body>
+</html>
