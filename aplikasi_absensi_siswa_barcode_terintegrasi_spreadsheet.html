@@ -294,7 +294,7 @@
                 </div>
                 <div>
                     <label class="block text-xs font-bold uppercase text-slate-400 mb-1">Jenis Kelamin</label>
-                    <select id="inputGender" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    <select id="inputjenis_kelamin" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
                         <option value="L">Laki-laki (L)</option>
                         <option value="P">Perempuan (P)</option>
                     </select>
@@ -349,7 +349,7 @@
                 </div>
 
                 <div>
-                    <label class="block text-xs font-bold uppercase text-slate-400 mb-1">2. Paste Data Excel (Format: NIS, NISN, Nama, Gender (L/P), Kelas)</label>
+                    <label class="block text-xs font-bold uppercase text-slate-400 mb-1">2. Paste Data Excel (Format: NIS, NISN, Nama, jenis_kelamin (L/P), Kelas)</label>
                     <textarea id="importTextarea" rows="4" placeholder="Paste data dari Excel di sini..." class="w-full bg-slate-50 border border-slate-300 rounded-xl p-3 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
                 </div>
 
@@ -370,7 +370,7 @@
             </div>
             
             <p class="text-xs text-slate-500 mb-3">
-                Salin kode di bawah ini ke editor Google Apps Script spreadsheet Anda untuk otomatis merekam tanggal, waktu, NIS, NISN, nama, gender, kelas, dan status kehadiran:
+                Salin kode di bawah ini ke editor Google Apps Script spreadsheet Anda untuk otomatis merekam tanggal, waktu, NIS, NISN, nama, jenis_kelamin, kelas, dan status kehadiran:
             </p>
 
             <div class="relative mb-4">
@@ -383,7 +383,7 @@
     
     // Buat header otomatis jika baris 1 masih kosong
     if (sheet.getLastRow() === 0) {
-      sheet.appendRow(["Tanggal", "Waktu", "NIS", "NISN", "Nama Siswa", "Gender", "Kelas", "Status"]);
+      sheet.appendRow(["Tanggal", "Waktu", "NIS", "NISN", "Nama Siswa", "jenis_kelamin", "Kelas", "Status"]);
     }
     
     var data = JSON.parse(e.postData.contents);
@@ -393,7 +393,7 @@
     var nis = data.nis || "";
     var nisn = data.nisn || "";
     var nama = data.nama || "";
-    var gender = data.gender || "";
+    var jenis_kelamin = data.jenis_kelamin || "";
     var kelas = data.kelas || "";
     var status = data.status || "";
     
@@ -411,7 +411,7 @@
     }
     
     if (!updated) {
-      sheet.appendRow([tanggal, waktu, nis, nisn, nama, gender, kelas, status]);
+      sheet.appendRow([tanggal, waktu, nis, nisn, nama, jenis_kelamin, kelas, status]);
     }
     
     return ContentService.createTextOutput(JSON.stringify({"result": "success"})).setMimeType(ContentService.MimeType.JSON);
@@ -437,9 +437,9 @@
         let lastScanTime = 0;
 
         const defaultSiswa = [
-            { nis: "101", nisn: "0081234561", nama: "Budi Santoso", gender: "L", kelas: "XI MIPA 1" },
-            { nis: "102", nisn: "0081234562", nama: "Siti Aminah", gender: "P", kelas: "XI MIPA 1" },
-            { nis: "103", nisn: "0081234563", nama: "Rizky Pratama", gender: "L", kelas: "XI MIPA 2" }
+            { nis: "101", nisn: "0081234561", nama: "Budi Santoso", jenis_kelamin: "L", kelas: "XI MIPA 1" },
+            { nis: "102", nisn: "0081234562", nama: "Siti Aminah", jenis_kelamin: "P", kelas: "XI MIPA 1" },
+            { nis: "103", nisn: "0081234563", nama: "Rizky Pratama", jenis_kelamin: "L", kelas: "XI MIPA 2" }
         ];
 
         document.addEventListener("DOMContentLoaded", () => {
@@ -593,7 +593,7 @@
                 nis: siswa.nis, 
                 nisn: siswa.nisn, 
                 nama: siswa.nama, 
-                gender: siswa.gender, 
+                jenis_kelamin: siswa.jenis_kelamin, 
                 kelas: siswa.kelas, 
                 status, 
                 waktu, 
@@ -616,7 +616,7 @@
                 <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-4 text-left flex items-center justify-between">
                     <div>
                         <span class="bg-emerald-100 text-emerald-800 text-xs font-bold px-2.5 py-1 rounded-full">${status}</span>
-                        <h4 class="font-bold text-slate-800 text-base mt-2">${siswa.nama} (${siswa.gender})</h4>
+                        <h4 class="font-bold text-slate-800 text-base mt-2">${siswa.nama} (${siswa.jenis_kelamin})</h4>
                         <p class="text-xs text-slate-500">NIS: ${siswa.nis} | NISN: ${siswa.nisn} | Kelas: ${siswa.kelas}</p>
                     </div>
                     <div class="text-right text-xs text-slate-400">
@@ -716,7 +716,7 @@
                         <td class="p-3 text-slate-500">${index + 1}</td>
                         <td class="p-3 font-medium text-slate-700">${item.nis}<br><span class="text-xs text-slate-400">NISN: ${item.nisn}</span></td>
                         <td class="p-3 font-semibold text-slate-800">${item.nama}</td>
-                        <td class="p-3 text-slate-600">${item.gender}</td>
+                        <td class="p-3 text-slate-600">${item.jenis_kelamin}</td>
                         <td class="p-3 text-slate-600">${item.kelas}</td>
                         <td class="p-3"><span class="px-2.5 py-1 rounded-full text-xs font-bold ${badgeColor}">${item.status}</span></td>
                         <td class="p-3 text-slate-500 text-xs"><i class="fa-regular fa-clock mr-1"></i>${item.waktu}</td>
@@ -772,7 +772,7 @@
                     <td class="p-3 font-medium text-slate-700">${siswa.nis}</td>
                     <td class="p-3 text-slate-600">${siswa.nisn}</td>
                     <td class="p-3 font-semibold text-slate-800">${siswa.nama}</td>
-                    <td class="p-3 text-slate-600">${siswa.gender}</td>
+                    <td class="p-3 text-slate-600">${siswa.jenis_kelamin}</td>
                     <td class="p-3 text-slate-600">${siswa.kelas}</td>
                     <td class="p-3 text-center">
                         <button onclick="bukaModalCetak('${siswa.nis}', '${siswa.nisn}', '${siswa.nama}', '${siswa.kelas}')" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-600 px-3 py-1.5 rounded-lg text-xs font-semibold transition">
@@ -871,12 +871,12 @@
                     const nis = cols[0];
                     const nisn = cols[1];
                     const nama = cols[2];
-                    const gender = (cols[3] || 'L').toUpperCase().startsWith('P') ? 'P' : 'L';
+                    const jenis_kelamin = (cols[3] || 'L').toUpperCase().startsWith('P') ? 'P' : 'L';
                     const kelas = cols[4];
 
                     if (nis && nama) {
                         const existingIdx = masterSiswa.findIndex(s => s.nis === nis);
-                        const siswaObj = { nis, nisn, nama, gender, kelas };
+                        const siswaObj = { nis, nisn, nama, jenis_kelamin, kelas };
                         
                         if (existingIdx !== -1) {
                             masterSiswa[existingIdx] = siswaObj;
@@ -902,7 +902,7 @@
             const nis = document.getElementById("inputNis").value.trim();
             const nisn = document.getElementById("inputNisn").value.trim();
             const nama = document.getElementById("inputNama").value.trim();
-            const gender = document.getElementById("inputGender").value;
+            const jenis_kelamin = document.getElementById("inputjenis_kelamin").value;
             const kelas = document.getElementById("inputKelas").value.trim();
 
             if (!nis || !nisn || !nama || !kelas) {
@@ -916,7 +916,7 @@
                 return;
             }
 
-            masterSiswa.push({ nis, nisn, nama, gender, kelas });
+            masterSiswa.push({ nis, nisn, nama, jenis_kelamin, kelas });
             localStorage.setItem("masterSiswa", JSON.stringify(masterSiswa));
 
             renderTabelSiswa();
