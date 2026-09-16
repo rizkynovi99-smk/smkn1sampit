@@ -627,19 +627,39 @@
             `;
         }
 
-        function kirimKeGoogleSheet(data) {
-            const url = localStorage.getItem("googleAppsScriptUrl");
-            if (!url) return;
+       function kirimKeSpreadsheet(data) {
+    const scriptUrl = localStorage.getItem("googleScriptUrl");
+    if (!scriptUrl) {
+        console.warn("URL Google Spreadsheet belum disetel.");
+        return;
+    }
 
-            fetch(url, {
-                method: "POST",
-                mode: "no-cors",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(data)
-            }).catch(err => {
-                console.error("Gagal sinkronisasi Google Sheet:", err);
-            });
-        }
+    // Susun parameter URL
+    const urlParams = new URLSearchParams({
+        tanggal: data.tanggal,
+        waktu: data.waktu,
+        nis: data.nis,
+        nisn: data.nisn,
+        nama: data.nama,
+        jenis_kelamin: data.jenis_kelamin,
+        kelas: data.kelas,
+        status: data.status
+    });
+
+    const fullUrl = `\({scriptUrl}?\){urlParams.toString()}`;
+
+    // Menggunakan fetch dengan no-cors agar tembus pembatasan browser
+    fetch(fullUrl, {
+        method: "GET",
+        mode: "no-cors"
+    })
+    .then(() => {
+        console.log("Permintaan kirim data ke spreadsheet berhasil dikirim.");
+    })
+    .catch(error => {
+        console.error("Gagal mengirim ke spreadsheet:", error);
+    });
+}
 
         function syncKeGoogleSheetManual() {
             const url = localStorage.getItem("googleAppsScriptUrl");
