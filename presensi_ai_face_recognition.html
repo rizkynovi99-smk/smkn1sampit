@@ -1,0 +1,1503 @@
+<!DOCTYPE html>
+<html lang="id" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Presensi AI Face Recognition</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#eff6ff',
+              100: '#dbeafe',
+              500: '#3b82f6',
+              600: '#2563eb',
+              700: '#1d4ed8',
+              800: '#1e40af',
+              900: '#1e3a8a',
+            }
+          },
+          animation: {
+            'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Font Awesome Icons CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Face API JS CDN -->
+  <script defer src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api/dist/face-api.js"></script>
+  
+  <style>
+    /* Custom scrollbar styling for high-density UI */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.05);
+    }
+    .dark ::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.05);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(99, 102, 241, 0.4);
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(99, 102, 241, 0.7);
+    }
+  </style>
+</head>
+
+<body class="bg-slate-100 dark:bg-slate-950 min-h-screen text-slate-800 dark:text-slate-100 flex flex-col font-sans transition-colors duration-200 selection:bg-indigo-500 selection:text-white">
+
+  <header class="bg-indigo-600 dark:bg-slate-900 text-white shadow-lg sticky top-0 z-30 border-b border-indigo-700 dark:border-slate-800 backdrop-blur-md">
+    <div class="max-w-7xl mx-auto px-4 py-2.5 flex justify-between items-center gap-3">
+      
+      <!-- App Brand Logo & Title -->
+      <div class="flex items-center gap-3 shrink-0">
+        <div class="p-2.5 bg-indigo-500/40 dark:bg-indigo-600/30 rounded-2xl flex items-center justify-center border border-indigo-400/30 shadow-inner">
+          <i class="fa-solid fa-id-card-clip text-2xl text-indigo-100"></i>
+        </div>
+        <div>
+          <h1 class="font-black text-base sm:text-lg md:text-xl leading-tight tracking-tight flex items-center gap-2">
+            Presensi AI <span class="text-xs font-semibold px-2 py-0.5 bg-indigo-500/50 rounded-full border border-indigo-300/30 hidden sm:inline">v2.5</span>
+          </h1>
+          <p class="text-[11px] sm:text-xs text-indigo-200 dark:text-slate-400 font-medium">Sistem Absensi Otomatis & Terintegrasi Google Sheets</p>
+        </div>
+      </div>
+      
+      <!-- Header Actions & Real-Time Clock -->
+      <div class="flex items-center gap-2">
+        
+        <!-- Live Clock Widget -->
+        <div class="hidden md:flex flex-col items-end px-3 py-1 bg-indigo-700/60 dark:bg-slate-800/80 rounded-xl border border-indigo-400/20 dark:border-slate-700/60 text-right">
+          <span id="liveTimeText" class="text-xs font-black tracking-widest font-mono text-amber-300">00:00:00 WIB</span>
+          <span id="liveDateText" class="text-[10px] text-indigo-200 dark:text-slate-400 font-medium">Senin, 1 Jan 2026</span>
+        </div>
+
+        <!-- Live Connection Status Badge -->
+        <div id="statusIndicator" class="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-indigo-700/80 dark:bg-slate-800 rounded-xl text-xs font-bold transition-all border border-indigo-400/30 dark:border-slate-700 shadow-sm">
+          <span class="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse" id="statusDot"></span>
+          <span id="statusText" class="text-indigo-100 dark:text-slate-300">Memuat Model AI...</span>
+        </div>
+
+        <!-- Mute / Unmute Audio Feedback -->
+        <button id="btnToggleSound" class="p-2.5 hover:bg-indigo-500 dark:hover:bg-slate-800 rounded-xl transition-colors text-indigo-100 hover:text-white" title="Suara Notifikasi ON/OFF">
+          <i class="fa-solid fa-volume-high text-lg" id="soundIcon"></i>
+        </button>
+
+        <!-- Dark/Light Theme Switcher -->
+        <button id="btnToggleTheme" class="p-2.5 hover:bg-indigo-500 dark:hover:bg-slate-800 rounded-xl transition-colors text-indigo-100 hover:text-white" title="Ubah Tema Warna">
+          <i class="fa-solid fa-moon text-lg dark:hidden"></i>
+          <i class="fa-solid fa-sun text-lg hidden dark:inline text-amber-300"></i>
+        </button>
+
+        <!-- Toggle Camera Focus Mode -->
+        <button id="btnToggleFocus" class="hidden lg:flex p-2.5 hover:bg-indigo-500 dark:hover:bg-slate-800 rounded-xl transition-colors text-indigo-100 hover:text-white" title="Mode Layar Perbesar Camera">
+          <i class="fa-solid fa-expand text-lg" id="focusIcon"></i>
+        </button>
+
+        <!-- Settings Button -->
+        <button id="btnOpenSettings" class="p-2.5 hover:bg-indigo-500 dark:hover:bg-slate-800 rounded-xl transition-colors text-indigo-100 hover:text-white flex items-center gap-1.5 text-xs font-bold" title="Pengaturan Database Apps Script">
+          <i class="fa-solid fa-gear text-lg"></i>
+          <span class="hidden md:inline">Pengaturan</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 py-4 sm:py-6 flex-1 w-full grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 transition-all duration-300" id="mainContainer">
+    
+    <!-- Left Column: Camera Feed & Mode Control Panels -->
+    <div class="lg:col-span-7 transition-all duration-300 flex flex-col gap-4" id="leftColumn">
+      
+      <!-- Video Frame Container with Live Overlay -->
+      <div id="videoCardContainer" class="bg-slate-900 rounded-2xl overflow-hidden shadow-2xl border border-slate-800 relative aspect-[4/3] flex items-center justify-center group transition-all">
+        
+        <video id="webcamVideo" autoplay playsinline muted class="w-full h-full object-cover -scale-x-100 transition-all duration-200"></video>
+        <canvas id="overlayCanvas" class="absolute inset-0 w-full h-full pointer-events-none -scale-x-100"></canvas>
+        
+        <!-- Target Camera Target Sight Overlay (HUD) -->
+        <div class="absolute inset-8 pointer-events-none border border-indigo-500/20 rounded-2xl flex flex-col justify-between p-2">
+          <div class="flex justify-between">
+            <div class="w-6 h-6 border-t-2 border-l-2 border-indigo-400 rounded-tl-lg"></div>
+            <div class="w-6 h-6 border-t-2 border-r-2 border-indigo-400 rounded-tr-lg"></div>
+          </div>
+          <div class="flex justify-between">
+            <div class="w-6 h-6 border-b-2 border-l-2 border-indigo-400 rounded-bl-lg"></div>
+            <div class="w-6 h-6 border-b-2 border-r-2 border-indigo-400 rounded-br-lg"></div>
+          </div>
+        </div>
+
+        <!-- Top Controls Overlay -->
+        <div class="absolute top-3 left-3 right-3 flex justify-between items-center z-20 pointer-events-auto">
+          <div id="cameraBadge" class="bg-slate-900/80 backdrop-blur-md px-3 py-1.5 rounded-full text-xs font-semibold text-white flex items-center gap-2 border border-white/10 shadow-lg">
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
+            <span class="text-emerald-300 font-bold">Kamera Live</span>
+          </div>
+
+          <!-- Camera Quick Tools -->
+          <div class="flex items-center gap-1 bg-slate-900/80 backdrop-blur-md p-1 rounded-xl border border-white/10 opacity-90 hover:opacity-100 transition-opacity">
+            <button id="btnToggleFit" class="p-2 text-xs text-slate-300 hover:text-white hover:bg-white/10 rounded-lg transition-all" title="Potong Layar / Skala Fit">
+              <i class="fa-solid fa-crop-simple"></i>
+            </button>
+            <button id="btnToggleMirror" class="p-2 text-xs text-slate-300 hover:text-white hover:bg-white/10 rounded-lg transition-all" title="Balik Kamera (Cermin)">
+              <i class="fa-solid fa-arrows-left-right"></i>
+            </button>
+            <button id="btnFullscreenVid" class="p-2 text-xs text-slate-300 hover:text-white hover:bg-white/10 rounded-lg transition-all" title="Mode Layar Penuh Kamera">
+              <i class="fa-solid fa-maximize"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Detection Banner Info Bar -->
+        <div id="scanBanner" class="absolute bottom-4 inset-x-4 bg-slate-950/90 backdrop-blur-md border border-slate-700/60 p-3.5 rounded-xl text-center text-white transition-all transform duration-300 shadow-2xl z-20">
+          <p class="text-[11px] text-indigo-300 uppercase tracking-widest font-extrabold" id="bannerSubtitle">Mode Presensi Otomatis AI</p>
+          <p class="text-base sm:text-lg font-black text-slate-100 mt-0.5" id="bannerTitle">Arahkan Wajah ke Kamera</p>
+        </div>
+
+        <!-- Initial Loader Overlay -->
+        <div id="videoLoader" class="absolute inset-0 bg-slate-900/95 flex flex-col items-center justify-center gap-3 text-white z-30 backdrop-blur-sm">
+          <i class="fa-solid fa-circle-notch fa-spin text-4xl text-indigo-500"></i>
+          <p class="text-sm font-semibold text-slate-300" id="loaderText">Mengaktifkan Kamera & Memuat AI Engine...</p>
+        </div>
+      </div>
+
+      <!-- Mode Tabs Navigator -->
+      <div class="grid grid-cols-3 gap-1.5 sm:gap-2 p-1.5 bg-slate-200/80 dark:bg-slate-800/80 rounded-2xl transition-colors">
+        <button id="tabScanMode" class="py-2.5 px-2 text-xs sm:text-sm rounded-xl font-bold transition-all flex items-center justify-center gap-2 bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-sm">
+          <i class="fa-solid fa-camera-rotate"></i>
+          <span>Scan Wajah</span>
+        </button>
+        <button id="tabManualMode" class="py-2.5 px-2 text-xs sm:text-sm rounded-xl font-bold transition-all flex items-center justify-center gap-2 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white">
+          <i class="fa-solid fa-keyboard"></i>
+          <span>Absen NIS</span>
+        </button>
+        <button id="tabRegisterMode" class="py-2.5 px-2 text-xs sm:text-sm rounded-xl font-bold transition-all flex items-center justify-center gap-2 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white">
+          <i class="fa-solid fa-user-plus"></i>
+          <span>Daftar Wajah</span>
+        </button>
+      </div>
+
+      <div id="manualPanel" class="hidden bg-white dark:bg-slate-900 p-5 rounded-2xl shadow-sm border border-slate-200/80 dark:border-slate-800 flex flex-col gap-4">
+        <div class="border-b border-slate-100 dark:border-slate-800 pb-3">
+          <h2 class="font-bold text-slate-800 dark:text-slate-100 text-base flex items-center gap-2">
+            <i class="fa-solid fa-keyboard text-indigo-500"></i>
+            Absensi Manual Berdasarkan NIS
+          </h2>
+          <p class="text-xs text-slate-500 dark:text-slate-400">Pilih status presensi siswa (Hadir, Sakit, Izin, atau Alpa).</p>
+        </div>
+
+        <div class="space-y-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1">Nomor Induk Siswa (NIS)</label>
+            <div class="flex gap-2">
+              <input type="text" id="manualNis" placeholder="Masukkan NIS..." class="flex-1 px-3.5 py-2.5 text-sm rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-mono">
+              <button id="btnCariNis" class="px-4 py-2.5 bg-slate-800 dark:bg-indigo-600 hover:bg-slate-900 dark:hover:bg-indigo-700 text-white font-bold text-xs rounded-xl transition-colors flex items-center gap-1.5 shrink-0">
+                <i class="fa-solid fa-magnifying-glass"></i> Cari NIS
+              </button>
+            </div>
+          </div>
+
+          <!-- Student Information Search Preview -->
+          <div id="studentInfoCard" class="hidden p-3 bg-indigo-50/80 dark:bg-slate-800/80 border border-indigo-100 dark:border-slate-700 rounded-xl text-xs space-y-1">
+            <p class="font-bold text-indigo-900 dark:text-indigo-300 text-sm" id="manualStudentNama">-</p>
+            <p class="text-indigo-700 dark:text-slate-300" id="manualStudentDetail">Kelas: - | NIS: -</p>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1">Nama Siswa *</label>
+            <input type="text" id="manualNama" placeholder="Terisi otomatis atau ketik nama manual..." class="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1.5">Status Presensi *</label>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              <label class="cursor-pointer">
+                <input type="radio" name="manualStatus" value="Hadir" checked class="peer hidden">
+                <div class="p-2.5 border border-slate-200 dark:border-slate-700 rounded-xl text-center text-xs font-bold text-slate-600 dark:text-slate-300 peer-checked:border-emerald-500 peer-checked:bg-emerald-50 dark:peer-checked:bg-emerald-950/40 peer-checked:text-emerald-700 dark:peer-checked:text-emerald-400 transition-all flex flex-col items-center gap-1">
+                  <i class="fa-solid fa-circle-check text-emerald-500 text-sm"></i> Hadir
+                </div>
+              </label>
+
+              <label class="cursor-pointer">
+                <input type="radio" name="manualStatus" value="Sakit" class="peer hidden">
+                <div class="p-2.5 border border-slate-200 dark:border-slate-700 rounded-xl text-center text-xs font-bold text-slate-600 dark:text-slate-300 peer-checked:border-amber-500 peer-checked:bg-amber-50 dark:peer-checked:bg-amber-950/40 peer-checked:text-amber-700 dark:peer-checked:text-amber-400 transition-all flex flex-col items-center gap-1">
+                  <i class="fa-solid fa-notes-medical text-amber-500 text-sm"></i> Sakit
+                </div>
+              </label>
+
+              <label class="cursor-pointer">
+                <input type="radio" name="manualStatus" value="Izin" class="peer hidden">
+                <div class="p-2.5 border border-slate-200 dark:border-slate-700 rounded-xl text-center text-xs font-bold text-slate-600 dark:text-slate-300 peer-checked:border-blue-500 peer-checked:bg-blue-50 dark:peer-checked:bg-blue-950/40 peer-checked:text-blue-700 dark:peer-checked:text-blue-400 transition-all flex flex-col items-center gap-1">
+                  <i class="fa-solid fa-envelope-open-text text-blue-500 text-sm"></i> Izin
+                </div>
+              </label>
+
+              <label class="cursor-pointer">
+                <input type="radio" name="manualStatus" value="Alpa" class="peer hidden">
+                <div class="p-2.5 border border-slate-200 dark:border-slate-700 rounded-xl text-center text-xs font-bold text-slate-600 dark:text-slate-300 peer-checked:border-rose-500 peer-checked:bg-rose-50 dark:peer-checked:bg-rose-950/40 peer-checked:text-rose-700 dark:peer-checked:text-rose-400 transition-all flex flex-col items-center gap-1">
+                  <i class="fa-solid fa-circle-xmark text-rose-500 text-sm"></i> Alpa
+                </div>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <button id="btnSubmitManual" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-md transition-all flex items-center justify-center gap-2 text-sm">
+          <i class="fa-solid fa-paper-plane"></i>
+          Simpan Presensi Manual
+        </button>
+      </div>
+
+      <div id="registerPanel" class="hidden bg-white dark:bg-slate-900 p-5 rounded-2xl shadow-sm border border-slate-200/80 dark:border-slate-800 flex flex-col gap-4">
+        <div class="border-b border-slate-100 dark:border-slate-800 pb-3">
+          <h2 class="font-bold text-slate-800 dark:text-slate-100 text-base flex items-center gap-2">
+            <i class="fa-solid fa-address-card text-indigo-500"></i>
+            Pendaftaran Sampel Wajah Siswa
+          </h2>
+          <p class="text-xs text-slate-500 dark:text-slate-400">Pastikan pencahayaan cukup dan wajah menghadap lurus ke kamera.</p>
+        </div>
+
+        <div class="space-y-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1">Nama Lengkap Siswa *</label>
+            <input type="text" id="regNama" placeholder="Contoh: Ahmad Subagyo" class="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1">NIS / Nomor Induk</label>
+              <input type="text" id="regNis" placeholder="Contoh: 1024" class="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-mono">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1">Kelas / Rombel</label>
+              <input type="text" id="regKelas" placeholder="Contoh: XII RPL 1" class="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            </div>
+          </div>
+        </div>
+
+        <button id="btnCaptureRegister" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-md transition-all flex items-center justify-center gap-2 text-sm">
+          <i class="fa-solid fa-camera"></i>
+          Ambil Sampel Wajah & Simpan
+        </button>
+      </div>
+
+    </div>
+
+    <div class="lg:col-span-5 transition-all duration-300 flex flex-col gap-4" id="rightColumn">
+      
+      <!-- Detailed Attendance Statistics Grid -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-2 gap-2.5">
+        
+        <div class="bg-white dark:bg-slate-900 p-3.5 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm flex items-center gap-3">
+          <div class="p-2.5 bg-indigo-100 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 rounded-xl text-base shrink-0">
+            <i class="fa-solid fa-users"></i>
+          </div>
+          <div>
+            <p class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">Terdaftar</p>
+            <p class="text-lg font-black text-slate-800 dark:text-slate-100 leading-none mt-0.5" id="statTerdaftar">0</p>
+          </div>
+        </div>
+
+        <div class="bg-white dark:bg-slate-900 p-3.5 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm flex items-center gap-3">
+          <div class="p-2.5 bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 rounded-xl text-base shrink-0">
+            <i class="fa-solid fa-user-check"></i>
+          </div>
+          <div>
+            <p class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">Hadir</p>
+            <p class="text-lg font-black text-emerald-600 dark:text-emerald-400 leading-none mt-0.5" id="statHadir">0</p>
+          </div>
+        </div>
+
+        <div class="bg-white dark:bg-slate-900 p-3.5 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm flex items-center gap-3">
+          <div class="p-2.5 bg-amber-100 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 rounded-xl text-base shrink-0">
+            <i class="fa-solid fa-notes-medical"></i>
+          </div>
+          <div>
+            <p class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">Sakit / Izin</p>
+            <p class="text-lg font-black text-amber-600 dark:text-amber-400 leading-none mt-0.5" id="statSakitIzin">0</p>
+          </div>
+        </div>
+
+        <div class="bg-white dark:bg-slate-900 p-3.5 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm flex items-center gap-3">
+          <div class="p-2.5 bg-rose-100 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 rounded-xl text-base shrink-0">
+            <i class="fa-solid fa-user-xmark"></i>
+          </div>
+          <div>
+            <p class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">Alpa</p>
+            <p class="text-lg font-black text-rose-600 dark:text-rose-400 leading-none mt-0.5" id="statAlpa">0</p>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Realtime Attendance Log List Widget -->
+      <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm flex-1 flex flex-col overflow-hidden min-h-[400px]">
+        
+        <!-- Header & Filter Bar -->
+        <div class="p-3.5 border-b border-slate-100 dark:border-slate-800 flex flex-col gap-2.5 bg-slate-50/50 dark:bg-slate-900/50">
+          <div class="flex justify-between items-center">
+            <div>
+              <h3 class="font-bold text-slate-800 dark:text-slate-100 text-sm">Riwayat Presensi</h3>
+              <p class="text-[11px] text-slate-500 dark:text-slate-400">Pencatatan aktivitas presensi hari ini</p>
+            </div>
+            
+            <div class="flex items-center gap-1.5">
+              <button id="btnExportCSV" class="text-xs text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 font-semibold px-2.5 py-1 rounded-lg hover:bg-slate-200/60 dark:hover:bg-slate-800 transition-colors flex items-center gap-1" title="Unduh CSV Presensi Hari Ini">
+                <i class="fa-solid fa-file-csv text-sm"></i> CSV
+              </button>
+              <button id="btnClearLogs" class="text-xs text-rose-600 hover:text-rose-800 font-semibold px-2 py-1 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-950/50 transition-colors" title="Bersihkan List Display Log">
+                <i class="fa-solid fa-trash-can"></i>
+              </button>
+              <button id="btnRefreshLogs" class="text-xs text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 font-bold flex items-center gap-1 bg-indigo-50 dark:bg-slate-800 px-2.5 py-1 rounded-lg hover:bg-indigo-100 dark:hover:bg-slate-700 transition-colors">
+                <i class="fa-solid fa-arrows-rotate"></i> Sync
+              </button>
+            </div>
+          </div>
+
+          <!-- Status Filter Pills -->
+          <div class="flex gap-1 overflow-x-auto pb-0.5 text-[11px] font-bold">
+            <button id="filterAll" class="filter-pill px-2.5 py-1 rounded-lg bg-indigo-600 text-white shadow-sm">Semua</button>
+            <button id="filterHadir" class="filter-pill px-2.5 py-1 rounded-lg bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-300">Hadir</button>
+            <button id="filterSakitIzin" class="filter-pill px-2.5 py-1 rounded-lg bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-300">Sakit/Izin</button>
+            <button id="filterAlpa" class="filter-pill px-2.5 py-1 rounded-lg bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-300">Alpa</button>
+          </div>
+
+          <!-- Log Search Input -->
+          <div class="relative">
+            <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-xs text-slate-400"></i>
+            <input type="text" id="logSearchInput" placeholder="Cari nama atau NIS di riwayat..." class="w-full pl-8 pr-3 py-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-1 focus:ring-indigo-500">
+          </div>
+        </div>
+
+        <!-- Log Items List Container -->
+        <div id="logContainer" class="p-3.5 flex-1 overflow-y-auto space-y-2.5 divide-y divide-slate-100 dark:divide-slate-800/80">
+          <div class="text-center py-12 text-slate-400 dark:text-slate-500 text-xs flex flex-col items-center gap-2">
+            <i class="fa-solid fa-clipboard-list text-3xl"></i>
+            <span>Belum ada data presensi yang tercatat hari ini.</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <div id="settingsModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden transform transition-all max-h-[90vh] flex flex-col border border-slate-200 dark:border-slate-800">
+      
+      <div class="bg-indigo-600 dark:bg-slate-800 p-4 text-white flex justify-between items-center shrink-0">
+        <h3 class="font-bold text-base flex items-center gap-2">
+          <i class="fa-solid fa-database"></i> Pengaturan Backend & Diagnostic
+        </h3>
+        <button id="btnCloseSettings" class="text-indigo-200 hover:text-white text-lg p-1">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="p-5 space-y-4 overflow-y-auto flex-1 text-xs">
+        <div>
+          <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Google Apps Script Web App URL *</label>
+          <div class="flex gap-2">
+            <input type="url" id="scriptUrlInput" placeholder="https://script.google.com/macros/s/.../exec" class="flex-1 px-3 py-2 font-mono rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-xs">
+            <button id="btnTestConn" class="px-3.5 py-2 bg-slate-800 dark:bg-indigo-600 hover:bg-slate-900 dark:hover:bg-indigo-700 text-white font-bold rounded-xl transition-colors flex items-center gap-1 shrink-0">
+              <i class="fa-solid fa-plug"></i> Tes
+            </button>
+          </div>
+          <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
+            Pastikan deployment Web App Apps Script diatur aksesnya ke <b>"Anyone" (Siapa saja)</b>.
+          </p>
+        </div>
+
+        <!-- Diagnostic Box -->
+        <div id="diagBox" class="hidden p-3 rounded-xl border text-xs leading-relaxed space-y-1"></div>
+
+        <!-- Apps Script Code Guide Accordion -->
+        <div class="border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden bg-slate-50 dark:bg-slate-800/50">
+          <div class="p-3 bg-slate-100 dark:bg-slate-800 font-bold text-slate-700 dark:text-slate-200 flex justify-between items-center cursor-pointer" id="toggleScriptGuide">
+            <span><i class="fa-solid fa-code text-indigo-500 me-1.5"></i> Kode Google Apps Script (`Code.gs`)</span>
+            <i class="fa-solid fa-chevron-down text-xs transition-transform" id="guideArrow"></i>
+          </div>
+          <div id="scriptGuideContent" class="p-3 border-t border-slate-200 dark:border-slate-700 space-y-2 hidden">
+            <p class="text-[11px] text-slate-600 dark:text-slate-400">Salin kode berikut ke Google Apps Script Editor di Google Sheets Anda:</p>
+            <textarea id="gsCodeSnippet" readonly class="w-full h-40 bg-slate-900 text-emerald-400 p-2.5 rounded-xl font-mono text-[10px] resize-none focus:outline-none" spellcheck="false"></textarea>
+            <button id="btnCopyGSCode" class="w-full py-2 bg-indigo-100 dark:bg-indigo-950/70 hover:bg-indigo-200 text-indigo-700 dark:text-indigo-300 font-bold rounded-xl transition-colors flex items-center justify-center gap-1.5 text-xs">
+              <i class="fa-solid fa-copy"></i> Salin Kode Apps Script
+            </button>
+          </div>
+        </div>
+
+        <div class="p-3 bg-indigo-50 dark:bg-slate-800/80 border border-indigo-200 dark:border-slate-700 rounded-xl text-indigo-900 dark:text-indigo-200 space-y-1">
+          <p class="font-bold"><i class="fa-solid fa-wifi text-indigo-600 dark:text-indigo-400 me-1"></i> Penanganan Sinkronisasi Otomatis</p>
+          <p>Jika jaringan terputus, presensi tersimpan di penyimpanan lokal browser dan akan otomatis disinkronkan saat koneksi internet kembali aktif.</p>
+        </div>
+
+        <div class="pt-2 flex justify-end gap-2 shrink-0">
+          <button id="btnSaveSettings" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm rounded-xl transition-colors shadow-md">
+            Simpan Konfigurasi
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+  <script type="module">
+    // Default Script URL backend endpoint
+    const DEFAULT_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxF02JkL9c1W7j5x9o_x_Xv_Xv/exec';
+
+    // Google Apps Script template for backend Google Sheet integration
+    const GS_CODE_TEMPLATE = `function doGet(e) {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName("Students");
+  if (!sheet) return ContentService.createTextOutput(JSON.stringify([])).setMimeType(ContentService.MimeType.JSON);
+  
+  var data = sheet.getDataRange().getValues();
+  if (data.length <= 1) return ContentService.createTextOutput(JSON.stringify([])).setMimeType(ContentService.MimeType.JSON);
+  
+  var result = [];
+  for (var i = 1; i < data.length; i++) {
+    result.push({
+      nama: data[i][0],
+      nis: data[i][1],
+      kelas: data[i][2],
+      descriptor: data[i][3]
+    });
+  }
+  return ContentService.createTextOutput(JSON.stringify(result)).setMimeType(ContentService.MimeType.JSON);
+}
+
+function doPost(e) {
+  try {
+    var contents = JSON.parse(e.postData.contents);
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    
+    if (contents.action === "save") {
+      var sheet = ss.getSheetByName("Students") || ss.insertSheet("Students");
+      if (sheet.getLastRow() === 0) {
+        sheet.appendRow(["Nama", "NIS", "Kelas", "Descriptor"]);
+      }
+      sheet.appendRow([contents.nama, contents.nis || "", contents.kelas || "", contents.descriptor]);
+      return ContentService.createTextOutput(JSON.stringify({ status: "success", message: "Data Siswa Berhasil Disimpan" })).setMimeType(ContentService.MimeType.JSON);
+    } 
+    else if (contents.action === "log") {
+      var sheet = ss.getSheetByName("Attendance") || ss.insertSheet("Attendance");
+      if (sheet.getLastRow() === 0) {
+        sheet.appendRow(["Nama", "NIS", "Tanggal", "Waktu", "Status"]);
+      }
+      sheet.appendRow([contents.nama, contents.nis || "", contents.tanggal, contents.waktu, contents.status || "Hadir"]);
+      return ContentService.createTextOutput(JSON.stringify({ status: "success", message: "Presensi Berhasil Dicatat" })).setMimeType(ContentService.MimeType.JSON);
+    }
+  } catch (err) {
+    return ContentService.createTextOutput(JSON.stringify({ status: "error", message: err.toString() })).setMimeType(ContentService.MimeType.JSON);
+  }
+}`;
+
+    const STATE = {
+      registeredStudents: [],
+      attendanceLogs: [],
+      pendingQueue: JSON.parse(localStorage.getItem('pending_sync_queue') || '[]'),
+      scriptUrl: localStorage.getItem('gs_script_url') || DEFAULT_SCRIPT_URL,
+      faceMatcher: null,
+      isScanning: true,
+      isModelLoaded: false,
+      isProcessingLog: false,
+      isMuted: localStorage.getItem('app_is_muted') === 'true',
+      lastScannedPerson: null,
+      cooldownTimer: null,
+      syncIntervalId: null,
+      activeFilter: 'Semua'
+    };
+
+    const elements = {
+      video: document.getElementById('webcamVideo'),
+      canvas: document.getElementById('overlayCanvas'),
+      bannerTitle: document.getElementById('bannerTitle'),
+      bannerSubtitle: document.getElementById('bannerSubtitle'),
+      videoLoader: document.getElementById('videoLoader'),
+      loaderText: document.getElementById('loaderText'),
+      statusIndicator: document.getElementById('statusIndicator'),
+      statusDot: document.getElementById('statusDot'),
+      statusText: document.getElementById('statusText'),
+      statTerdaftar: document.getElementById('statTerdaftar'),
+      statHadir: document.getElementById('statHadir'),
+      statSakitIzin: document.getElementById('statSakitIzin'),
+      statAlpa: document.getElementById('statAlpa'),
+      logContainer: document.getElementById('logContainer'),
+      tabScanMode: document.getElementById('tabScanMode'),
+      tabManualMode: document.getElementById('tabManualMode'),
+      tabRegisterMode: document.getElementById('tabRegisterMode'),
+      manualPanel: document.getElementById('manualPanel'),
+      registerPanel: document.getElementById('registerPanel'),
+      manualNis: document.getElementById('manualNis'),
+      btnCariNis: document.getElementById('btnCariNis'),
+      manualNama: document.getElementById('manualNama'),
+      studentInfoCard: document.getElementById('studentInfoCard'),
+      manualStudentNama: document.getElementById('manualStudentNama'),
+      manualStudentDetail: document.getElementById('manualStudentDetail'),
+      btnSubmitManual: document.getElementById('btnSubmitManual'),
+      regNama: document.getElementById('regNama'),
+      regNis: document.getElementById('regNis'),
+      regKelas: document.getElementById('regKelas'),
+      btnCaptureRegister: document.getElementById('btnCaptureRegister'),
+      btnOpenSettings: document.getElementById('btnOpenSettings'),
+      btnCloseSettings: document.getElementById('btnCloseSettings'),
+      settingsModal: document.getElementById('settingsModal'),
+      scriptUrlInput: document.getElementById('scriptUrlInput'),
+      btnTestConn: document.getElementById('btnTestConn'),
+      diagBox: document.getElementById('diagBox'),
+      toggleScriptGuide: document.getElementById('toggleScriptGuide'),
+      scriptGuideContent: document.getElementById('scriptGuideContent'),
+      guideArrow: document.getElementById('guideArrow'),
+      gsCodeSnippet: document.getElementById('gsCodeSnippet'),
+      btnCopyGSCode: document.getElementById('btnCopyGSCode'),
+      btnSaveSettings: document.getElementById('btnSaveSettings'),
+      btnRefreshLogs: document.getElementById('btnRefreshLogs'),
+      btnClearLogs: document.getElementById('btnClearLogs'),
+      btnToggleTheme: document.getElementById('btnToggleTheme'),
+      btnToggleSound: document.getElementById('btnToggleSound'),
+      soundIcon: document.getElementById('soundIcon'),
+      btnToggleFocus: document.getElementById('btnToggleFocus'),
+      focusIcon: document.getElementById('focusIcon'),
+      mainContainer: document.getElementById('mainContainer'),
+      leftColumn: document.getElementById('leftColumn'),
+      rightColumn: document.getElementById('rightColumn'),
+      btnToggleFit: document.getElementById('btnToggleFit'),
+      btnToggleMirror: document.getElementById('btnToggleMirror'),
+      btnFullscreenVid: document.getElementById('btnFullscreenVid'),
+      videoCardContainer: document.getElementById('videoCardContainer'),
+      logSearchInput: document.getElementById('logSearchInput'),
+      btnExportCSV: document.getElementById('btnExportCSV'),
+      toastContainer: document.getElementById('toastContainer'),
+      liveTimeText: document.getElementById('liveTimeText'),
+      liveDateText: document.getElementById('liveDateText'),
+      filterAll: document.getElementById('filterAll'),
+      filterHadir: document.getElementById('filterHadir'),
+      filterSakitIzin: document.getElementById('filterSakitIzin'),
+      filterAlpa: document.getElementById('filterAlpa')
+    };
+
+    let isMirrored = true;
+    let isCoverFit = true;
+    let isFocusedView = false;
+
+    function updateClock() {
+      const now = new Date();
+      const optionsDate = { weekday: 'long', day: 'numeric', month: 'short', year: 'numeric' };
+      if (elements.liveTimeText) {
+        elements.liveTimeText.innerText = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' }) + ' WIB';
+      }
+      if (elements.liveDateText) {
+        elements.liveDateText.innerText = now.toLocaleDateString('id-ID', optionsDate);
+      }
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    function playSound(type) {
+      if (STATE.isMuted) return;
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        if (type === 'success') {
+          osc.frequency.setValueAtTime(523.25, ctx.currentTime); // C5
+          osc.frequency.setValueAtTime(659.25, ctx.currentTime + 0.1); // E5
+          osc.frequency.setValueAtTime(783.99, ctx.currentTime + 0.2); // G5
+          gain.gain.setValueAtTime(0.12, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.35);
+          osc.start(ctx.currentTime);
+          osc.stop(ctx.currentTime + 0.35);
+        } else if (type === 'warn') {
+          osc.frequency.setValueAtTime(440, ctx.currentTime); // A4
+          osc.frequency.setValueAtTime(349.23, ctx.currentTime + 0.15); // F4
+          gain.gain.setValueAtTime(0.12, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.4);
+          osc.start(ctx.currentTime);
+          osc.stop(ctx.currentTime + 0.4);
+        }
+      } catch (e) {
+        console.warn("Audio Context tidak diizinkan browser:", e);
+      }
+    }
+
+    function updateSoundIcon() {
+      if (STATE.isMuted) {
+        elements.soundIcon.className = 'fa-solid fa-volume-xmark text-lg text-rose-300';
+      } else {
+        elements.soundIcon.className = 'fa-solid fa-volume-high text-lg';
+      }
+    }
+
+    elements.btnToggleSound.addEventListener('click', () => {
+      STATE.isMuted = !STATE.isMuted;
+      localStorage.setItem('app_is_muted', STATE.isMuted);
+      updateSoundIcon();
+      showToast(STATE.isMuted ? "Suara Notifikasi Dimatikan" : "Suara Notifikasi Diaktifkan", "info");
+    });
+    updateSoundIcon();
+
+    function showToast(message, type = 'info') {
+      const toast = document.createElement('div');
+      const bgColors = {
+        success: 'bg-emerald-600 border-emerald-500',
+        error: 'bg-rose-600 border-rose-500',
+        warn: 'bg-amber-600 border-amber-500',
+        info: 'bg-indigo-600 border-indigo-500'
+      };
+      const icons = {
+        success: 'fa-circle-check',
+        error: 'fa-triangle-exclamation',
+        warn: 'fa-circle-exclamation',
+        info: 'fa-circle-info'
+      };
+
+      toast.className = `pointer-events-auto flex items-center gap-2.5 text-white text-xs font-semibold px-4 py-3 rounded-xl shadow-2xl border ${bgColors[type] || bgColors.info} transition-all duration-300 transform translate-y-2 opacity-0`;
+      toast.innerHTML = `<i class="fa-solid ${icons[type] || icons.info} text-sm"></i> <span>${message}</span>`;
+      
+      elements.toastContainer.appendChild(toast);
+
+      requestAnimationFrame(() => {
+        toast.classList.remove('translate-y-2', 'opacity-0');
+      });
+
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-2');
+        setTimeout(() => toast.remove(), 300);
+      }, 3500);
+    }
+
+    function setConnectionStatus(status, label) {
+      if (status === 'connected') {
+        elements.statusDot.className = 'w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse';
+        elements.statusText.innerText = label || 'Terhubung';
+      } else if (status === 'connecting') {
+        elements.statusDot.className = 'w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse';
+        elements.statusText.innerText = label || 'Sinkronisasi...';
+      } else {
+        elements.statusDot.className = 'w-2.5 h-2.5 rounded-full bg-rose-400';
+        elements.statusText.innerText = label || 'Mode Offline';
+      }
+    }
+
+    function saveLocalBackup() {
+      try {
+        const serializable = STATE.registeredStudents.map(s => ({
+          nama: s.nama,
+          nis: s.nis,
+          kelas: s.kelas,
+          descriptor: Array.from(s.descriptor)
+        }));
+        localStorage.setItem('local_students_db', JSON.stringify(serializable));
+      } catch (e) {
+        console.error("Gagal menyimpan backup siswa lokal:", e);
+      }
+    }
+
+    function updateStatsBreakdown() {
+      const todayStr = new Date().toLocaleDateString('id-ID');
+      const todayLogs = STATE.attendanceLogs.filter(log => log.tanggal === todayStr);
+
+      const hadirCount = todayLogs.filter(l => (l.status || 'Hadir') === 'Hadir').length;
+      const sakitIzinCount = todayLogs.filter(l => l.status === 'Sakit' || l.status === 'Izin').length;
+      const alpaCount = todayLogs.filter(l => l.status === 'Alpa').length;
+
+      elements.statHadir.innerText = hadirCount;
+      elements.statSakitIzin.innerText = sakitIzinCount;
+      elements.statAlpa.innerText = alpaCount;
+    }
+
+    function loadLocalBackup() {
+      try {
+        const rawLogs = localStorage.getItem('local_attendance_logs');
+        if (rawLogs) {
+          STATE.attendanceLogs = JSON.parse(rawLogs);
+          updateStatsBreakdown();
+          renderLogsWithFilter();
+        }
+
+        const rawStudents = localStorage.getItem('local_students_db');
+        if (rawStudents) {
+          const parsed = JSON.parse(rawStudents);
+          STATE.registeredStudents = parsed.map(s => ({
+            nama: s.nama,
+            nis: s.nis || '',
+            kelas: s.kelas || '',
+            descriptor: new Float32Array(s.descriptor)
+          }));
+          updateFaceMatcher();
+        }
+      } catch (e) {
+        console.error("Gagal memuat backup lokal:", e);
+      }
+    }
+
+    function initTheme() {
+      const savedTheme = localStorage.getItem('theme_mode');
+      if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    }
+
+    elements.btnToggleTheme.addEventListener('click', () => {
+      const isDark = document.documentElement.classList.toggle('dark');
+      localStorage.setItem('theme_mode', isDark ? 'dark' : 'light');
+    });
+    initTheme();
+
+    elements.btnToggleFocus.addEventListener('click', () => {
+      isFocusedView = !isFocusedView;
+      if (isFocusedView) {
+        elements.rightColumn.classList.add('hidden');
+        elements.leftColumn.className = "lg:col-span-12 transition-all duration-300 flex flex-col gap-4";
+        elements.focusIcon.className = "fa-solid fa-compress text-lg";
+        showToast("Mode Tampilan Kamera Perbesar", "info");
+      } else {
+        elements.rightColumn.classList.remove('hidden');
+        elements.leftColumn.className = "lg:col-span-7 transition-all duration-300 flex flex-col gap-4";
+        elements.focusIcon.className = "fa-solid fa-expand text-lg";
+      }
+    });
+
+    elements.btnToggleMirror.addEventListener('click', () => {
+      isMirrored = !isMirrored;
+      if (isMirrored) {
+        elements.video.classList.add('-scale-x-100');
+        elements.canvas.classList.add('-scale-x-100');
+      } else {
+        elements.video.classList.remove('-scale-x-100');
+        elements.canvas.classList.remove('-scale-x-100');
+      }
+    });
+
+    elements.btnToggleFit.addEventListener('click', () => {
+      isCoverFit = !isCoverFit;
+      if (isCoverFit) {
+        elements.video.classList.replace('object-contain', 'object-cover');
+        showToast("Tampilan Kamera: Full Crop", "info");
+      } else {
+        elements.video.classList.replace('object-cover', 'object-contain');
+        showToast("Tampilan Kamera: Fit Ratio", "info");
+      }
+    });
+
+    elements.btnFullscreenVid.addEventListener('click', () => {
+      if (!document.fullscreenElement) {
+        elements.videoCardContainer.requestFullscreen().catch(() => {
+          showToast("Gagal aktifkan mode layar penuh", "error");
+        });
+      } else {
+        document.exitFullscreen();
+      }
+    });
+
+    function renderLogsWithFilter() {
+      elements.logContainer.innerHTML = '';
+      if (STATE.attendanceLogs.length === 0) {
+        elements.logContainer.innerHTML = `
+          <div class="text-center py-12 text-slate-400 dark:text-slate-500 text-xs flex flex-col items-center gap-2">
+            <i class="fa-solid fa-clipboard-list text-3xl"></i>
+            <span>Belum ada data presensi yang tercatat hari ini.</span>
+          </div>
+        `;
+        return;
+      }
+
+      const searchQuery = elements.logSearchInput.value.toLowerCase().trim();
+
+      STATE.attendanceLogs.forEach(log => {
+        const matchSearch = !searchQuery || log.nama.toLowerCase().includes(searchQuery) || (log.nis && log.nis.toLowerCase().includes(searchQuery));
+        let matchFilter = true;
+
+        if (STATE.activeFilter === 'Hadir') {
+          matchFilter = (log.status || 'Hadir') === 'Hadir';
+        } else if (STATE.activeFilter === 'SakitIzin') {
+          matchFilter = log.status === 'Sakit' || log.status === 'Izin';
+        } else if (STATE.activeFilter === 'Alpa') {
+          matchFilter = log.status === 'Alpa';
+        }
+
+        if (matchSearch && matchFilter) {
+          renderLogElement(log.nama, log.tanggal, log.waktu, log.status || 'Hadir', log.nis || '');
+        }
+      });
+    }
+
+    // Filter Buttons Handlers
+    const filterPills = [
+      { btn: elements.filterAll, tag: 'Semua' },
+      { btn: elements.filterHadir, tag: 'Hadir' },
+      { btn: elements.filterSakitIzin, tag: 'SakitIzin' },
+      { btn: elements.filterAlpa, tag: 'Alpa' }
+    ];
+
+    filterPills.forEach(p => {
+      p.btn.addEventListener('click', () => {
+        STATE.activeFilter = p.tag;
+        filterPills.forEach(other => {
+          other.btn.className = "filter-pill px-2.5 py-1 rounded-lg bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-300";
+        });
+        p.btn.className = "filter-pill px-2.5 py-1 rounded-lg bg-indigo-600 text-white shadow-sm font-bold";
+        renderLogsWithFilter();
+      });
+    });
+
+    elements.logSearchInput.addEventListener('input', () => {
+      renderLogsWithFilter();
+    });
+
+    elements.btnExportCSV.addEventListener('click', () => {
+      if (!STATE.attendanceLogs || STATE.attendanceLogs.length === 0) {
+        showToast("Belum ada data presensi untuk diekspor!", "warn");
+        return;
+      }
+
+      let csvContent = "data:text/csv;charset=utf-8,Nama,NIS,Tanggal,Waktu,Status\n";
+      STATE.attendanceLogs.forEach(row => {
+        csvContent += `"${row.nama}","${row.nis || ''}","${row.tanggal}","${row.waktu}","${row.status || 'Hadir'}"\n`;
+      });
+
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      const today = new Date().toISOString().split('T')[0];
+      link.setAttribute("download", `presensi_siswa_${today}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      showToast("File CSV Presensi berhasil diunduh!", "success");
+    });
+
+    async function loadModels() {
+      try {
+        loadLocalBackup();
+        elements.loaderText.innerText = "Memuat AI Face Recognition Engine (Tiny Face + SSD)...";
+        const MODEL_URL = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model';
+
+        await Promise.all([
+          faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL),
+          faceapi.nets.ssdMobilenetv1.loadFromUri(MODEL_URL),
+          faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL),
+          faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL)
+        ]);
+
+        STATE.isModelLoaded = true;
+        elements.loaderText.innerText = "Menghubungkan Kamera...";
+        
+        await startCamera();
+        startAutoSyncEngine();
+      } catch (err) {
+        console.error("Gagal memuat model face-api:", err);
+        elements.loaderText.innerText = "Gagal memuat model AI. Periksa koneksi internet!";
+        showToast("Gagal memuat AI Face Model", "error");
+      }
+    }
+
+    async function startCamera() {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: { width: { ideal: 640 }, height: { ideal: 480 }, facingMode: "user" }
+        });
+        elements.video.srcObject = stream;
+        
+        elements.video.onloadedmetadata = () => {
+          elements.videoLoader.classList.add('hidden');
+          startContinuousScanning();
+        };
+      } catch (err) {
+        console.error("Kamera error:", err);
+        elements.loaderText.innerText = "Gagal mengakses kamera. Mohon izinkan akses browser!";
+        showToast("Akses kamera ditolak!", "error");
+      }
+    }
+
+    async function fetchDatabaseFromSheets(isManual = false) {
+      if (!STATE.scriptUrl) {
+        setConnectionStatus('offline', 'URL Script Kosong');
+        updateFaceMatcher();
+        return;
+      }
+
+      try {
+        setConnectionStatus('connecting', 'Sinkronisasi...');
+        const targetUrl = STATE.scriptUrl + (STATE.scriptUrl.includes('?') ? '&' : '?') + 't=' + Date.now();
+        const res = await fetch(targetUrl, { method: 'GET', redirect: 'follow' });
+
+        if (!res.ok) throw new Error(`HTTP status code: ${res.status}`);
+
+        const data = await res.json();
+
+        if (Array.isArray(data)) {
+          STATE.registeredStudents = data.map(item => ({
+            nama: item.nama,
+            nis: item.nis || '',
+            kelas: item.kelas || '',
+            descriptor: new Float32Array(typeof item.descriptor === 'string' ? JSON.parse(item.descriptor) : item.descriptor)
+          }));
+
+          saveLocalBackup();
+          updateFaceMatcher();
+          setConnectionStatus('connected', `Terhubung (${STATE.registeredStudents.length} Siswa)`);
+          
+          if (isManual) showToast(`Sync Berhasil: ${STATE.registeredStudents.length} siswa terdaftar`, "success");
+          flushOfflineQueue();
+        } else {
+          throw new Error("Respon Apps Script bukan array valid");
+        }
+      } catch (err) {
+        console.warn("Koneksi Google Sheets bermasalah:", err.message);
+        setConnectionStatus('offline', 'Mode Offline');
+        if (isManual) showToast("Gagal Sync Sheets. Menggunakan database lokal.", "warn");
+        loadLocalBackup();
+      }
+    }
+
+    async function sendDataToSheets(payload) {
+      if (!STATE.scriptUrl) return false;
+
+      try {
+        const res = await fetch(STATE.scriptUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify(payload),
+          redirect: 'follow'
+        });
+
+        if (res.ok) {
+          setConnectionStatus('connected');
+          return true;
+        }
+      } catch (e) {
+        console.warn("Gagal mengirim payload ke Google Sheets. Masuk antrean offline:", e);
+      }
+
+      STATE.pendingQueue.push(payload);
+      localStorage.setItem('pending_sync_queue', JSON.stringify(STATE.pendingQueue));
+      setConnectionStatus('offline', 'Pending Sync');
+      return false;
+    }
+
+    async function flushOfflineQueue() {
+      if (STATE.pendingQueue.length === 0 || !STATE.scriptUrl) return;
+
+      const queueCopy = [...STATE.pendingQueue];
+      STATE.pendingQueue = [];
+
+      for (const item of queueCopy) {
+        try {
+          const res = await fetch(STATE.scriptUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify(item),
+            redirect: 'follow'
+          });
+          if (!res.ok) STATE.pendingQueue.push(item);
+        } catch (err) {
+          STATE.pendingQueue.push(item);
+        }
+      }
+      localStorage.setItem('pending_sync_queue', JSON.stringify(STATE.pendingQueue));
+      if (STATE.pendingQueue.length === 0) {
+        showToast("Semua antrean presensi offline berhasil terkirim!", "success");
+      }
+    }
+
+    function startAutoSyncEngine() {
+      fetchDatabaseFromSheets();
+      if (STATE.syncIntervalId) clearInterval(STATE.syncIntervalId);
+      STATE.syncIntervalId = setInterval(() => {
+        fetchDatabaseFromSheets();
+      }, 30000);
+    }
+
+    window.addEventListener('online', () => {
+      showToast("Koneksi Internet Pulih!", "info");
+      fetchDatabaseFromSheets();
+    });
+
+    window.addEventListener('offline', () => {
+      setConnectionStatus('offline', 'Internet Terputus');
+      showToast("Koneksi Terputus. Mode Offline aktif.", "warn");
+    });
+
+    function updateFaceMatcher() {
+      if (STATE.registeredStudents.length === 0) {
+        STATE.faceMatcher = null;
+        elements.statTerdaftar.innerText = "0";
+        return;
+      }
+
+      const labeledDescriptors = STATE.registeredStudents.map(student => {
+        return new faceapi.LabeledFaceDescriptors(student.nama, [student.descriptor]);
+      });
+
+      STATE.faceMatcher = new faceapi.FaceMatcher(labeledDescriptors, 0.55);
+      elements.statTerdaftar.innerText = STATE.registeredStudents.length;
+    }
+
+    let isDetecting = false;
+    let cachedCanvasWidth = 0;
+    let cachedCanvasHeight = 0;
+
+    async function scanLoop() {
+      if (STATE.isScanning && STATE.isModelLoaded && !STATE.isProcessingLog && !isDetecting) {
+        if (elements.video && !elements.video.paused && !elements.video.ended && elements.video.readyState === 4) {
+          isDetecting = true;
+          try {
+            const displaySize = { 
+              width: elements.video.clientWidth || 640, 
+              height: elements.video.clientHeight || 480 
+            };
+
+            // Only match canvas dimensions when video dimensions actually change
+            if (cachedCanvasWidth !== displaySize.width || cachedCanvasHeight !== displaySize.height) {
+              faceapi.matchDimensions(elements.canvas, displaySize);
+              cachedCanvasWidth = displaySize.width;
+              cachedCanvasHeight = displaySize.height;
+            }
+
+            // Lightweight TinyFaceDetector for smooth high-fps scanning
+            const detectorOptions = new faceapi.TinyFaceDetectorOptions({ inputSize: 320, scoreThreshold: 0.5 });
+            const detections = await faceapi.detectAllFaces(elements.video, detectorOptions)
+              .withFaceLandmarks()
+              .withFaceDescriptors();
+
+            const resizedDetections = faceapi.resizeResults(detections, displaySize);
+            const ctx = elements.canvas.getContext('2d');
+            ctx.clearRect(0, 0, displaySize.width, displaySize.height);
+
+            if (resizedDetections.length === 0) {
+              elements.bannerTitle.innerText = "Arahkan Wajah ke Kamera";
+              elements.bannerSubtitle.innerText = "Mode Presensi Otomatis AI";
+            } else if (STATE.faceMatcher) {
+              resizedDetections.forEach(detection => {
+                const bestMatch = STATE.faceMatcher.findBestMatch(detection.descriptor);
+                const box = detection.detection.box;
+
+                const isKnown = bestMatch.label !== 'unknown';
+                ctx.strokeStyle = isKnown ? '#10B981' : '#EF4444';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                if (ctx.roundRect) {
+                  ctx.roundRect(box.x, box.y, box.width, box.height, 12);
+                } else {
+                  ctx.rect(box.x, box.y, box.width, box.height);
+                }
+                ctx.stroke();
+
+                // Draw name tag badge over box
+                const confidencePct = Math.round((1 - bestMatch.distance) * 100);
+                const labelText = isKnown ? `${bestMatch.label} (${confidencePct}%)` : 'Tidak Dikenali';
+                
+                ctx.fillStyle = isKnown ? '#10B981' : '#EF4444';
+                ctx.font = 'bold 12px sans-serif';
+                const textWidth = ctx.measureText(labelText).width;
+                ctx.fillRect(box.x, box.y - 24 > 0 ? box.y - 24 : box.y, textWidth + 12, 22);
+                
+                ctx.fillStyle = '#FFFFFF';
+                ctx.fillText(labelText, box.x + 6, box.y - 24 > 0 ? box.y - 8 : box.y + 15);
+
+                if (isKnown) {
+                  processAttendance(bestMatch.label);
+                } else {
+                  elements.bannerTitle.innerText = "Wajah Tidak Dikenali";
+                  elements.bannerSubtitle.innerText = "Silakan daftar wajah siswa terlebih dahulu";
+                }
+              });
+            }
+          } catch (err) {
+            console.error("Error pada scanning loop:", err);
+          } finally {
+            isDetecting = false;
+          }
+        }
+      }
+      setTimeout(scanLoop, 300);
+    }
+
+    function startContinuousScanning() {
+      scanLoop();
+    }
+
+    async function processAttendance(nama) {
+      if (STATE.isProcessingLog || STATE.lastScannedPerson === nama) return;
+
+      const now = new Date();
+      const dateStr = now.toLocaleDateString('id-ID');
+      const timeStr = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+      const alreadyAttendedToday = STATE.attendanceLogs.some(
+        log => log.nama.toLowerCase() === nama.toLowerCase() && log.tanggal === dateStr
+      );
+
+      if (alreadyAttendedToday) {
+        STATE.lastScannedPerson = nama;
+        elements.bannerTitle.innerText = `${nama} - Sudah Absen!`;
+        elements.bannerSubtitle.innerText = "Siswa ini sudah mencatat presensi hari ini.";
+        playSound('warn');
+        showToast(`${nama} sudah melakukan presensi hari ini!`, "warn");
+
+        clearTimeout(STATE.cooldownTimer);
+        STATE.cooldownTimer = setTimeout(() => {
+          STATE.lastScannedPerson = null;
+        }, 5000);
+        return;
+      }
+
+      STATE.isProcessingLog = true;
+      STATE.lastScannedPerson = nama;
+
+      elements.bannerTitle.innerText = `Presensi Berhasil: ${nama}`;
+      elements.bannerSubtitle.innerText = `Tercatat pada jam ${timeStr}`;
+
+      const studentInfo = STATE.registeredStudents.find(s => s.nama.toLowerCase() === nama.toLowerCase());
+      const nis = studentInfo ? studentInfo.nis : '';
+
+      addLogToUI(nama, dateStr, timeStr, 'Hadir', nis);
+      playSound('success');
+      showToast(`Absen Berhasil: ${nama} (${timeStr})`, "success");
+
+      sendDataToSheets({
+        action: 'log',
+        nama: nama,
+        nis: nis,
+        tanggal: dateStr,
+        waktu: timeStr,
+        status: 'Hadir'
+      });
+
+      clearTimeout(STATE.cooldownTimer);
+      STATE.cooldownTimer = setTimeout(() => {
+        STATE.lastScannedPerson = null;
+        STATE.isProcessingLog = false;
+      }, 5000);
+    }
+
+    function renderLogElement(nama, tanggal, waktu, status = 'Hadir', nis = '') {
+      const item = document.createElement('div');
+      item.className = "flex items-center justify-between pt-2.5 first:pt-0";
+
+      const badgeStyles = {
+        'Hadir': 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800',
+        'Sakit': 'bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-800',
+        'Izin': 'bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-800',
+        'Alpa': 'bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 border-rose-200 dark:border-rose-800'
+      };
+
+      const styleClass = badgeStyles[status] || badgeStyles['Hadir'];
+
+      item.innerHTML = `
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-full bg-indigo-100 dark:bg-indigo-950/80 text-indigo-700 dark:text-indigo-300 flex items-center justify-center font-bold text-xs shrink-0 border border-indigo-200 dark:border-indigo-800">
+            ${nama.substring(0, 2).toUpperCase()}
+          </div>
+          <div>
+            <p class="font-bold text-slate-800 dark:text-slate-100 text-xs">${nama} ${nis ? `<span class="text-[10px] text-slate-400 font-mono font-normal">(${nis})</span>` : ''}</p>
+            <p class="text-[10px] text-slate-400">${tanggal}</p>
+          </div>
+        </div>
+        <div class="text-right flex items-center gap-1.5">
+          <span class="inline-block px-2 py-0.5 border rounded-lg text-[10px] font-bold ${styleClass}">
+            ${status}
+          </span>
+          <span class="inline-block px-2 py-0.5 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-lg text-[10px] font-semibold font-mono">
+            ${waktu}
+          </span>
+        </div>
+      `;
+      elements.logContainer.prepend(item);
+    }
+
+    function addLogToUI(nama, tanggal, waktu, status = 'Hadir', nis = '') {
+      STATE.attendanceLogs.unshift({ nama, nis, tanggal, waktu, status });
+      updateStatsBreakdown();
+
+      try {
+        localStorage.setItem('local_attendance_logs', JSON.stringify(STATE.attendanceLogs));
+      } catch (e) {
+        console.error("Gagal menyimpan log lokal:", e);
+      }
+
+      renderLogsWithFilter();
+    }
+
+    function cariSiswaByNis() {
+      const nisInput = elements.manualNis.value.trim();
+      if (!nisInput) {
+        showToast("Masukkan NIS siswa terlebih dahulu!", "warn");
+        return;
+      }
+
+      const match = STATE.registeredStudents.find(s => s.nis && s.nis.toLowerCase() === nisInput.toLowerCase());
+
+      if (match) {
+        elements.manualNama.value = match.nama;
+        elements.manualStudentNama.innerText = match.nama;
+        elements.manualStudentDetail.innerText = `Kelas: ${match.kelas || '-'} | NIS: ${match.nis}`;
+        elements.studentInfoCard.classList.remove('hidden');
+        showToast(`Siswa Ditemukan: ${match.nama}`, "success");
+      } else {
+        elements.studentInfoCard.classList.add('hidden');
+        showToast("NIS tidak ditemukan di database. Silakan isi nama manual.", "info");
+      }
+    }
+
+    elements.btnCariNis.addEventListener('click', cariSiswaByNis);
+    elements.manualNis.addEventListener('keyup', (e) => {
+      if (e.key === 'Enter') cariSiswaByNis();
+    });
+
+    // Manual Form Submission
+    elements.btnSubmitManual.addEventListener('click', async () => {
+      const nama = elements.manualNama.value.trim();
+      const nis = elements.manualNis.value.trim();
+      const selectedStatusEl = document.querySelector('input[name="manualStatus"]:checked');
+      const status = selectedStatusEl ? selectedStatusEl.value : 'Hadir';
+
+      if (!nama) {
+        showToast("Nama siswa wajib diisi!", "warn");
+        playSound('warn');
+        return;
+      }
+
+      const now = new Date();
+      const dateStr = now.toLocaleDateString('id-ID');
+      const timeStr = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+      const alreadyAttendedToday = STATE.attendanceLogs.some(
+        log => (log.nama.toLowerCase() === nama.toLowerCase() || (nis && log.nis === nis)) && log.tanggal === dateStr
+      );
+
+      if (alreadyAttendedToday) {
+        showToast(`${nama} sudah tercatat presensi hari ini!`, "warn");
+        playSound('warn');
+        return;
+      }
+
+      elements.btnSubmitManual.disabled = true;
+      elements.btnSubmitManual.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan...`;
+
+      addLogToUI(nama, dateStr, timeStr, status, nis);
+      playSound('success');
+      showToast(`Presensi ${status} untuk ${nama} berhasil disimpan!`, "success");
+
+      sendDataToSheets({
+        action: 'log',
+        nama: nama,
+        nis: nis,
+        tanggal: dateStr,
+        waktu: timeStr,
+        status: status
+      });
+
+      elements.manualNis.value = '';
+      elements.manualNama.value = '';
+      elements.studentInfoCard.classList.add('hidden');
+      elements.btnSubmitManual.disabled = false;
+      elements.btnSubmitManual.innerHTML = `<i class="fa-solid fa-paper-plane"></i> Simpan Presensi Manual`;
+    });
+
+    elements.btnCaptureRegister.addEventListener('click', async () => {
+      const nama = elements.regNama.value.trim();
+      const nis = elements.regNis.value.trim();
+      const kelas = elements.regKelas.value.trim();
+
+      if (!nama) {
+        showToast("Nama siswa wajib diisi!", "warn");
+        playSound('warn');
+        return;
+      }
+
+      elements.btnCaptureRegister.disabled = true;
+      elements.btnCaptureRegister.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Memproses Ekstraksi Wajah...`;
+
+      // Try fast detection first, fallback to SSD if face is not captured
+      const tinyOptions = new faceapi.TinyFaceDetectorOptions({ inputSize: 416, scoreThreshold: 0.5 });
+      let detection = await faceapi.detectSingleFace(elements.video, tinyOptions)
+        .withFaceLandmarks()
+        .withFaceDescriptor();
+
+      if (!detection) {
+        detection = await faceapi.detectSingleFace(elements.video)
+          .withFaceLandmarks()
+          .withFaceDescriptor();
+      }
+
+      if (detection) {
+        const descriptorArray = Array.from(detection.descriptor);
+        const descriptorString = JSON.stringify(descriptorArray);
+
+        STATE.registeredStudents.push({
+          nama: nama,
+          nis: nis,
+          kelas: kelas,
+          descriptor: detection.descriptor
+        });
+
+        saveLocalBackup();
+        updateFaceMatcher();
+        playSound('success');
+        showToast(`Wajah ${nama} berhasil didaftarkan!`, "success");
+
+        sendDataToSheets({
+          action: 'save',
+          nama: nama,
+          nis: nis,
+          kelas: kelas,
+          descriptor: descriptorString
+        });
+
+        elements.regNama.value = '';
+        elements.regNis.value = '';
+        elements.regKelas.value = '';
+
+        elements.tabScanMode.click();
+
+      } else {
+        playSound('warn');
+        showToast("Wajah tidak terdeteksi! Posisikan wajah tepat di depan kamera.", "error");
+      }
+
+      elements.btnCaptureRegister.disabled = false;
+      elements.btnCaptureRegister.innerHTML = `<i class="fa-solid fa-camera"></i> Ambil Sampel Wajah & Simpan`;
+    });
+
+    elements.tabScanMode.addEventListener('click', () => {
+      STATE.isScanning = true;
+      elements.tabScanMode.className = "py-2.5 px-2 text-xs sm:text-sm rounded-xl font-bold transition-all flex items-center justify-center gap-2 bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-sm";
+      elements.tabManualMode.className = "py-2.5 px-2 text-xs sm:text-sm rounded-xl font-bold transition-all flex items-center justify-center gap-2 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white";
+      elements.tabRegisterMode.className = "py-2.5 px-2 text-xs sm:text-sm rounded-xl font-bold transition-all flex items-center justify-center gap-2 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white";
+      elements.manualPanel.classList.add('hidden');
+      elements.registerPanel.classList.add('hidden');
+      elements.bannerSubtitle.innerText = "Mode Presensi Otomatis AI";
+    });
+
+    elements.tabManualMode.addEventListener('click', () => {
+      STATE.isScanning = false;
+      elements.tabManualMode.className = "py-2.5 px-2 text-xs sm:text-sm rounded-xl font-bold transition-all flex items-center justify-center gap-2 bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-sm";
+      elements.tabScanMode.className = "py-2.5 px-2 text-xs sm:text-sm rounded-xl font-bold transition-all flex items-center justify-center gap-2 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white";
+      elements.tabRegisterMode.className = "py-2.5 px-2 text-xs sm:text-sm rounded-xl font-bold transition-all flex items-center justify-center gap-2 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white";
+      elements.manualPanel.classList.remove('hidden');
+      elements.registerPanel.classList.add('hidden');
+      elements.bannerSubtitle.innerText = "Mode Absensi Manual NIS";
+      elements.bannerTitle.innerText = "Input NIS & Pilih Status Presensi";
+    });
+
+    elements.tabRegisterMode.addEventListener('click', () => {
+      STATE.isScanning = false;
+      elements.tabRegisterMode.className = "py-2.5 px-2 text-xs sm:text-sm rounded-xl font-bold transition-all flex items-center justify-center gap-2 bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-sm";
+      elements.tabScanMode.className = "py-2.5 px-2 text-xs sm:text-sm rounded-xl font-bold transition-all flex items-center justify-center gap-2 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white";
+      elements.tabManualMode.className = "py-2.5 px-2 text-xs sm:text-sm rounded-xl font-bold transition-all flex items-center justify-center gap-2 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white";
+      elements.registerPanel.classList.remove('hidden');
+      elements.manualPanel.classList.add('hidden');
+      elements.bannerSubtitle.innerText = "Mode Pendaftaran Wajah Baru";
+      elements.bannerTitle.innerText = "Isi Form & Klik Ambil Sampel";
+    });
+
+    elements.btnOpenSettings.addEventListener('click', () => {
+      elements.scriptUrlInput.value = STATE.scriptUrl;
+      elements.gsCodeSnippet.value = GS_CODE_TEMPLATE;
+      elements.settingsModal.classList.remove('hidden');
+    });
+
+    elements.btnCloseSettings.addEventListener('click', () => {
+      elements.settingsModal.classList.add('hidden');
+    });
+
+    elements.btnSaveSettings.addEventListener('click', () => {
+      const url = elements.scriptUrlInput.value.trim() || DEFAULT_SCRIPT_URL;
+      STATE.scriptUrl = url;
+      localStorage.setItem('gs_script_url', url);
+      elements.settingsModal.classList.add('hidden');
+      showToast("URL Google Apps Script diperbarui!", "success");
+      fetchDatabaseFromSheets(true);
+    });
+
+    elements.btnRefreshLogs.addEventListener('click', () => {
+      fetchDatabaseFromSheets(true);
+    });
+
+    elements.btnClearLogs.addEventListener('click', () => {
+      STATE.attendanceLogs = [];
+      localStorage.removeItem('local_attendance_logs');
+      updateStatsBreakdown();
+      renderLogsWithFilter();
+      showToast("Tampilan riwayat dibersihkan", "info");
+    });
+
+    elements.btnTestConn.addEventListener('click', async () => {
+      const url = elements.scriptUrlInput.value.trim() || DEFAULT_SCRIPT_URL;
+
+      elements.diagBox.classList.remove('hidden');
+      elements.diagBox.className = "p-3 rounded-xl border border-blue-200 bg-blue-50 text-blue-900 dark:border-blue-800 dark:bg-blue-950/60 dark:text-blue-300 text-xs leading-relaxed space-y-1";
+      elements.diagBox.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> Menghubungi Google Apps Script...`;
+
+      try {
+        const testUrl = url + (url.includes('?') ? '&' : '?') + 't=' + Date.now();
+        const res = await fetch(testUrl, { method: 'GET', redirect: 'follow' });
+        
+        if (res.ok) {
+          const data = await res.json();
+          elements.diagBox.className = "p-3 rounded-xl border border-emerald-200 bg-emerald-50 text-emerald-900 dark:border-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300 text-xs leading-relaxed space-y-1";
+          elements.diagBox.innerHTML = `
+            <p class="font-bold"><i class="fa-solid fa-circle-check text-emerald-600 dark:text-emerald-400"></i> Koneksi Berhasil!</p>
+            <p>Terhubung ke Web App. Total siswa di Sheet: <b>${Array.isArray(data) ? data.length : 0}</b>.</p>
+          `;
+        } else {
+          throw new Error(`HTTP Status Code: ${res.status}`);
+        }
+      } catch (err) {
+        elements.diagBox.className = "p-3 rounded-xl border border-rose-200 bg-rose-50 text-rose-900 dark:border-rose-800 dark:bg-rose-950/60 dark:text-rose-300 text-xs leading-relaxed space-y-1";
+        elements.diagBox.innerHTML = `
+          <p class="font-bold"><i class="fa-solid fa-circle-xmark text-rose-600 dark:text-rose-400"></i> Koneksi Gagal (${err.message})</p>
+          <ul class="list-disc list-inside space-y-0.5 text-[11px]">
+            <li>Buka Apps Script > Deploy > Manage Deployments</li>
+            <li>Pastikan <b>"Who has access"</b> diatur ke <b>"Anyone" (Siapa saja)</b></li>
+          </ul>
+        `;
+      }
+    });
+
+    elements.toggleScriptGuide.addEventListener('click', () => {
+      const isHidden = elements.scriptGuideContent.classList.contains('hidden');
+      if (isHidden) {
+        elements.scriptGuideContent.classList.remove('hidden');
+        elements.guideArrow.classList.add('rotate-180');
+      } else {
+        elements.scriptGuideContent.classList.add('hidden');
+        elements.guideArrow.classList.remove('rotate-180');
+      }
+    });
+
+    elements.btnCopyGSCode.addEventListener('click', () => {
+      elements.gsCodeSnippet.select();
+      document.execCommand('copy');
+      showToast("Kode Google Apps Script disalin ke clipboard!", "success");
+    });
+
+    window.addEventListener('load', () => {
+      loadModels();
+    });
+  </script>
+</body>
+</html>
