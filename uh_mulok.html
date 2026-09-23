@@ -1,0 +1,1101 @@
+<!DOCTYPE html>
+<html lang="id" class="h-full bg-slate-50">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Ulangan Harian Muatan Lokal</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Font: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        dayak: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            500: '#16a34a',
+                            600: '#15803d',
+                            700: '#166534',
+                            800: '#14532d',
+                            900: '#052e16',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-user-select: none;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        input, textarea, .selectable-text {
+            -webkit-user-select: text !important;
+            user-select: text !important;
+            font-size: 16px !important;
+        }
+
+        @keyframes timer-pulse {
+            0%, 100% { background-color: #dc2626; color: #ffffff; transform: scale(1); }
+            50% { background-color: #ef4444; color: #ffffff; transform: scale(1.03); }
+        }
+
+        .timer-warning-critical {
+            animation: timer-pulse 1s infinite ease-in-out;
+        }
+
+        @media print {
+            .no-print { display: none !important; }
+            body { background: white !important; }
+            .print-card { border: none !important; box-shadow: none !important; }
+        }
+    </style>
+</head>
+<body class="h-full flex flex-col antialiased text-slate-800">
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 flex flex-col gap-2 pointer-events-none w-full max-w-sm px-4"></div>
+
+    <!-- Custom Confirmation Modal -->
+    <div id="modal-overlay" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl space-y-4 border border-slate-100 animate-in fade-in zoom-in duration-200">
+            <div class="w-12 h-12 rounded-full bg-amber-50 text-amber-600 flex items-center justify-center text-xl mx-auto">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <div class="text-center space-y-1">
+                <h3 id="modal-title" class="font-extrabold text-slate-900 text-base">Konfirmasi</h3>
+                <p id="modal-message" class="text-xs text-slate-500 leading-relaxed">Apakah Anda yakin?</p>
+            </div>
+            <div class="grid grid-cols-2 gap-2.5 pt-2">
+                <button id="modal-btn-cancel" class="py-2.5 px-4 rounded-xl border border-slate-300 bg-white hover:bg-slate-100 text-slate-700 font-bold text-xs transition">
+                    Batal
+                </button>
+                <button id="modal-btn-confirm" class="py-2.5 px-4 rounded-xl bg-dayak-600 hover:bg-dayak-700 text-white font-bold text-xs shadow-md transition">
+                    Ya, Lanjutkan
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-xs">
+        <div class="max-w-3xl mx-auto px-4 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-dayak-600 text-white flex items-center justify-center font-bold shadow-sm">
+                    <i class="fa-solid fa-book-open text-base"></i>
+                </div>
+                <div>
+                    <h1 class="font-extrabold text-slate-900 text-xs sm:text-sm tracking-tight">Ulangan Muatan Lokal</h1>
+                    <p class="text-[10px] sm:text-xs text-slate-500">Materi: Bélum Bahadat Dayak</p>
+                </div>
+            </div>
+
+            <!-- TIMER BADGE -->
+            <div id="header-timer-box" class="hidden items-center">
+                <div id="timer-badge" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 font-mono font-bold text-xs sm:text-sm transition-all shadow-xs">
+                    <i id="timer-icon" class="fa-regular fa-clock text-emerald-600 text-xs sm:text-sm"></i>
+                    <span id="timer-display">50:00</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- STEP 0: HALAMAN TUNGGU & CEK KONEKSI SPREADSHEET -->
+    <section id="step-waiting" class="flex-grow flex items-center justify-center px-4 py-8 sm:py-12">
+        <div class="w-full max-w-md bg-white rounded-2xl border border-slate-200 shadow-xl overflow-hidden text-center p-6 sm:p-8 space-y-6">
+            
+            <div class="relative w-20 h-20 mx-auto flex items-center justify-center">
+                <div id="waiting-spinner" class="absolute inset-0 rounded-full border-4 border-slate-100 border-t-dayak-600 animate-spin"></div>
+                <div id="waiting-icon-bg" class="w-14 h-14 rounded-full bg-dayak-50 text-dayak-600 flex items-center justify-center text-2xl transition-all duration-300">
+                    <i id="waiting-icon" class="fa-solid fa-file-csv animate-pulse"></i>
+                </div>
+            </div>
+
+            <div class="space-y-2">
+                <h2 id="waiting-title" class="text-lg sm:text-xl font-extrabold text-slate-900">
+                    Memeriksa Koneksi Spreadsheet...
+                </h2>
+                <p id="waiting-status-text" class="text-xs sm:text-sm text-slate-500 leading-relaxed max-w-xs mx-auto">
+                    Sistem sedang memverifikasi keterhubungan dengan Google Sheets server. Mohon tunggu sebentar.
+                </p>
+            </div>
+
+            <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden relative">
+                <div id="waiting-progress" class="bg-dayak-600 h-2 rounded-full transition-all duration-500 w-1/4"></div>
+            </div>
+
+            <div id="waiting-actions" class="pt-2 space-y-3">
+                <div id="waiting-badge" class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-50 border border-amber-200 text-amber-800 text-xs font-semibold">
+                    <i class="fa-solid fa-spinner fa-spin text-amber-600"></i>
+                    <span id="waiting-badge-text">Menghubungkan ke Server...</span>
+                </div>
+
+                <div id="waiting-error-controls" class="hidden space-y-2 pt-2">
+                    <button id="btn-waiting-retry" onclick="checkSpreadsheetConnection()" 
+                        class="w-full py-3 px-4 bg-dayak-600 hover:bg-dayak-700 active:bg-dayak-800 text-white font-bold rounded-xl shadow-md transition flex items-center justify-center gap-2 text-xs sm:text-sm">
+                        <i class="fa-solid fa-rotate-right"></i>
+                        <span>Coba Koneksi Ulang</span>
+                    </button>
+                </div>
+            </div>
+
+            <p class="text-[11px] text-slate-400 border-t border-slate-100 pt-3">
+                <i class="fa-solid fa-shield-halved text-slate-400 mr-1"></i>
+                Ujian hanya dapat dibuka jika server Google Spreadsheet aktif & terkoneksi.
+            </p>
+
+        </div>
+    </section>
+
+    <!-- STEP 1: IDENTITAS SISWA -->
+    <section id="step-identity" class="hidden flex-grow flex items-center justify-center px-4 py-6 sm:py-10">
+        <div class="w-full max-w-md bg-white rounded-2xl border border-slate-200 shadow-xl overflow-hidden">
+            
+            <div class="bg-gradient-to-br from-dayak-800 via-dayak-700 to-dayak-600 p-6 text-white text-center relative">
+                <div class="inline-flex p-3 rounded-2xl bg-white/10 backdrop-blur-md mb-2 shadow-inner">
+                    <i class="fa-solid fa-user-graduate text-2xl text-emerald-200"></i>
+                </div>
+                <h2 class="text-lg sm:text-xl font-extrabold tracking-tight">Ulangan Harian Muatan Lokal</h2>
+                <p class="text-emerald-100 text-xs mt-1">Materi: Kebudayaan & Etika Bélum Bahadat Dayak</p>
+            </div>
+
+            <form id="form-identity" class="p-5 sm:p-6 space-y-4">
+                <div>
+                    <label for="student-name" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                        Nama Lengkap Siswa <span class="text-rose-500">*</span>
+                    </label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                            <i class="fa-regular fa-user"></i>
+                        </div>
+                        <input type="text" id="student-name" required placeholder="Contoh: Budi Santoso"
+                            class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-300 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-dayak-600 focus:border-dayak-600 text-slate-800 text-base transition">
+                    </div>
+                </div>
+
+                <div>
+                    <label for="student-class" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                        Kelas <span class="text-rose-500">*</span>
+                    </label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                            <i class="fa-solid fa-graduation-cap"></i>
+                        </div>
+                        <input type="text" id="student-class" required placeholder="Contoh: VIII-A / IX-B"
+                            class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-300 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-dayak-600 focus:border-dayak-600 text-slate-800 text-base transition">
+                    </div>
+                </div>
+
+                <div class="bg-amber-50/80 border border-amber-200/80 rounded-xl p-3.5 text-xs text-amber-900 space-y-1.5">
+                    <div class="font-bold flex items-center gap-1.5 text-amber-800">
+                        <i class="fa-solid fa-shield-halved text-amber-600"></i> Petunjuk & Aturan Ujian HP:
+                    </div>
+                    <ul class="list-disc pl-4 space-y-1 text-amber-800/90 leading-relaxed text-[11px] sm:text-xs">
+                        <li>Waktu pengerjaan otomatis <strong>50 Menit</strong>.</li>
+                        <li>Terdiri dari <strong>10 Soal Sesuai/Tidak Sesuai</strong> & <strong>5 Soal Esai</strong>.</li>
+                        <li><strong class="text-rose-700">Anti Copy-Paste:</strong> Jawaban esai wajib diketik langsung secara manual.</li>
+                        <li>Nilai & jawaban otomatis tersimpan ke <strong>Google Sheets</strong> saat selesai.</li>
+                    </ul>
+                </div>
+
+                <button type="submit" 
+                    class="w-full py-3.5 px-5 bg-dayak-600 hover:bg-dayak-700 active:bg-dayak-800 text-white font-bold rounded-xl shadow-lg shadow-dayak-600/30 transition flex items-center justify-center gap-2 text-sm sm:text-base min-h-[48px] mt-2">
+                    <span>Mulai Ulangan Sekarang</span>
+                    <i class="fa-solid fa-arrow-right text-xs"></i>
+                </button>
+            </form>
+
+        </div>
+    </section>
+
+    <!-- STEP 2: LEMBAR SOAL UJIAN -->
+    <section id="step-exam" class="hidden max-w-3xl mx-auto px-3 sm:px-4 py-4 sm:py-6 space-y-6 w-full">
+        
+        <div class="bg-white rounded-xl border border-slate-200 p-3.5 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-full bg-dayak-100 text-dayak-700 flex items-center justify-center font-bold text-xs flex-shrink-0">
+                    <i class="fa-solid fa-user-check"></i>
+                </div>
+                <div class="min-w-0">
+                    <div class="font-bold text-slate-800 text-xs sm:text-sm truncate" id="badge-student-name">Nama Siswa</div>
+                    <div class="text-[11px] text-slate-500">Kelas: <span id="badge-student-class" class="font-medium text-slate-700">-</span></div>
+                </div>
+            </div>
+
+            <div class="w-full sm:w-48 space-y-1">
+                <div class="flex justify-between text-[11px] text-slate-500 font-semibold">
+                    <span>Terjawab</span>
+                    <span id="progress-text">0 / 15</span>
+                </div>
+                <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+                    <div id="exam-progress-bar" class="bg-dayak-500 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
+
+        <form id="form-exam" onsubmit="event.preventDefault();" class="space-y-8">
+            
+            <div class="space-y-4">
+                <div class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-xs flex items-center justify-between">
+                    <div>
+                        <span class="px-2.5 py-0.5 rounded-md bg-dayak-100 text-dayak-800 text-[11px] font-extrabold uppercase tracking-wider">BAGIAN A</span>
+                        <h2 class="text-sm sm:text-base font-bold text-slate-800 mt-1">Soal Sesuai / Tidak Sesuai</h2>
+                    </div>
+                    <span class="text-[11px] text-slate-500 font-medium">10 Soal • Auto-Score</span>
+                </div>
+
+                <div id="container-part-a" class="space-y-3 sm:space-y-4"></div>
+            </div>
+
+            <div class="space-y-4 pt-2">
+                <div class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-xs flex items-center justify-between">
+                    <div>
+                        <span class="px-2.5 py-0.5 rounded-md bg-indigo-100 text-indigo-800 text-[11px] font-extrabold uppercase tracking-wider">BAGIAN B</span>
+                        <h2 class="text-sm sm:text-base font-bold text-slate-800 mt-1">Soal Uraian / Esai</h2>
+                    </div>
+                    <span class="text-[11px] text-rose-600 font-bold"><i class="fa-solid fa-lock"></i> No Copy-Paste</span>
+                </div>
+
+                <div id="container-part-b" class="space-y-4"></div>
+            </div>
+
+            <div class="pt-4 pb-8">
+                <button type="button" id="btn-submit-exam" 
+                    class="w-full py-4 px-6 bg-dayak-600 hover:bg-dayak-700 active:bg-dayak-800 text-white font-bold rounded-2xl shadow-xl shadow-dayak-600/30 transition flex items-center justify-center gap-2 text-base min-h-[52px]">
+                    <i class="fa-solid fa-paper-plane"></i>
+                    <span>Kumpulkan Jawaban Ujian</span>
+                </button>
+            </div>
+        </form>
+
+    </section>
+
+    <!-- STEP 3: HASIL & TRANSKRIP PENGUMPULAN -->
+    <section id="step-result" class="hidden max-w-3xl mx-auto px-3 sm:px-4 py-6 space-y-6 w-full">
+        
+        <div class="bg-gradient-to-br from-dayak-800 via-dayak-700 to-dayak-600 text-white rounded-2xl p-5 sm:p-6 shadow-xl text-center space-y-2 relative overflow-hidden print-card">
+            <div class="inline-flex p-3 rounded-full bg-white/10 backdrop-blur-md mb-1">
+                <i class="fa-solid fa-circle-check text-3xl text-emerald-300"></i>
+            </div>
+            <h2 class="text-xl sm:text-2xl font-black">Ulangan Berhasil Dikumpulkan!</h2>
+            <p class="text-emerald-100 text-xs sm:text-sm max-w-md mx-auto leading-relaxed">
+                Terima kasih, jawaban Anda telah tersimpan secara otomatis dan terkirim ke sistem spreadsheet guru.
+            </p>
+            <div class="pt-2 text-[11px] font-mono text-emerald-200" id="res-timestamp">Waktu Selesai: -</div>
+        </div>
+
+        <div id="sheets-sync-status" class="bg-blue-50 border border-blue-200 rounded-xl p-3 text-xs text-blue-900 flex items-center justify-between gap-3 no-print">
+            <div class="flex items-center gap-2">
+                <i class="fa-solid fa-spinner fa-spin text-blue-600 text-sm" id="sync-icon"></i>
+                <span id="sync-text" class="font-medium">Mengirim jawaban ke Google Spreadsheet...</span>
+            </div>
+            <button id="btn-retry-sync" class="hidden px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg text-[11px] transition">
+                Coba Lagi
+            </button>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+            
+            <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-xs space-y-2.5 print-card">
+                <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400 border-b border-slate-100 pb-1.5">Identitas Siswa</div>
+                <div class="space-y-1.5">
+                    <div>
+                        <span class="text-[11px] text-slate-400 block">Nama Lengkap</span>
+                        <span class="font-bold text-slate-800 text-sm" id="res-name">-</span>
+                    </div>
+                    <div>
+                        <span class="text-[11px] text-slate-400 block">Kelas</span>
+                        <span class="font-semibold text-slate-800 text-xs" id="res-class">-</span>
+                    </div>
+                    <div>
+                        <span class="text-[11px] text-slate-400 block">Lama Pengerjaan</span>
+                        <span class="font-semibold text-slate-800 text-xs" id="res-time-used">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-xs sm:col-span-2 flex flex-col justify-between print-card space-y-3">
+                <div>
+                    <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400 border-b border-slate-100 pb-1.5">Status Pengumpulan</div>
+                    <div class="mt-3 flex items-center justify-between">
+                        <div>
+                            <div class="text-xl sm:text-2xl font-black text-dayak-700 leading-tight" id="res-score-a">Terkirim Ke Sheet</div>
+                            <p class="text-xs text-slate-500 mt-1 font-medium" id="res-score-detail">Total 15 Soal (10 Pilihan Sesuai/Tidak + 5 Esai)</p>
+                        </div>
+                        <div>
+                            <span class="inline-block px-3 py-1.5 rounded-xl bg-blue-50 text-blue-800 text-[11px] font-bold border border-blue-200">
+                                Menunggu Pemeriksaan Guru
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <p class="text-[11px] text-slate-500 bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                    <i class="fa-solid fa-circle-info text-slate-400 mr-1"></i> Indikator benar/salah disembunyikan. Kunci jawaban & koreksi total akan dilakukan langsung oleh Guru.
+                </p>
+            </div>
+
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 no-print">
+            <button id="btn-copy-summary" class="py-3.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-2 min-h-[48px]">
+                <i class="fa-brands fa-whatsapp text-base"></i>
+                <span>Salin Laporan ke WA Guru</span>
+            </button>
+            <button onclick="window.print()" class="py-3.5 px-4 rounded-xl bg-slate-800 hover:bg-slate-900 active:bg-slate-950 text-white font-bold text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-2 min-h-[48px]">
+                <i class="fa-solid fa-print"></i>
+                <span>Cetak / Simpan PDF</span>
+            </button>
+            <button id="btn-restart" class="py-3.5 px-4 rounded-xl border border-slate-300 bg-white hover:bg-slate-100 active:bg-slate-200 text-slate-700 font-bold text-xs sm:text-sm transition flex items-center justify-center gap-2 min-h-[48px]">
+                <i class="fa-solid fa-rotate-right"></i>
+                <span>Keluar Ujian</span>
+            </button>
+        </div>
+
+        <div class="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-xs space-y-3 print-card">
+            <h3 class="text-sm font-bold text-slate-900 border-b border-slate-100 pb-2 flex items-center gap-2">
+                <i class="fa-solid fa-list-check text-dayak-600"></i>
+                <span>Rincian Jawaban Bagian A (Sesuai / Tidak Sesuai)</span>
+            </h3>
+            <div id="res-list-a" class="space-y-2.5"></div>
+        </div>
+
+        <div class="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-xs space-y-3 print-card">
+            <h3 class="text-sm font-bold text-slate-900 border-b border-slate-100 pb-2 flex items-center gap-2">
+                <i class="fa-solid fa-pen-nib text-indigo-600"></i>
+                <span>Transkrip Jawaban Esai Bagian B</span>
+            </h3>
+            <div id="res-list-b" class="space-y-4"></div>
+        </div>
+
+        <div class="bg-slate-100 rounded-2xl border border-slate-200 p-4 text-xs text-slate-600 space-y-2 no-print">
+            <div class="font-bold text-slate-800 flex items-center gap-1.5">
+                <i class="fa-solid fa-link text-dayak-600"></i> Status Koneksi Google Sheets
+            </div>
+            <div class="flex items-center gap-2">
+                <input type="text" id="input-script-url" class="flex-1 p-2.5 rounded-lg border border-slate-300 bg-white font-mono text-[11px] selectable-text"
+                       value="https://script.google.com/macros/s/AKfycbxb1RRd_Ac5eFvITNhP4kMSkXEAt37M8aEvFPXm7zEkdIAttbuf9RrBiq4AKTGUy51h/exec">
+                <button id="btn-save-script-url" class="px-3 py-2.5 bg-slate-800 hover:bg-slate-900 text-white font-bold rounded-lg text-xs whitespace-nowrap">
+                    Simpan URL
+                </button>
+            </div>
+            <p class="text-[10px] text-slate-500">
+                Tautan Apps Script telah terpasang secara default untuk otomatis menyimpan data ke spreadsheet <strong>ulangan_mulok</strong>.
+            </p>
+        </div>
+
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 py-3 text-center text-[11px] text-slate-400 no-print">
+        <div class="max-w-3xl mx-auto px-4">
+            Aplikasi Ulangan Harian Muatan Lokal • dibuat oleh Annisa Yuniar Yasmin
+        </div>
+    </footer>
+
+    <script>
+        let DEFAULT_SCRIPT_URL = localStorage.getItem('script_url') || "https://script.google.com/macros/s/AKfycbxb1RRd_Ac5eFvITNhP4kMSkXEAt37M8aEvFPXm7zEkdIAttbuf9RrBiq4AKTGUy51h/exec";
+
+        async function checkSpreadsheetConnection() {
+            const stepWaiting = document.getElementById('step-waiting');
+            const stepIdentity = document.getElementById('step-identity');
+            
+            const titleEl = document.getElementById('waiting-title');
+            const statusText = document.getElementById('waiting-status-text');
+            const spinner = document.getElementById('waiting-spinner');
+            const iconBg = document.getElementById('waiting-icon-bg');
+            const icon = document.getElementById('waiting-icon');
+            const progressBar = document.getElementById('waiting-progress');
+            const badge = document.getElementById('waiting-badge');
+            const badgeText = document.getElementById('waiting-badge-text');
+            const errorControls = document.getElementById('waiting-error-controls');
+
+            const targetUrl = document.getElementById('input-script-url')?.value.trim() || DEFAULT_SCRIPT_URL;
+
+            titleEl.textContent = "Memeriksa Koneksi Spreadsheet...";
+            statusText.textContent = "Sistem sedang memverifikasi keterhubungan dengan Google Sheets server. Mohon tunggu...";
+            spinner.classList.remove('hidden');
+            iconBg.className = "w-14 h-14 rounded-full bg-dayak-50 text-dayak-600 flex items-center justify-center text-2xl transition-all duration-300";
+            icon.className = "fa-solid fa-file-csv animate-pulse";
+            progressBar.style.width = "35%";
+            badge.className = "inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-50 border border-amber-200 text-amber-800 text-xs font-semibold";
+            badgeText.textContent = "Menghubungkan ke Server...";
+            errorControls.classList.add('hidden');
+
+            try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 9000);
+
+                const response = await fetch(targetUrl + '?action=ping', {
+                    method: 'GET',
+                    mode: 'no-cors',
+                    signal: controller.signal
+                });
+
+                clearTimeout(timeoutId);
+
+                progressBar.style.width = "100%";
+                spinner.classList.add('hidden');
+                iconBg.className = "w-14 h-14 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-2xl scale-110 transition-all duration-300";
+                icon.className = "fa-solid fa-circle-check";
+                
+                titleEl.textContent = "Koneksi Terhubung!";
+                statusText.textContent = "Google Spreadsheet aktif & siap menerima jawaban. Membuka halaman ujian...";
+                
+                badge.className = "inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold";
+                badgeText.textContent = "Spreadsheet Terkoneksi";
+
+                showToast("✅ Spreadsheet terhubung! Selamat mengerjakan.", "info");
+
+                setTimeout(() => {
+                    stepWaiting.classList.add('hidden');
+                    stepIdentity.classList.remove('hidden');
+                }, 1200);
+
+            } catch (error) {
+                progressBar.style.width = "100%";
+                progressBar.classList.replace('bg-dayak-600', 'bg-rose-500');
+                spinner.classList.add('hidden');
+                iconBg.className = "w-14 h-14 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center text-2xl transition-all duration-300";
+                icon.className = "fa-solid fa-triangle-exclamation";
+
+                titleEl.textContent = "Spreadsheet Tidak Terkoneksi";
+                statusText.textContent = "Sistem gagal terhubung ke Google Spreadsheet. Pastikan perangkat Anda memiliki akses internet stabil.";
+
+                badge.className = "inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-rose-50 border border-rose-200 text-rose-800 text-xs font-bold";
+                badgeText.textContent = "Gagal Terhubung ke Server";
+
+                errorControls.classList.remove('hidden');
+                showToast("⚠️ Gagal terhubung ke Spreadsheet. Silakan coba lagi.", "error");
+            }
+        }
+
+        const QUESTIONS_PART_A = [
+            {
+                id: 1,
+                statement: "Adat istiadat adalah kebiasaan atau tradisi dari leluhur sejak manusia ada yang dijadikan sebagai tuntunan hidup.",
+                key: "Sesuai",
+                explanation: "Adat istiadat merupakan pedoman dan norma kebiasaan leluhur yang diwariskan untuk tuntunan hidup."
+            },
+            {
+                id: 2,
+                statement: "Bélum Bahadat sama dengan Dia Bahadat.",
+                key: "Tidak Sesuai",
+                explanation: "Bélum Bahadat artinya 'hidup beradat/santun', sedangkan Dia Bahadat artinya 'tidak beradat/kurang sopan'."
+            },
+            {
+                id: 3,
+                statement: "Penguatan adat istiadat dapat dilakukan dengan cara tidak menghargai tradisi budaya lain.",
+                key: "Tidak Sesuai",
+                explanation: "Penguatan adat istiadat harus berlandaskan sikap saling menghormati dan toleransi terhadap budaya lain."
+            },
+            {
+                id: 4,
+                statement: "Senang membicarakan kekurangan orang lain adalah salah satu perilaku Bélum Bahadat.",
+                key: "Tidak Sesuai",
+                explanation: "Membicarakan keburukan orang lain bertentangan dengan etika kesantunan Bélum Bahadat."
+            },
+            {
+                id: 5,
+                statement: "Acara adat memberi makan para leluhur agar terhindar dari kesialan adalah Manawur.",
+                key: "Sesuai",
+                explanation: "Manawur merupakan ritual adat menabur beras/sesajen untuk memohon keselamatan dan perlindungan."
+            },
+            {
+                id: 6,
+                statement: "Acara pengataran roh jenazah ke Lewu Tatau dengan memindahkan tulang-belulang boleh dilakukan semua agama.",
+                key: "Tidak Sesuai",
+                explanation: "Ritual Tiwah (pengantaran roh ke Lewu Tatau) khusus dilaksanakan oleh penganut ajaran adat Hindu Kaharingan."
+            },
+            {
+                id: 7,
+                statement: "Panduduk harus ada dalam ritual adat Nahunan.",
+                key: "Sesuai",
+                explanation: "Panduduk (perangkat adat) adalah syarat wajib dalam pelaksanaan ritual Nahunan (upacara pemberian nama anak)."
+            },
+            {
+                id: 8,
+                statement: "Pandér dia baramana adalah bicara yang selalu menyakiti orang lain.",
+                key: "Sesuai",
+                explanation: "Pandér dia baramana bermakna perkataan sembarangan atau perkataan yang menyakiti perasaan orang lain."
+            },
+            {
+                id: 9,
+                statement: "“Salamat Dumah, Mina narai kabar? Bahalap ih, Mina senang aku ketemu dengan Mina”. Kalimat tersebut adalah contoh Bakihing kutak pandér.",
+                key: "Sesuai",
+                explanation: "Kalimat tersebut menunjukkan contoh tutur kata Bakihing (saling menyapa dengan santun)."
+            },
+            {
+                id: 10,
+                statement: "Kita harus membedakan cara berbicara kita dari segi tingkatan umur, pangkat, dan jabatan.",
+                key: "Sesuai",
+                explanation: "Tata tutur bahasa (Kutak Pandér) harus menyesuaikan tingkat umur, penghormatan, dan norma sosial."
+            }
+        ];
+
+        const QUESTIONS_PART_B = [
+            {
+                id: 1,
+                title: "Definisi Bélum Bahadat",
+                prompt: "Jelaskan Definisi dari Bélum Bahadat!",
+                placeholder: "Ketik penjelasan definisi Bélum Bahadat di sini..."
+            },
+            {
+                id: 2,
+                title: "Perilaku Bélum Bahadat Digital",
+                prompt: "Berikan 3 contoh Perilaku Bélum Bahadat Di Era Digital!",
+                placeholder: "Ketik 3 contoh perilaku santun/beradat di era digital..."
+            },
+            {
+                id: 3,
+                title: "Pelestarian Acara Adat Dayak",
+                prompt: "Mengapa Acara Adat Dayak harus dilestarikan?",
+                placeholder: "Ketik alasan pentingnya melestarikan acara adat Dayak..."
+            },
+            {
+                id: 4,
+                title: "Makna Ungkapan Adat",
+                prompt: "Apa makna dari “ Éla manduan taluh barangai bara parakkayu, tau haban “?",
+                placeholder: "Ketik penjelasan makna dari ungkapan adat tersebut..."
+            },
+            {
+                id: 5,
+                title: "Kutak Pandér Karakter Positif",
+                prompt: "Sebutkan 3 istilah Kutak Pandér karater positif!",
+                placeholder: "Ketik 3 istilah Kutak Pandér berkarakter positif..."
+            }
+        ];
+
+        let state = {
+            studentName: '',
+            studentClass: '',
+            timerSeconds: 50 * 60,
+            timerInterval: null,
+            startTime: null,
+            endTime: null,
+            answersPartA: {},
+            answersPartB: {},
+            isSubmitted: false,
+            scorePartA: 0
+        };
+
+        function showToast(message, type = 'warning') {
+            const container = document.getElementById('toast-container');
+            if (!container) return;
+            const toast = document.createElement('div');
+            
+            const bgClass = type === 'error' ? 'bg-rose-600 text-white' : 
+                            type === 'warning' ? 'bg-amber-500 text-white' : 'bg-slate-900 text-white';
+            const icon = type === 'error' ? 'fa-triangle-exclamation' : 
+                         type === 'warning' ? 'fa-ban' : 'fa-info-circle';
+
+            toast.className = `flex items-center gap-2.5 px-4 py-3 rounded-xl shadow-xl ${bgClass} text-xs font-semibold transition-all transform translate-y-2 opacity-0 pointer-events-auto border border-white/10`;
+            toast.innerHTML = `
+                <i class="fa-solid ${icon} text-sm flex-shrink-0"></i>
+                <span class="flex-1">${message}</span>
+            `;
+
+            container.appendChild(toast);
+
+            requestAnimationFrame(() => {
+                toast.classList.remove('translate-y-2', 'opacity-0');
+            });
+
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-2');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        function showConfirmModal(title, message, onConfirm) {
+            const overlay = document.getElementById('modal-overlay');
+            document.getElementById('modal-title').textContent = title;
+            document.getElementById('modal-message').textContent = message;
+
+            overlay.classList.remove('hidden');
+
+            const btnCancel = document.getElementById('modal-btn-cancel');
+            const btnConfirm = document.getElementById('modal-btn-confirm');
+
+            const cleanup = () => {
+                overlay.classList.add('hidden');
+                btnCancel.onclick = null;
+                btnConfirm.onclick = null;
+            };
+
+            btnCancel.onclick = () => cleanup();
+            btnConfirm.onclick = () => {
+                cleanup();
+                onConfirm();
+            };
+        }
+
+        function attachAntiCheatListeners(element) {
+            const blockedEvents = ['paste', 'copy', 'cut', 'drop', 'contextmenu'];
+            blockedEvents.forEach(eventType => {
+                element.addEventListener(eventType, (e) => {
+                    e.preventDefault();
+                    showToast('⚠️ Dilarang copy-paste! Jawaban esai wajib diketik manual.', 'warning');
+                });
+            });
+
+            element.addEventListener('keydown', (e) => {
+                const isModifier = e.ctrlKey || e.metaKey;
+                const key = e.key.toLowerCase();
+
+                if ((isModifier && ['v', 'c', 'x'].includes(key)) || (e.shiftKey && e.key === 'Insert')) {
+                    e.preventDefault();
+                    showToast('⚠️ Akses pintasan Copy-Paste diblokir!', 'warning');
+                }
+            });
+        }
+
+        function startTimer() {
+            state.startTime = new Date();
+            const display = document.getElementById('timer-display');
+            const badge = document.getElementById('timer-badge');
+            const icon = document.getElementById('timer-icon');
+
+            document.getElementById('header-timer-box').classList.remove('hidden');
+            document.getElementById('header-timer-box').classList.add('flex');
+
+            state.timerInterval = setInterval(() => {
+                state.timerSeconds--;
+
+                const mins = Math.floor(state.timerSeconds / 60);
+                const secs = state.timerSeconds % 60;
+                display.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+
+                if (state.timerSeconds <= 300 && state.timerSeconds > 60) {
+                    badge.className = "flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-100 border border-amber-300 text-amber-800 font-mono font-bold text-xs sm:text-sm";
+                    icon.className = "fa-solid fa-triangle-exclamation text-amber-600";
+                } else if (state.timerSeconds <= 60 && state.timerSeconds > 0) {
+                    badge.className = "flex items-center gap-1.5 px-3 py-1.5 rounded-xl timer-warning-critical font-mono font-bold text-xs sm:text-sm shadow-md";
+                    icon.className = "fa-solid fa-stopwatch text-white";
+                } else if (state.timerSeconds <= 0) {
+                    clearInterval(state.timerInterval);
+                    showToast('⏰ Waktu pengerjaan habis! Jawaban Anda dikumpulkan otomatis.', 'error');
+                    submitExam(true);
+                }
+            }, 1000);
+        }
+
+        function renderQuestions() {
+            const containerA = document.getElementById('container-part-a');
+            containerA.innerHTML = '';
+
+            QUESTIONS_PART_A.forEach((q, idx) => {
+                const card = document.createElement('div');
+                card.className = "bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-xs space-y-3";
+                card.innerHTML = `
+                    <div class="flex items-start gap-2.5">
+                        <span class="flex-shrink-0 w-6 h-6 rounded-lg bg-dayak-100 text-dayak-800 text-xs font-bold flex items-center justify-center mt-0.5">
+                            ${idx + 1}
+                        </span>
+                        <p class="text-xs sm:text-sm text-slate-800 font-medium leading-relaxed">
+                            ${q.statement}
+                        </p>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2 pt-1 pl-8 sm:pl-9">
+                        <label class="cursor-pointer flex items-center justify-center gap-2 p-3 rounded-xl border border-slate-200 bg-slate-50 hover:bg-emerald-50 active:scale-98 transition text-xs font-bold text-slate-700 min-h-[48px] has-[:checked]:bg-emerald-600 has-[:checked]:border-emerald-600 has-[:checked]:text-white shadow-xs">
+                            <input type="radio" name="partA_${q.id}" value="Sesuai" class="hidden" onchange="updateProgress()">
+                            <i class="fa-regular fa-circle-check text-sm"></i>
+                            <span>Sesuai</span>
+                        </label>
+
+                        <label class="cursor-pointer flex items-center justify-center gap-2 p-3 rounded-xl border border-slate-200 bg-slate-50 hover:bg-rose-50 active:scale-98 transition text-xs font-bold text-slate-700 min-h-[48px] has-[:checked]:bg-rose-600 has-[:checked]:border-rose-600 has-[:checked]:text-white shadow-xs">
+                            <input type="radio" name="partA_${q.id}" value="Tidak Sesuai" class="hidden" onchange="updateProgress()">
+                            <i class="fa-regular fa-circle-xmark text-sm"></i>
+                            <span>Tidak Sesuai</span>
+                        </label>
+                    </div>
+                `;
+                containerA.appendChild(card);
+            });
+
+            const containerB = document.getElementById('container-part-b');
+            containerB.innerHTML = '';
+
+            QUESTIONS_PART_B.forEach((q, idx) => {
+                const card = document.createElement('div');
+                card.className = "bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-xs space-y-3";
+                card.innerHTML = `
+                    <div class="flex items-start gap-2.5">
+                        <span class="flex-shrink-0 w-6 h-6 rounded-lg bg-indigo-100 text-indigo-800 text-xs font-bold flex items-center justify-center mt-0.5">
+                            ${idx + 1}
+                        </span>
+                        <div class="space-y-0.5">
+                            <h4 class="font-bold text-slate-800 text-xs sm:text-sm">${q.title}</h4>
+                            <p class="text-xs text-slate-600 leading-relaxed">${q.prompt}</p>
+                        </div>
+                    </div>
+
+                    <div class="space-y-1.5 pl-8 sm:pl-9">
+                        <textarea id="essay_${q.id}" rows="3" placeholder="${q.placeholder}"
+                            class="w-full p-3 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-xs sm:text-sm text-slate-800 transition selectable-text resize-y"
+                            oninput="updateProgress(); updateCounter(${q.id});"></textarea>
+                        
+                        <div class="flex items-center justify-between text-[10px] sm:text-[11px] text-slate-400">
+                            <span><i class="fa-solid fa-keyboard text-indigo-400 mr-1"></i> Wajib diketik</span>
+                            <span id="counter_${q.id}" class="font-mono">0 Karakter</span>
+                        </div>
+                    </div>
+                `;
+                containerB.appendChild(card);
+
+                const textarea = card.querySelector(`#essay_${q.id}`);
+                attachAntiCheatListeners(textarea);
+            });
+        }
+
+        function updateCounter(id) {
+            const text = document.getElementById(`essay_${id}`).value;
+            const charCount = text.length;
+            const wordCount = text.trim() ? text.trim().split(/\s+/).length : 0;
+            document.getElementById(`counter_${id}`).textContent = `${charCount} Karakter | ${wordCount} Kata`;
+        }
+
+        function updateProgress() {
+            let count = 0;
+            QUESTIONS_PART_A.forEach(q => {
+                if (document.querySelector(`input[name="partA_${q.id}"]:checked`)) count++;
+            });
+            QUESTIONS_PART_B.forEach(q => {
+                const val = document.getElementById(`essay_${q.id}`)?.value.trim();
+                if (val && val.length >= 2) count++;
+            });
+
+            document.getElementById('progress-text').textContent = `${count} / 15`;
+            const pct = Math.round((count / 15) * 100);
+            document.getElementById('exam-progress-bar').style.width = `${pct}%`;
+        }
+
+        function submitExam(forced = false) {
+            if (state.isSubmitted) return;
+
+            // Validasi kelengkapan jawaban jika tidak dipaksa waktu habis
+            if (!forced) {
+                let unA = 0;
+                let unB = 0;
+                let firstUnansweredIndex = -1;
+
+                QUESTIONS_PART_A.forEach((q, idx) => {
+                    if (!document.querySelector(`input[name="partA_${q.id}"]:checked`)) {
+                        unA++;
+                        if (firstUnansweredIndex === -1) firstUnansweredIndex = `Bagian A Nomor ${idx + 1}`;
+                    }
+                });
+
+                QUESTIONS_PART_B.forEach((q, idx) => {
+                    const val = document.getElementById(`essay_${q.id}`)?.value.trim();
+                    if (!val || val.length < 2) {
+                        unB++;
+                        if (firstUnansweredIndex === -1) firstUnansweredIndex = `Bagian B Uraian Nomor ${idx + 1}`;
+                    }
+                });
+
+                if (unA > 0 || unB > 0) {
+                    showToast(`⚠️ Setiap jawaban wajib diisi! Belum lengkap pada: ${firstUnansweredIndex} (Total ${unA + unB} belum terisi).`, 'error');
+                    return;
+                }
+            }
+
+            state.isSubmitted = true;
+
+            clearInterval(state.timerInterval);
+            state.endTime = new Date();
+
+            let scorePartA = 0;
+            let correctCountA = 0;
+
+            QUESTIONS_PART_A.forEach(q => {
+                const selected = document.querySelector(`input[name="partA_${q.id}"]:checked`);
+                const userVal = selected ? selected.value : '(Tidak dijawab)';
+                const isCorrect = userVal === q.key;
+
+                if (isCorrect) {
+                    scorePartA += 4;
+                    correctCountA++;
+                }
+
+                state.answersPartA[q.id] = {
+                    userAnswer: userVal,
+                    isCorrect: isCorrect,
+                    key: q.key,
+                    statement: q.statement,
+                    explanation: q.explanation
+                };
+            });
+
+            state.scorePartA = scorePartA;
+
+            QUESTIONS_PART_B.forEach(q => {
+                const text = document.getElementById(`essay_${q.id}`)?.value.trim() || '(Tidak diisi)';
+                state.answersPartB[q.id] = {
+                    title: q.title,
+                    prompt: q.prompt,
+                    userAnswer: text
+                };
+            });
+
+            document.getElementById('step-exam').classList.add('hidden');
+            document.getElementById('step-identity').classList.add('hidden');
+            document.getElementById('header-timer-box').classList.add('hidden');
+            document.getElementById('step-result').classList.remove('hidden');
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            displayResults(scorePartA, correctCountA);
+            sendDataToGoogleSheets(forced ? 'Waktu Habis' : 'Selesai Tepat Waktu');
+        }
+
+        function sendDataToGoogleSheets(statusWaktu = 'Selesai Tepat Waktu') {
+            const scriptUrl = document.getElementById('input-script-url').value.trim() || DEFAULT_SCRIPT_URL;
+            const statusBox = document.getElementById('sheets-sync-status');
+            const syncIcon = document.getElementById('sync-icon');
+            const syncText = document.getElementById('sync-text');
+            const btnRetry = document.getElementById('btn-retry-sync');
+
+            if (!scriptUrl) {
+                statusBox.className = "bg-amber-50 border border-amber-200 rounded-xl p-3 text-xs text-amber-900 flex items-center justify-between gap-3 no-print";
+                syncIcon.className = "fa-solid fa-triangle-exclamation text-amber-600 text-sm";
+                syncText.textContent = "URL Apps Script belum diatur. Data hanya tersimpan lokal di layar ini.";
+                return;
+            }
+
+            statusBox.className = "bg-blue-50 border border-blue-200 rounded-xl p-3 text-xs text-blue-900 flex items-center justify-between gap-3 no-print";
+            syncIcon.className = "fa-solid fa-spinner fa-spin text-blue-600 text-sm";
+            syncText.textContent = "Mengirim jawaban ke Google Spreadsheet ulangan_mulok...";
+            btnRetry.classList.add('hidden');
+
+            const payload = {
+                timestamp: state.endTime ? state.endTime.toLocaleString('id-ID') : new Date().toLocaleString('id-ID'),
+                nama: state.studentName,
+                kelas: state.studentClass,
+                skorObjektif: `${state.scorePartA} / 40`,
+                detailObjektif: Object.values(state.answersPartA).map((a, i) => `S${i+1}:${a.userAnswer}`).join(', '),
+                esai1: state.answersPartB[1]?.userAnswer || '-',
+                esai2: state.answersPartB[2]?.userAnswer || '-',
+                esai3: state.answersPartB[3]?.userAnswer || '-',
+                esai4: state.answersPartB[4]?.userAnswer || '-',
+                esai5: state.answersPartB[5]?.userAnswer || '-',
+                statusWaktu: statusWaktu
+            };
+
+            // Menggunakan method POST dengan mode 'no-cors' atau format URLSearchParams untuk Apps Script Web App
+            // Mengirim sebagai form/text untuk menghindari CORS preflight issues di Google Apps Script
+            fetch(scriptUrl, {
+                method: 'POST',
+                mode: 'no-cors',
+                cache: 'no-cache',
+                headers: {
+                    'Content-Type': 'text/plain;charset=utf-8',
+                },
+                body: JSON.stringify(payload)
+            })
+            .then(() => {
+                // Karena mode 'no-cors', respons selalu opaque (status 0). Kita anggap sukses terkirim.
+                statusBox.className = "bg-emerald-50 border border-emerald-200 rounded-xl p-3 text-xs text-emerald-900 flex items-center justify-between gap-3 no-print";
+                syncIcon.className = "fa-solid fa-cloud-check text-emerald-600 text-sm";
+                syncText.textContent = "Berhasil! Jawaban tersimpan otomatis di Google Spreadsheet ulangan_mulok.";
+                showToast("✅ Data berhasil dikirim ke Spreadsheet!", "info");
+            })
+            .catch(err => {
+                console.error("Sheets Sync Error:", err);
+                statusBox.className = "bg-rose-50 border border-rose-200 rounded-xl p-3 text-xs text-rose-900 flex items-center justify-between gap-3 no-print";
+                syncIcon.className = "fa-solid fa-circle-exclamation text-rose-600 text-sm";
+                syncText.textContent = "Gagal mengirim otomatis. Periksa koneksi internet atau URL Web App.";
+                btnRetry.classList.remove('hidden');
+                showToast("⚠️ Gagal mengirim data ke Google Sheets.", "error");
+            });
+        }
+
+        function displayResults(scoreA, correctA) {
+            document.getElementById('res-name').textContent = state.studentName;
+            document.getElementById('res-class').textContent = state.studentClass;
+
+            const durationMs = state.endTime - state.startTime;
+            const durMins = Math.floor(durationMs / 60000);
+            const durSecs = Math.floor((durationMs % 60000) / 1000);
+            document.getElementById('res-time-used').textContent = `${durMins}m ${durSecs}s`;
+
+            const options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+            document.getElementById('res-timestamp').textContent = `Selesai: ${state.endTime.toLocaleDateString('id-ID', options)}`;
+
+            document.getElementById('res-score-a').innerHTML = `<i class="fa-solid fa-cloud-arrow-up text-dayak-600 mr-1.5"></i>Terkirim Ke Sheet`;
+            document.getElementById('res-score-detail').textContent = `Status: 10 Soal Bagian A & 5 Soal Bagian B Tersimpan`;
+
+            const listA = document.getElementById('res-list-a');
+            listA.innerHTML = '';
+            QUESTIONS_PART_A.forEach((q, idx) => {
+                const ans = state.answersPartA[q.id];
+                const card = document.createElement('div');
+                card.className = "p-3 rounded-xl border border-slate-200 bg-slate-50/70 text-xs space-y-1.5";
+                card.innerHTML = `
+                    <div class="flex items-start justify-between gap-2">
+                        <div class="font-medium text-slate-800">
+                            <strong>${idx + 1}.</strong> ${ans.statement}
+                        </div>
+                        <span class="flex-shrink-0 px-2 py-0.5 rounded text-[10px] font-semibold bg-slate-200 text-slate-700">
+                            Terekam
+                        </span>
+                    </div>
+                    <div class="flex gap-3 text-[11px] pt-1 border-t border-slate-200/60 text-slate-600">
+                        <span>Jawaban Anda: <strong class="text-slate-800">${ans.userAnswer}</strong></span>
+                    </div>
+                `;
+                listA.appendChild(card);
+            });
+
+            const listB = document.getElementById('res-list-b');
+            listB.innerHTML = '';
+            QUESTIONS_PART_B.forEach((q, idx) => {
+                const ans = state.answersPartB[q.id];
+                const card = document.createElement('div');
+                card.className = "p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 space-y-2";
+                card.innerHTML = `
+                    <div>
+                        <div class="text-[11px] font-bold text-indigo-700">Soal ${idx + 1}: ${ans.title}</div>
+                        <p class="text-xs text-slate-700 font-medium">${ans.prompt}</p>
+                    </div>
+                    <div class="bg-white p-3 rounded-lg border border-slate-200 text-xs text-slate-800 whitespace-pre-wrap leading-relaxed selectable-text">
+                        <span class="text-[10px] text-slate-400 font-semibold block mb-0.5">Hasil Ketikan Siswa:</span>
+                        ${escapeHtml(ans.userAnswer)}
+                    </div>
+                `;
+                listB.appendChild(card);
+            });
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.innerText = text;
+            return div.innerHTML;
+        }
+
+        function copySummaryToClipboard() {
+            let text = `*LAPORAN ULANGAN HARIAN MUATAN LOKAL*\n`;
+            text += `===================================\n`;
+            text += `Nama  : ${state.studentName}\n`;
+            text += `Kelas : ${state.studentClass}\n`;
+            text += `Waktu : ${document.getElementById('res-timestamp').textContent}\n`;
+            text += `===================================\n\n`;
+            text += `*JAWABAN BAGIAN A (Sesuai / Tidak Sesuai)*:\n`;
+
+            QUESTIONS_PART_A.forEach((q, idx) => {
+                const ans = state.answersPartA[q.id];
+                text += `No. ${idx + 1}: ${ans.userAnswer}\n`;
+            });
+
+            text += `\n*JAWABAN ESAI (BAGIAN B)*:\n`;
+
+            QUESTIONS_PART_B.forEach((q, idx) => {
+                const ans = state.answersPartB[q.id];
+                text += `\n*${idx + 1}. ${ans.title}*\n`;
+                text += `Jawab: ${ans.userAnswer}\n`;
+            });
+
+            const dummy = document.createElement('textarea');
+            document.body.appendChild(dummy);
+            dummy.value = text;
+            dummy.select();
+
+            try {
+                const ok = document.execCommand('copy');
+                if (ok) showToast('📋 Laporan disalin! Siap dikirim ke WhatsApp Guru.', 'info');
+                else showToast('Gagal menyalin teks.', 'error');
+            } catch (err) {
+                showToast('Gagal menyalin teks.', 'error');
+            }
+            document.body.removeChild(dummy);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderQuestions();
+            checkSpreadsheetConnection();
+
+            document.getElementById('form-identity').addEventListener('submit', (e) => {
+                e.preventDefault();
+
+                state.studentName = document.getElementById('student-name').value.trim();
+                state.studentClass = document.getElementById('student-name').value.trim() ? document.getElementById('student-class').value.trim() : '';
+
+                if (!state.studentName || !document.getElementById('student-class').value.trim()) {
+                    showToast('Harap isi Nama Lengkap dan Kelas!', 'warning');
+                    return;
+                }
+
+                state.studentClass = document.getElementById('student-class').value.trim();
+
+                document.getElementById('badge-student-name').textContent = state.studentName;
+                document.getElementById('badge-student-class').textContent = state.studentClass;
+
+                document.getElementById('step-identity').classList.add('hidden');
+                document.getElementById('step-exam').classList.remove('hidden');
+
+                startTimer();
+                showToast(`Ulangan dimulai! Selamat mengerjakan, ${state.studentName}.`, 'info');
+            });
+
+            document.getElementById('btn-submit-exam').addEventListener('click', () => {
+                let unA = 0;
+                let unB = 0;
+                QUESTIONS_PART_A.forEach(q => {
+                    if (!document.querySelector(`input[name="partA_${q.id}"]:checked`)) unA++;
+                });
+                QUESTIONS_PART_B.forEach(q => {
+                    if (!document.getElementById(`essay_${q.id}`)?.value.trim()) unB++;
+                });
+
+                if (unA > 0 || unB > 0) {
+                    showToast(`⚠️ Setiap jawaban wajib diisi! Masih ada ${unA} soal Sesuai/Tidak Sesuai dan ${unB} soal Esai yang kosong.`, 'error');
+                    return;
+                }
+
+                showConfirmModal('Kumpulkan Ujian', 'Apakah Anda yakin ingin mengumpulkan lembar jawaban ujian sekarang?', () => {
+                    submitExam(false);
+                });
+            });
+
+            document.getElementById('btn-retry-sync').addEventListener('click', () => {
+                sendDataToGoogleSheets('Selesai Tepat Waktu');
+            });
+
+            document.getElementById('btn-save-script-url').addEventListener('click', () => {
+                const url = document.getElementById('input-script-url').value.trim();
+                if (url) {
+                    DEFAULT_SCRIPT_URL = url;
+                    localStorage.setItem('script_url', url);
+                    showToast('URL Apps Script disimpan!', 'info');
+                } else {
+                    showToast('Harap masukkan URL Web App yang valid.', 'warning');
+                }
+            });
+
+            document.getElementById('btn-copy-summary').addEventListener('click', copySummaryToClipboard);
+
+            document.getElementById('btn-restart').addEventListener('click', () => {
+                showConfirmModal('Keluar Ujian', 'Aplikasi akan dimuat ulang ke halaman awal.', () => {
+                    window.location.reload();
+                });
+            });
+        });
+    </script>
+</body>
+</html>
