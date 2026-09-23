@@ -49,6 +49,7 @@
             -webkit-user-select: text !important;
             user-select: text !important;
             font-size: 16px !important;
+            -webkit-touch-callout: none !important;
         }
 
         @keyframes timer-pulse {
@@ -58,6 +59,21 @@
 
         .timer-warning-critical {
             animation: timer-pulse 1s infinite ease-in-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-slide-down {
+            animation: slideDown 0.4s ease-out forwards;
         }
 
         @media print {
@@ -209,7 +225,7 @@
                     <ul class="list-disc pl-4 space-y-1 text-amber-800/90 leading-relaxed text-[11px] sm:text-xs">
                         <li>Waktu pengerjaan otomatis <strong>50 Menit</strong>.</li>
                         <li>Terdiri dari <strong>10 Soal Sesuai/Tidak Sesuai</strong> & <strong>5 Soal Esai</strong>.</li>
-                        <li><strong class="text-rose-700">Anti Copy-Paste:</strong> Jawaban esai wajib diketik langsung secara manual.</li>
+                        <li><strong class="text-rose-700">Anti Copy-Paste & Paste Blokir Total:</strong> Jawaban esai wajib diketik manual huruf demi huruf (terproteksi di HP & PC).</li>
                         <li>Nilai & jawaban otomatis tersimpan ke <strong>Google Sheets</strong> saat selesai.</li>
                     </ul>
                 </div>
@@ -646,23 +662,62 @@
         }
 
         function attachAntiCheatListeners(element) {
-            const blockedEvents = ['paste', 'copy', 'cut', 'drop', 'contextmenu'];
-            blockedEvents.forEach(eventType => {
-                element.addEventListener(eventType, (e) => {
+            const preventAction = (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                showToast('⚠️ Dilarang copy-paste! Jawaban esai wajib diketik manual.', 'warning');
+                return false;
+            };
+
+            // Blokir semua event clipboard & context menu standar
+            element.addEventListener('paste', preventAction, true);
+            element.addEventListener('copy', preventAction, true);
+            element.addEventListener('cut', preventAction, true);
+            element.addEventListener('drop', preventAction, true);
+            element.addEventListener('contextmenu', preventAction, true);
+
+            // Atribut inline tambahan untuk proteksi ganda
+            element.setAttribute('onpaste', 'return false;');
+            element.setAttribute('ondrop', 'return false;');
+            element.setAttribute('oncopy', 'return false;');
+            element.setAttribute('oncut', 'return false;');
+
+            // Penanganan khusus mobile (Android / iOS long-press menu atau clipboard paste button)
+            element.addEventListener('beforeinput', (e) => {
+                if (e.inputType === 'insertFromPaste' || e.inputType === 'insertFromPasteAsPlainText') {
                     e.preventDefault();
-                    showToast('⚠️ Dilarang copy-paste! Jawaban esai wajib diketik manual.', 'warning');
-                });
+                    e.stopPropagation();
+                    showToast('⚠️ Fitur Paste dari papan klip diblokir di HP!', 'warning');
+                    return false;
+                }
+            }, true);
+
+            // Deteksi perubahan panjang teks secara drastis dalam satu event (indikasi paste blok besar di mobile)
+            let lastLength = element.value.length;
+            element.addEventListener('input', (e) => {
+                const currentLength = element.value.length;
+                // Jika bertambah lebih dari 4 karakter sekaligus dalam satu event input, curigai sebagai paste
+                if (currentLength - lastLength > 4) {
+                    element.value = ''; // Reset paksa textarea
+                    updateCounter(element.dataset.id);
+                    showToast('⚠️ Aksi paste terdeteksi dan diblokir! Ketik manual.', 'error');
+                }
+                lastLength = element.value.length;
             });
 
             element.addEventListener('keydown', (e) => {
                 const isModifier = e.ctrlKey || e.metaKey;
                 const key = e.key.toLowerCase();
 
-                if ((isModifier && ['v', 'c', 'x'].includes(key)) || (e.shiftKey && e.key === 'Insert')) {
+                if ((isModifier && ['v', 'c', 'x', 'a'].includes(key)) || 
+                    (e.shiftKey && e.key === 'Insert') ||
+                    (isModifier && e.shiftKey && key === 'v')) {
                     e.preventDefault();
-                    showToast('⚠️ Akses pintasan Copy-Paste diblokir!', 'warning');
+                    e.stopPropagation();
+                    showToast('⚠️ Pintasan papan klip (Clipboard) diblokir!', 'warning');
+                    return false;
                 }
-            });
+            }, true);
         }
 
         function startTimer() {
@@ -701,7 +756,8 @@
 
             QUESTIONS_PART_A.forEach((q, idx) => {
                 const card = document.createElement('div');
-                card.className = "bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-xs space-y-3";
+                card.className = "bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-xs space-y-3 animate-slide-down";
+                card.style.animationDelay = `${idx * 0.05}s`;
                 card.innerHTML = `
                     <div class="flex items-start gap-2.5">
                         <span class="flex-shrink-0 w-6 h-6 rounded-lg bg-dayak-100 text-dayak-800 text-xs font-bold flex items-center justify-center mt-0.5">
@@ -734,7 +790,8 @@
 
             QUESTIONS_PART_B.forEach((q, idx) => {
                 const card = document.createElement('div');
-                card.className = "bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-xs space-y-3";
+                card.className = "bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-xs space-y-3 animate-slide-down";
+                card.style.animationDelay = `${(QUESTIONS_PART_A.length + idx) * 0.05}s`;
                 card.innerHTML = `
                     <div class="flex items-start gap-2.5">
                         <span class="flex-shrink-0 w-6 h-6 rounded-lg bg-indigo-100 text-indigo-800 text-xs font-bold flex items-center justify-center mt-0.5">
@@ -747,12 +804,13 @@
                     </div>
 
                     <div class="space-y-1.5 pl-8 sm:pl-9">
-                        <textarea id="essay_${q.id}" rows="3" placeholder="${q.placeholder}"
+                        <textarea id="essay_${q.id}" data-id="${q.id}" rows="3" placeholder="${q.placeholder}"
                             class="w-full p-3 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-xs sm:text-sm text-slate-800 transition selectable-text resize-y"
-                            oninput="updateProgress(); updateCounter(${q.id});"></textarea>
+                            oninput="updateProgress(); updateCounter(${q.id});"
+                            onpaste="return false;" ondrop="return false;" oncopy="return false;" oncut="return false;"></textarea>
                         
                         <div class="flex items-center justify-between text-[10px] sm:text-[11px] text-slate-400">
-                            <span><i class="fa-solid fa-keyboard text-indigo-400 mr-1"></i> Wajib diketik</span>
+                            <span><i class="fa-solid fa-keyboard text-indigo-400 mr-1"></i> Wajib diketik manual</span>
                             <span id="counter_${q.id}" class="font-mono">0 Karakter</span>
                         </div>
                     </div>
@@ -789,7 +847,6 @@
         function submitExam(forced = false) {
             if (state.isSubmitted) return;
 
-            // Validasi kelengkapan jawaban jika tidak dipaksa waktu habis
             if (!forced) {
                 let unA = 0;
                 let unB = 0;
@@ -898,8 +955,6 @@
                 statusWaktu: statusWaktu
             };
 
-            // Menggunakan method POST dengan mode 'no-cors' atau format URLSearchParams untuk Apps Script Web App
-            // Mengirim sebagai form/text untuk menghindari CORS preflight issues di Google Apps Script
             fetch(scriptUrl, {
                 method: 'POST',
                 mode: 'no-cors',
@@ -910,7 +965,6 @@
                 body: JSON.stringify(payload)
             })
             .then(() => {
-                // Karena mode 'no-cors', respons selalu opaque (status 0). Kita anggap sukses terkirim.
                 statusBox.className = "bg-emerald-50 border border-emerald-200 rounded-xl p-3 text-xs text-emerald-900 flex items-center justify-between gap-3 no-print";
                 syncIcon.className = "fa-solid fa-cloud-check text-emerald-600 text-sm";
                 syncText.textContent = "Berhasil! Jawaban tersimpan otomatis di Google Spreadsheet ulangan_mulok.";
