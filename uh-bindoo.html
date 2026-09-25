@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ulangan Harian Bahasa Indonesia - Teks LHO</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-slide-down {
+            animation: slideDown 0.4s ease-out forwards;
+        }
+        /* Proteksi anti seleksi/salin teks secara umum kecuali input */
+        body {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+        input, textarea {
+            -webkit-user-select: text;
+            -moz-user-select: text;
+            -ms-user-select: text;
+            user-select: text;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased min-h-screen flex flex-col justify-between">
+
+    <!-- STEP 0: HALAMAN TUNGGU & GATEKEEPER KONEKSI -->
+    <div id="step-0" class="fixed inset-0 bg-slate-900 z-50 flex items-center justify-center p-4 transition-opacity duration-500">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8 text-center animate-slide-down">
+            <div id="connection-status-icon" class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
+                🔗
+            </div>
+            <h2 class="text-xl font-bold text-slate-900 mb-2">Menghubungkan ke Server</h2>
+            <p id="connection-message" class="text-sm text-slate-600 mb-6">Memverifikasi koneksi Google Spreadsheet (uh_bindo)...</p>
+            <button id="btn-retry-connection" onclick="checkConnection()" class="hidden w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 px-4 rounded-xl transition duration-200 shadow-md">
+                Coba Koneksi Ulang
+            </button>
+        </div>
+    </div>
+
+    <!-- HEADER APLIKASI -->
+    <header class="bg-emerald-700 text-white shadow-md py-4 px-6 sticky top-0 z-30">
+        <div class="max-w-2xl mx-auto flex justify-between items-center">
+            <div>
+                <h1 class="font-bold text-lg leading-tight">Ulangan Harian Bahasa Indonesia</h1>
+                <p class="text-xs text-emerald-100">Materi: Teks Laporan Hasil Observasi (LHO)</p>
+            </div>
+            <div id="timer-box" class="hidden bg-emerald-800 border border-emerald-600 px-3 py-1.5 rounded-lg text-sm font-mono font-bold tracking-wider">
+                ⏱️ <span id="timer-countdown">50:00</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- KONTEN UTAMA -->
+    <main class="max-w-2xl w-full mx-auto p-4 sm:p-6 flex-grow">
+
+        <!-- STEP 1: INPUT IDENTITAS -->
+        <section id="step-1" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 animate-slide-down">
+            <div class="border-b border-slate-100 pb-4 mb-6">
+                <h2 class="text-lg font-bold text-slate-900">Identitas Siswa</h2>
+                <p class="text-xs text-slate-500">Silakan masukkan data diri Anda sebelum memulai ujian.</p>
+            </div>
+            <form id="form-identitas" onsubmit="startExam(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Nama Lengkap</label>
+                    <input type="text" id="input-nama" required placeholder="Contoh: Budi Santoso" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Kelas</label>
+                    <input type="text" id="input-kelas" required placeholder="Contoh: X MIPA 1 / X E" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm">
+                </div>
+                <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-4 text-xs text-emerald-800 space-y-1">
+                    <p class="font-bold">⚠️ Ketentuan Ujian:</p>
+                    <p>• Durasi pengerjaan: <strong>50 Menit</strong>.</p>
+                    <p>• Terdiri dari 10 soal Pilihan Ganda (Sesuai/Tidak Sesuai) dan 5 Soal Esai.</p>
+                    <p>• Dilarang melakukan salin-tempel (copy-paste) pada kolom esai.</p>
+                </div>
+                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 px-4 rounded-xl transition duration-200 shadow-sm text-sm">
+                    Mulai Ujian Sekarang
+                </button>
+            </form>
+        </section>
+
+        <!-- STEP 2: LEMBAR SOAL UJIAN -->
+        <section id="step-2" class="hidden space-y-6">
+            <form id="form-ujian" onsubmit="submitExam(event)" class="space-y-6">
+                
+                <!-- Bagian A: Pilihan Ganda Sesuai / Tidak Sesuai -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 animate-slide-down">
+                    <div class="border-b border-slate-100 pb-3 mb-4">
+                        <h3 class="font-bold text-slate-900">Bagian A: Pilihan Ganda (Sesuai / Tidak Sesuai)</h3>
+                        <p class="text-xs text-slate-500">Pilihlah opsi yang tepat untuk setiap pernyataan berikut.</p>
+                    </div>
+
+                    <div id="container-soal-a" class="space-y-6">
+                        <!-- Soal dirender dinamis via JS -->
+                    </div>
+                </div>
+
+                <!-- Bagian B: Soal Esai -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 animate-slide-down">
+                    <div class="border-b border-slate-100 pb-3 mb-4">
+                        <h3 class="font-bold text-slate-900">Bagian B: Soal Uraian (Esai)</h3>
+                        <p class="text-xs text-slate-500">Jawablah pertanyaan berikut dengan uraian yang jelas dan benar.</p>
+                    </div>
+
+                    <div id="container-soal-b" class="space-y-6">
+                        <!-- Soal esai dirender dinamis via JS -->
+                    </div>
+                </div>
+
+                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 px-4 rounded-xl transition duration-200 shadow-md text-sm">
+                    Kirim Jawaban Ujian
+                </button>
+            </form>
+        </section>
+
+        <!-- STEP 3: HASIL & TRANSKRIP PENGUMPULAN -->
+        <section id="step-3" class="hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-6 text-center animate-slide-down space-y-4">
+            <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto text-2xl font-bold">
+                ✓
+            </div>
+            <h2 class="text-xl font-bold text-slate-900">Ujian Berhasil Dikirim!</h2>
+            <p class="text-xs text-slate-600">Jawaban Anda telah tersimpan secara otomatis di Google Spreadsheet (uh_bindo).</p>
+            
+            <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 text-left text-xs space-y-2">
+                <div class="flex justify-between"><span class="text-slate-500">Nama:</span> <span id="res-nama" class="font-bold text-slate-800"></span></div>
+                <div class="flex justify-between"><span class="text-slate-500">Kelas:</span> <span id="res-kelas" class="font-bold text-slate-800"></span></div>
+                <div class="flex justify-between"><span class="text-slate-500">Status Waktu:</span> <span id="res-status-waktu" class="font-bold text-slate-800">Selesai Tepat Waktu</span></div>
+            </div>
+
+            <div class="pt-2 flex flex-col sm:flex-row gap-3">
+                <button onclick="copyToWhatsApp()" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 px-4 rounded-xl transition text-xs shadow-sm">
+                    Salin Ringkasan untuk WhatsApp
+                </button>
+                <button onclick="window.print()" class="flex-1 bg-slate-800 hover:bg-slate-900 text-white font-semibold py-2.5 px-4 rounded-xl transition text-xs shadow-sm">
+                    Cetak / Simpan PDF
+                </button>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="text-center py-6 text-xs text-slate-400">
+        Dibuat oleh Annisa Yuniar Yasmin • Ulangan Harian Bahasa Indonesia
+    </footer>
+
+    <!-- SCRIPT UTAMA -->
+    <script>
+        // URL Web App Google Apps Script yang terhubung ke sheet uh_bindo
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzLCmqgZiMvV0qpIWosth-BcuiDy_AQ-1ZJD-iMWTbgRPLm278fODXhzxaExmI_Ltc4LA/exec";
+
+        let studentData = { nama: "", kelas: "" };
+        let timerInterval = null;
+        let timeLeft = 50 * 60; // 50 Menit
+        let isTimeUp = false;
+
+        // Data Soal Bagian A (Pilihan Ganda Sesuai/Tidak Sesuai)
+        const soalBagianA = [
+            { id: 1, text: "Laporan hasil observasi harus objektif dan mudah dipahami", kunci: "Sesuai" },
+            { id: 2, text: "Struktur yang memuat hal-hal umum mengenai objek adalah deskripsi manfaat", kunci: "Tidak Sesuai" },
+            { id: 3, text: "Buah durian memiliki kulit berduri dan rasa yang manis, adalah termasuk deskripsi manfaat", kunci: "Tidak Sesuai" },
+            { id: 4, text: "Saya rasa lebih baik hari ini kita memancing saja, adalah kalimat fakta", kunci: "Tidak Sesuai" },
+            { id: 5, text: "Laporan hasil observasi memiliki 6 kaidah kebahasaan", kunci: "Sesuai" },
+            { id: 6, text: "Memanjat adalah kata benda", kunci: "Tidak Sesuai" },
+            { id: 7, text: "Indikasi adalah kata teknis", kunci: "Sesuai" },
+            { id: 8, text: "Gelas adalah benda yang digunakan untuk minum, adalah pernyataan umum", kunci: "Sesuai" },
+            { id: 9, text: "Pohon kelapa memiliki batang yang sangat tinggi, adalah deskripsi bagian", kunci: "Sesuai" },
+            { id: 10, text: "Kata numeralia adalah kaidah kebahasaan teks laporan hasil observasi.", kunci: "Tidak Sesuai" }
+        ];
+
+        // Data Soal Bagian B (Esai)
+        const soalBagianB = [
+            { id: 1, label: "Esai 1", text: "Berikan masing-masing 1 contoh kalimat fakta dan opini!" },
+            { id: 2, label: "Esai 2", text: "Mengapa laporan hasil observasi harus dibuat berdasarkan fakta? Jelaskan!" },
+            { id: 3, label: "Esai 3", text: "Buatlah kalimat deskripsi manfaat mengenai objek perpustakaan!" },
+            { id: 4, label: "Esai 4", text: "Jelaskan perbedaan nomina dan adjektiva!" },
+            { id: 5, label: "Esai 5", text: "Buat 1 kalimat yang terdapat kata pengelompokkan!" }
+        ];
+
+        // Cek Koneksi saat pertama kali dimuat
+        window.addEventListener('DOMContentLoaded', () => {
+            checkConnection();
+            renderSoal();
+        });
+
+        async function checkConnection() {
+            const icon = document.getElementById('connection-status-icon');
+            const msg = document.getElementById('connection-message');
+            const btnRetry = document.getElementById('btn-retry-connection');
+            const step0 = document.getElementById('step-0');
+
+            icon.innerHTML = "🔄";
+            icon.className = "w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold animate-spin";
+            msg.innerText = "Menghubungkan ke Google Spreadsheet (uh_bindo)...";
+            btnRetry.classList.add('hidden');
+
+            try {
+                // Menggunakan mode no-cors agar dapat berkomunikasi langsung dengan Apps Script endpoint
+                const response = await fetch(SCRIPT_URL + "?action=ping", {
+                    method: 'GET',
+                    mode: 'no-cors'
+                });
+
+                // Karena mode no-cors menghasilkan opaque response, kita verifikasi responsif jaringan berhasil
+                icon.innerHTML = "✓";
+                icon.className = "w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold";
+                msg.innerText = "Koneksi ke Google Spreadsheet Berhasil!";
+                setTimeout(() => {
+                    step0.classList.add('opacity-0', 'pointer-events-none');
+                    setTimeout(() => step0.remove(), 500);
+                }, 600);
+
+            } catch (error) {
+                icon.innerHTML = "⚠️";
+                icon.className = "w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold";
+                msg.innerText = "Gagal terhubung ke server spreadsheet. Pastikan koneksi internet stabil.";
+                btnRetry.classList.remove('hidden');
+            }
+        }
+
+        function renderSoal() {
+            // Render Bagian A
+            const containerA = document.getElementById('container-soal-a');
+            containerA.innerHTML = soalBagianA.map((soal, index) => `
+                <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-3">
+                    <p class="text-xs font-semibold text-slate-700">Soal ${index + 1}</p>
+                    <p class="text-sm font-medium text-slate-900">${soal.text}</p>
+                    <div class="grid grid-cols-2 gap-3 pt-1">
+                        <label class="flex items-center justify-center px-4 py-2.5 rounded-xl border border-slate-300 bg-white cursor-pointer hover:bg-emerald-50 hover:border-emerald-500 transition text-xs font-semibold text-slate-700">
+                            <input type="radio" name="soal_a_${soal.id}" value="Sesuai" required class="mr-2 text-emerald-600 focus:ring-emerald-500"> Sesuai
+                        </label>
+                        <label class="flex items-center justify-center px-4 py-2.5 rounded-xl border border-slate-300 bg-white cursor-pointer hover:bg-emerald-50 hover:border-emerald-500 transition text-xs font-semibold text-slate-700">
+                            <input type="radio" name="soal_a_${soal.id}" value="Tidak Sesuai" required class="mr-2 text-emerald-600 focus:ring-emerald-500"> Tidak Sesuai
+                        </label>
+                    </div>
+                </div>
+            `).join('');
+
+            // Render Bagian B
+            const containerB = document.getElementById('container-soal-b');
+            containerB.innerHTML = soalBagianB.map((soal, index) => `
+                <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-3">
+                    <p class="text-xs font-semibold text-slate-700">${soal.label}</p>
+                    <p class="text-sm font-medium text-slate-900">${soal.text}</p>
+                    <textarea id="esai_${index + 1}" rows="3" required placeholder="Tulis jawaban uraian Anda di sini..." class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-xs"></textarea>
+                </div>
+            `).join('');
+
+            setupAntiPasteProtection();
+        }
+
+        // Proteksi Anti Copy-Paste Ketat
+        function setupAntiPasteProtection() {
+            const textareas = document.querySelectorAll('textarea');
+            textareas.forEach(textarea => {
+                ['cut', 'copy', 'paste', 'contextmenu'].forEach(evt => {
+                    textarea.addEventListener(evt, e => e.preventDefault());
+                });
+
+                let lastLength = 0;
+                textarea.addEventListener('beforeinput', e => {
+                    if (e.inputType === 'insertFromPaste' || e.inputType === 'insertFromPasteAsPlainText') {
+                        e.preventDefault();
+                        alert("Peringatan: Salin-tempel (Copy-Paste) tidak diizinkan pada soal esai!");
+                        return;
+                    }
+                });
+
+                textarea.addEventListener('input', e => {
+                    const currentLength = textarea.value.length;
+                    if (currentLength - lastLength > 15) {
+                        textarea.value = "";
+                        alert("Peringatan Keamanan: Terdeteksi upaya tempel teks (paste besar). Kolom dikosongkan.");
+                    }
+                    lastLength = textarea.value.length;
+                });
+            });
+        }
+
+        function startExam(e) {
+            e.preventDefault();
+            studentData.nama = document.getElementById('input-nama').value.trim();
+            studentData.kelas = document.getElementById('input-kelas').value.trim();
+
+            if (!studentData.nama || !studentData.kelas) return;
+
+            document.getElementById('step-1').classList.add('hidden');
+            document.getElementById('step-2').classList.remove('hidden');
+            document.getElementById('timer-box').classList.remove('hidden');
+
+            startTimer();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function startTimer() {
+            const timerDisplay = document.getElementById('timer-countdown');
+            const timerBox = document.getElementById('timer-box');
+
+            timerInterval = setInterval(() => {
+                let minutes = Math.floor(timeLeft / 60);
+                let seconds = timeLeft % 60;
+
+                timerDisplay.innerText = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+
+                if (timeLeft <= 300) {
+                    timerBox.classList.remove('bg-emerald-800', 'border-emerald-600');
+                    timerBox.classList.add('bg-red-700', 'border-red-500', 'animate-pulse');
+                }
+
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    isTimeUp = true;
+                    alert("Waktu ujian telah habis! Sistem akan mengirimkan jawaban Anda secara otomatis.");
+                    document.getElementById('form-ujian').requestSubmit();
+                }
+                timeLeft--;
+            }, 1000);
+        }
+
+        async function submitExam(e) {
+            e.preventDefault();
+            if (timerInterval) clearInterval(timerInterval);
+
+            let skorA = 0;
+            let detailObjektifArr = [];
+            soalBagianA.forEach(soal => {
+                const selected = document.querySelector(`input[name="soal_a_${soal.id}"]:checked`);
+                const jawabanSiswa = selected ? selected.value : "-";
+                if (jawabanSiswa === soal.kunci) {
+                    skorA += 4;
+                }
+                detailObjektifArr.push(`S${soal.id}:${jawabanSiswa}`);
+            });
+
+            const payload = {
+                timestamp: new Date().toLocaleString('id-ID'),
+                nama: studentData.nama,
+                kelas: studentData.kelas,
+                skorObjektif: `${skorA} / 40`,
+                detailObjektif: detailObjektifArr.join(', '),
+                esai1: document.getElementById('esai_1').value.trim() || '-',
+                esai2: document.getElementById('esai_2').value.trim() || '-',
+                esai3: document.getElementById('esai_3').value.trim() || '-',
+                esai4: document.getElementById('esai_4').value.trim() || '-',
+                esai5: document.getElementById('esai_5').value.trim() || '-',
+                statusWaktu: isTimeUp ? 'Waktu Habis' : 'Selesai Tepat Waktu'
+            };
+
+            document.getElementById('res-nama').innerText = payload.nama;
+            document.getElementById('res-kelas').innerText = payload.kelas;
+            document.getElementById('res-skor').innerText = payload.skorObjektif;
+            document.getElementById('res-status-waktu').innerText = payload.statusWaktu;
+
+            document.getElementById('step-2').classList.add('hidden');
+            document.getElementById('timer-box').classList.add('hidden');
+            document.getElementById('step-3').classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            // Kirim ke Google Apps Script Web App menggunakan mode no-cors
+            try {
+                await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+            } catch (err) {
+                console.error("Gagal mengirim data ke server:", err);
+            }
+        }
+
+        function copyToWhatsApp() {
+            const text = `*LAPORAN HASIL ULANGAN HARIAN BAHASA INDONESIA*\n` +
+                         `--------------------------------------------------\n` +
+                         `Nama: ${studentData.nama}\n` +
+                         `Kelas: ${studentData.kelas}\n` +
+                     
+                         `Status: ${document.getElementById('res-status-waktu').innerText}\n` +
+                         `--------------------------------------------------\n` +
+                         `Jawaban Esai & Objektif telah terekam di sistem server guru. Terima kasih!`;
+            
+            navigator.clipboard.writeText(text).then(() => {
+                alert("Ringkasan berhasil disalin! Silakan tempel (paste) ke chat WhatsApp guru Anda.");
+            });
+        }
+    </script>
+</body>
+</html>
