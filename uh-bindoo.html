@@ -133,6 +133,7 @@
             <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 text-left text-xs space-y-2">
                 <div class="flex justify-between"><span class="text-slate-500">Nama:</span> <span id="res-nama" class="font-bold text-slate-800"></span></div>
                 <div class="flex justify-between"><span class="text-slate-500">Kelas:</span> <span id="res-kelas" class="font-bold text-slate-800"></span></div>
+                <div class="flex justify-between"><span class="text-slate-500">Skor Objektif (Bagian A):</span> <span id="res-skor" class="font-bold text-emerald-600"></span></div>
                 <div class="flex justify-between"><span class="text-slate-500">Status Waktu:</span> <span id="res-status-waktu" class="font-bold text-slate-800">Selesai Tepat Waktu</span></div>
             </div>
 
@@ -320,14 +321,18 @@
                     clearInterval(timerInterval);
                     isTimeUp = true;
                     alert("Waktu ujian telah habis! Sistem akan mengirimkan jawaban Anda secara otomatis.");
-                    document.getElementById('form-ujian').requestSubmit();
+                    submitExamData();
                 }
                 timeLeft--;
             }, 1000);
         }
 
-        async function submitExam(e) {
+        function submitExam(e) {
             e.preventDefault();
+            submitExamData();
+        }
+
+        async function submitExamData() {
             if (timerInterval) clearInterval(timerInterval);
 
             let skorA = 0;
@@ -343,8 +348,8 @@
 
             const payload = {
                 timestamp: new Date().toLocaleString('id-ID'),
-                nama: studentData.nama,
-                kelas: studentData.kelas,
+                nama: studentData.nama || 'Tanpa Nama',
+                kelas: studentData.kelas || '-',
                 skorObjektif: `${skorA} / 40`,
                 detailObjektif: detailObjektifArr.join(', '),
                 esai1: document.getElementById('esai_1').value.trim() || '-',
@@ -365,7 +370,6 @@
             document.getElementById('step-3').classList.remove('hidden');
             window.scrollTo({ top: 0, behavior: 'smooth' });
 
-            // Kirim ke Google Apps Script Web App menggunakan mode no-cors
             try {
                 await fetch(SCRIPT_URL, {
                     method: 'POST',
@@ -383,7 +387,7 @@
                          `--------------------------------------------------\n` +
                          `Nama: ${studentData.nama}\n` +
                          `Kelas: ${studentData.kelas}\n` +
-                     
+                         `Skor Objektif: ${document.getElementById('res-skor').innerText}\n` +
                          `Status: ${document.getElementById('res-status-waktu').innerText}\n` +
                          `--------------------------------------------------\n` +
                          `Jawaban Esai & Objektif telah terekam di sistem server guru. Terima kasih!`;
