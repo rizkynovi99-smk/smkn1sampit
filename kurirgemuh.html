@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sorting Challenge: Kurir Pintar (Asesmen Individu 50 Menit) - Berpikir Komputasional</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .card-pop { transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1); }
+        .card-pop:hover { transform: translateY(-2px); }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col justify-between selection:bg-indigo-500 selection:text-white">
+
+    <header class="bg-slate-800/90 backdrop-blur border-b border-slate-700 sticky top-0 z-40 px-4 py-3">
+        <div class="max-w-5xl mx-auto flex flex-wrap justify-between items-center gap-3">
+            <div class="flex items-center space-x-3">
+                <div class="bg-gradient-to-tr from-amber-500 to-orange-500 p-2.5 rounded-2xl shadow-lg shadow-orange-500/20 text-2xl">📦</div>
+                <div>
+                    <h1 class="font-extrabold text-white text-base sm:text-lg leading-tight">Kurir Pintar: Asesmen Individu (10 Level)</h1>
+                    <p class="text-xs text-amber-300 font-medium">Laboratorium Berpikir Komputasional • Waktu: 50 Menit</p>
+                </div>
+            </div>
+
+            <!-- Stats Bar -->
+            <div id="stats-bar" class="hidden flex items-center space-x-2 sm:space-x-3">
+                <div class="bg-slate-700/60 px-3 py-1.5 rounded-xl text-xs font-semibold border border-slate-600 flex items-center space-x-1.5">
+                    <span>👤</span> <span id="display-student-name" class="text-emerald-300 font-bold">Siswa</span>
+                </div>
+                <div class="bg-slate-700/60 px-3 py-1.5 rounded-xl text-xs font-semibold border border-slate-600 flex items-center space-x-1.5">
+                    <span>🏫</span> <span id="display-student-class" class="text-indigo-300 font-bold">Kelas</span>
+                </div>
+                <div class="bg-slate-700/60 px-3 py-1.5 rounded-xl text-xs font-semibold border border-slate-600 flex items-center space-x-1.5">
+                    <span>⭐</span> <span id="display-score" class="font-bold text-amber-400">0</span> Poin
+                </div>
+                <div class="bg-slate-700/60 px-3 py-1.5 rounded-xl text-xs font-semibold border border-slate-600 flex items-center space-x-1.5">
+                    <span>🛡️</span> <span id="display-violations" class="font-bold text-rose-400">0/3 Pelanggaran</span>
+                </div>
+                <div class="bg-slate-700/60 px-3 py-1.5 rounded-xl text-xs font-mono border border-slate-600 flex items-center space-x-1">
+                    <span>⏱️</span> <span id="timer" class="font-bold text-emerald-400">50:00</span>
+                </div>
+                <button onclick="openTeacherMode()" class="bg-slate-700 hover:bg-slate-600 px-3 py-1.5 rounded-xl text-xs font-bold text-indigo-300 border border-slate-600 transition-all flex items-center space-x-1">
+                    <span>👨‍🏫</span> <span>Mode Guru</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-4xl w-full mx-auto px-4 py-6 flex-grow flex flex-col items-center justify-center">
+
+        <!-- SCREEN 1: WELCOME & STUDENT REGISTRATION -->
+        <div id="screen-welcome" class="w-full max-w-xl bg-slate-800/90 border border-slate-700 rounded-3xl p-6 sm:p-8 shadow-2xl backdrop-blur">
+            <div class="text-center mb-6">
+                <div class="inline-block bg-amber-500/20 text-amber-400 p-4 rounded-3xl text-4xl mb-3 border border-amber-500/30 shadow-inner">🚚</div>
+                <h2 class="text-2xl sm:text-3xl font-extrabold text-white mb-2">Asesmen Kurir Pintar (10 Level)</h2>
+                <p class="text-slate-400 text-sm leading-relaxed">
+                    Ujian Berpikir Komputasional Individu. Waktu pengerjaan total: 50 Menit.<br>
+                    <strong class="text-rose-400">⚠️ Proteksi Aktif:</strong> Keluar dari halaman/tab ujian maksimal 3 kali akan menyebabkan ujian terkunci dan terkirim otomatis!
+                </p>
+                <!-- DB Connection Status Pill -->
+                <div id="db-status-pill" class="mt-3 inline-flex items-center space-x-2 bg-emerald-500/10 border border-emerald-500/30 px-3 py-1 rounded-full text-xs font-semibold text-emerald-400">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <span>Database kurir_pintar Terhubung Otomatis</span>
+                </div>
+            </div>
+
+            <div class="space-y-4 mb-6">
+                <div>
+                    <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">1. Nama Lengkap:</label>
+                    <input type="text" id="input-name" placeholder="Contoh: Budi Santoso" class="w-full bg-slate-900 border border-slate-700 rounded-2xl px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition-all font-medium">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">2. Nomor Induk Siswa (NIS):</label>
+                    <input type="text" id="input-nis" placeholder="Contoh: 12345" class="w-full bg-slate-900 border border-slate-700 rounded-2xl px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition-all font-medium">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">3. Pilih Kelas:</label>
+                    <select id="select-class" class="w-full bg-slate-900 border border-slate-700 rounded-2xl px-4 py-3 text-sm text-white focus:outline-none focus:border-indigo-500 transition-all font-medium">
+                        <option value="X DKV 1">X DKV 1</option>
+                        <option value="X DKV 2">X DKV 2</option>
+                        <option value="X PM 1">X PM 1</option>
+                        <option value="X PM 2">X PM 2</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row gap-3">
+                <button onclick="startAssessment()" class="flex-1 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-white font-bold py-3.5 px-6 rounded-2xl shadow-lg shadow-orange-600/30 transition-all text-sm uppercase tracking-wider flex items-center justify-center space-x-2">
+                    <span>🚀</span> <span>Mulai Asesmen (50 Menit)</span>
+                </button>
+                <button onclick="openTeacherMode()" class="bg-slate-700 hover:bg-slate-600 text-indigo-300 font-bold py-3.5 px-4 rounded-2xl border border-slate-600 transition-all text-xs uppercase tracking-wider flex items-center justify-center space-x-1.5">
+                    <span>👨‍🏫</span> <span>Mode Guru</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- SCREEN 2: GAMEPLAY SCREEN -->
+        <div id="screen-game" class="hidden w-full max-w-2xl flex flex-col items-center">
+            
+            <!-- Level Banner & Rule Box -->
+            <div class="w-full bg-slate-800 border border-slate-700 rounded-2xl p-4 mb-4 shadow-lg flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                <div>
+                    <div class="flex items-center space-x-2">
+                        <span id="level-badge" class="text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">🟢 Level 1</span>
+                        <button onclick="openLevelSelectModal()" class="bg-slate-700 hover:bg-slate-600 text-slate-200 px-2.5 py-1 rounded-lg text-xs font-bold border border-slate-600 transition-all flex items-center space-x-1">
+                            <span>🗺️ Pilih Level</span>
+                        </button>
+                    </div>
+                    <h4 id="level-title" class="font-bold text-white text-sm mt-1">Judul Level</h4>
+                    <p id="level-rule-desc" class="text-xs text-slate-400 mt-0.5">Aturan pengurutan...</p>
+                </div>
+                <div id="event-alert" class="hidden bg-rose-500/20 border border-rose-500/40 text-rose-300 text-xs px-3 py-2 rounded-xl font-semibold flex items-center space-x-1">
+                    <span>🚨</span> <span id="event-text">Event Khusus!</span>
+                </div>
+            </div>
+
+            <!-- Paket Pool (Unsorted items) -->
+            <div class="w-full bg-slate-800/80 border border-slate-700 p-4 rounded-3xl shadow-xl mb-4">
+                <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 flex items-center justify-between">
+                    <span>📦 Daftar Paket Tersedia</span>
+                    <span class="text-[10px] text-indigo-300">Klik paket untuk memasukkan ke slot kosong</span>
+                </div>
+                <div id="packet-pool" class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                    <!-- Dynamic packets -->
+                </div>
+            </div>
+
+            <!-- Delivery Order Slot (Drop Target) -->
+            <div class="w-full bg-slate-800/80 border border-slate-700 p-4 rounded-3xl shadow-xl mb-6">
+                <div class="text-xs font-bold text-amber-400 uppercase tracking-wider mb-3 flex items-center justify-between">
+                    <span>🚚 Urutan Pengiriman (Klik slot untuk mengembalikan)</span>
+                    <span id="slot-counter" class="text-[10px] text-slate-400">0 / 4 Terisi</span>
+                </div>
+                <div id="delivery-slots" class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 min-h-[90px] bg-slate-900/50 p-3 rounded-2xl border border-slate-700/60">
+                    <!-- Dynamic slots -->
+                </div>
+            </div>
+
+            <!-- Action Controls -->
+            <div class="flex items-center justify-between w-full gap-3">
+                <button onclick="resetCurrentLevel()" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 px-5 py-3 rounded-xl text-xs font-bold transition-all flex items-center space-x-1">
+                    <span>🔄</span> <span>Reset Slot</span>
+                </button>
+                <button onclick="submitDeliveryOrder()" class="flex-grow bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold py-3 px-6 rounded-xl text-xs shadow-lg shadow-emerald-600/30 transition-all uppercase tracking-wider flex items-center justify-center space-x-2">
+                    <span>🚚</span> <span>Berangkat Mengantar!</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- SCREEN 3: REFLECTION & 4 PILLARS ANALYSIS MODAL -->
+        <div id="screen-reflection" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <div class="bg-slate-800 border border-slate-700 rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl max-h-[90vh] overflow-y-auto">
+                <div class="text-center mb-5">
+                    <div class="inline-block bg-emerald-500/20 text-emerald-400 p-3.5 rounded-2xl text-3xl mb-2 border border-emerald-500/30">🎉</div>
+                    <h3 id="reflection-header-title" class="text-xl font-bold text-white">Misi Level Berhasil!</h3>
+                    <p class="text-xs text-slate-400 mt-1">Skor Diperoleh: <span id="reflection-score-gain" class="text-amber-400 font-bold">+10</span> poin</p>
+                </div>
+
+                <!-- 4 Pillars Breakdown -->
+                <div class="bg-slate-900/70 border border-slate-700 rounded-2xl p-4 mb-5 space-y-3">
+                    <div class="text-xs font-bold text-indigo-300 uppercase tracking-wider flex items-center space-x-1">
+                        <span>🧠</span> <span>Analisis 4 Pilar Berpikir Komputasional</span>
+                    </div>
+                    <div class="space-y-2 text-xs">
+                        <div class="bg-slate-800/80 p-2.5 rounded-xl border border-slate-700">
+                            <span class="font-bold text-emerald-400">🔨 Dekomposisi:</span> <span id="analysis-decom" class="text-slate-300">Memecah paket berdasarkan atribut data.</span>
+                        </div>
+                        <div class="bg-slate-800/80 p-2.5 rounded-xl border border-slate-700">
+                            <span class="font-bold text-amber-400">🔎 Pengenalan Pola:</span> <span id="analysis-pattern" class="text-slate-300">Menemukan pola urutan data.</span>
+                        </div>
+                        <div class="bg-slate-800/80 p-2.5 rounded-xl border border-slate-700">
+                            <span class="font-bold text-orange-400">🎯 Abstraksi:</span> <span id="analysis-abstrac" class="text-slate-300">Mengabaikan atribut tidak penting.</span>
+                        </div>
+                        <div class="bg-slate-800/80 p-2.5 rounded-xl border border-slate-700">
+                            <span class="font-bold text-rose-400">📋 Algoritma:</span> <span id="analysis-algo" class="text-slate-300">Mengikuti prosedur sistematis.</span>
+                        </div>
+                    </div>
+                </div>
+
+                <button onclick="proceedNextLevel()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 px-4 rounded-xl text-xs shadow-lg shadow-indigo-600/30 transition-all uppercase tracking-wider">
+                    Lanjut ke Level Berikutnya 🚀
+                </button>
+            </div>
+        </div>
+
+        <!-- SCREEN 4: FINAL VICTORY & SPREADSHEET SUBMISSION -->
+        <div id="screen-victory" class="hidden w-full max-w-xl bg-slate-800/95 border border-slate-700 rounded-3xl p-6 sm:p-8 shadow-2xl backdrop-blur text-center">
+            <div class="inline-block bg-amber-500/20 text-amber-400 p-4 rounded-3xl text-4xl mb-3 border border-amber-500/30">👑</div>
+            <h2 id="victory-main-title" class="text-2xl font-extrabold text-white mb-1">Asesmen Selesai!</h2>
+            <p id="victory-badge-title" class="text-xs text-amber-300 font-bold mb-4 uppercase tracking-wider">Gelar: Kurir Legend</p>
+
+            <div class="bg-slate-900/60 border border-slate-700 rounded-2xl p-4 mb-5 text-left space-y-2">
+                <div class="text-xs font-bold text-indigo-300 uppercase tracking-wider">📊 Rekapitulasi Siswa:</div>
+                <div class="flex justify-between text-xs text-slate-300">
+                    <span>Nama / NIS:</span> <span id="vic-student-info" class="font-bold text-white">-</span>
+                </div>
+                <div class="flex justify-between text-xs text-slate-300">
+                    <span>Kelas:</span> <span id="vic-class-info" class="font-bold text-white">-</span>
+                </div>
+                <div class="flex justify-between text-xs text-slate-300">
+                    <span>Total Skor:</span> <span id="vic-score" class="font-bold text-amber-400">0</span>
+                </div>
+                <div class="flex justify-between text-xs text-slate-300">
+                    <span>Level Tercapai:</span> <span id="vic-level" class="font-bold text-emerald-400">10 / 10</span>
+                </div>
+                <div class="flex justify-between text-xs text-slate-300">
+                    <span>Total Pelanggaran Tab:</span> <span id="vic-violations" class="font-bold text-rose-400">0</span>
+                </div>
+                <div class="flex justify-between text-xs text-slate-300">
+                    <span>Kesalahan Susun:</span> <span id="vic-errors" class="font-bold text-orange-400">0</span>
+                </div>
+                <div class="flex justify-between text-xs text-slate-300 pt-2 border-t border-slate-800">
+                    <span>Status Google Sheets:</span> <span id="vic-sheets-status" class="font-bold text-amber-400">Menunggu pengiriman...</span>
+                </div>
+            </div>
+
+            <div class="flex gap-3">
+                <button onclick="submitToSpreadsheetManually()" class="flex-1 bg-slate-700 hover:bg-slate-600 text-slate-200 font-bold py-3 px-4 rounded-xl text-xs transition-all">
+                    Kirim Ulang ke Sheets 🔄
+                </button>
+                <button onclick="location.reload()" class="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 px-4 rounded-xl text-xs transition-all shadow-lg">
+                    Selesai & Keluar 🚪
+                </button>
+            </div>
+        </div>
+
+        <!-- LEVEL SELECTOR MODAL -->
+        <div id="modal-level-select" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <div class="bg-slate-800 border border-slate-700 rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl max-h-[90vh] overflow-y-auto">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="font-bold text-white text-base flex items-center space-x-2">
+                        <span>🗺️</span> <span>Pilih Level Permainan (1 - 10)</span>
+                    </h3>
+                    <button onclick="closeLevelSelectModal()" class="text-slate-400 hover:text-white text-sm font-bold">✕</button>
+                </div>
+                <p class="text-xs text-slate-400 mb-4">Pilih level yang ingin dikerjakan:</p>
+                <div id="level-grid-buttons" class="grid grid-cols-2 sm:grid-cols-5 gap-2.5 mb-6">
+                    <!-- Dynamic level buttons -->
+                </div>
+                <button onclick="closeLevelSelectModal()" class="w-full bg-slate-700 hover:bg-slate-600 text-slate-200 font-bold py-2.5 px-4 rounded-xl text-xs shadow-lg transition-all">
+                    Kembali
+                </button>
+            </div>
+        </div>
+
+        <!-- TEACHER AUTH MODAL -->
+        <div id="modal-teacher-auth" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <div class="bg-slate-800 border border-slate-700 rounded-3xl max-w-sm w-full p-6 text-center shadow-2xl">
+                <div class="text-4xl mb-3">🔒</div>
+                <h4 class="text-lg font-bold text-white mb-2">Autentikasi Mode Guru</h4>
+                <p class="text-xs text-slate-300 mb-4">Masukkan sandi khusus guru untuk mengakses panel:</p>
+                <input type="password" id="input-teacher-pass" placeholder="Kata sandi..." class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white mb-4 text-center focus:outline-none focus:border-indigo-500 font-mono">
+                <div class="flex gap-2">
+                    <button onclick="closeTeacherAuthModal()" class="flex-1 bg-slate-700 hover:bg-slate-600 text-slate-200 font-bold py-2.5 px-4 rounded-xl text-xs">Batal</button>
+                    <button onclick="verifyTeacherPassword()" class="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2.5 px-4 rounded-xl text-xs shadow-lg">Masuk</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- TEACHER DASHBOARD MODAL -->
+        <div id="modal-teacher" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <div class="bg-slate-800 border border-slate-700 rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl max-h-[90vh] overflow-y-auto">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="font-bold text-white text-base flex items-center space-x-2">
+                        <span>👨‍🏫</span> <span>Dashboard Guru (Bypass Level)</span>
+                    </h3>
+                    <button onclick="closeTeacherMode()" class="text-slate-400 hover:text-white text-sm font-bold">✕</button>
+                </div>
+                <div class="bg-slate-900/60 p-3 rounded-2xl border border-slate-700 mb-4 text-xs space-y-1">
+                    <div><span class="text-slate-400">Siswa Aktif:</span> <span id="teach-name" class="font-bold text-white">-</span></div>
+                    <div><span class="text-slate-400">Kelas:</span> <span id="teach-class" class="font-bold text-indigo-300">-</span></div>
+                </div>
+                <p class="text-xs text-slate-400 mb-3 font-semibold">Pilih level untuk langsung menguji:</p>
+                <div id="teacher-level-grid" class="grid grid-cols-2 sm:grid-cols-5 gap-2 mb-6">
+                    <!-- Dynamic teacher buttons -->
+                </div>
+                <button onclick="closeTeacherMode()" class="w-full bg-slate-700 hover:bg-slate-600 text-slate-200 font-bold py-2.5 px-4 rounded-xl text-xs transition-all">
+                    Tutup Panel
+                </button>
+            </div>
+        </div>
+
+        <!-- MESSAGE MODAL -->
+        <div id="modal-msg" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <div class="bg-slate-800 border border-slate-700 rounded-3xl max-w-sm w-full p-6 text-center shadow-2xl">
+                <div id="modal-icon" class="text-4xl mb-3">⚠️</div>
+                <h4 id="modal-title" class="text-lg font-bold text-white mb-2">Peringatan</h4>
+                <p id="modal-desc" class="text-xs text-slate-300 mb-6 leading-relaxed">Keterangan pesan.</p>
+                <button onclick="closeMsgModal()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2.5 px-4 rounded-xl text-xs shadow-lg transition-all">
+                    Mengerti 👍
+                </button>
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="bg-slate-800/40 border-t border-slate-800 py-3 text-center text-xs text-slate-500">
+        Sorting Challenge: Kurir Pintar (Asesmen Individu 50 Menit) • Laboratorium CT 🧠📦
+    </footer>
+
+    <!-- GAME ENGINE & PROCTORING SCRIPT -->
+    <script>
+        // Default Webhook URL terhubung otomatis ke spreadsheet kurir_pintar
+        const DEFAULT_SHEETS_URL = "https://script.google.com/macros/s/AKfycbyBU10bpxL3uzhuFdtZ-sYes-k7dCVVMB6heasE3odNF6BS2SZuSC5P85aAE6eP5gtytA/exec";
+
+        let studentData = {
+            name: "",
+            nis: "",
+            studentClass: "X DKV 1",
+            sheetsUrl: DEFAULT_SHEETS_URL,
+            score: 0,
+            errors: 0,
+            violations: 0,
+            levelReached: 1
+        };
+
+        let gameState = {
+            currentLevel: 1,
+            lives: 3,
+            comboCount: 0,
+            totalSecondsElapsed: 0,
+            assessmentTimerInterval: null,
+            examActive: false
+        };
+
+        const ASSESSMENT_TOTAL_TIME = 50 * 60; // 50 minutes in seconds
+        const MAX_VIOLATIONS = 3;
+
+        // 10 Progressive Computational Thinking Levels Dataset
+        const LEVELS_DATA = {
+            1: {
+                badge: "🟢 Level 1: Bonus Latihan",
+                title: "Pengenalan Jarak Dasar (Bonus / 0 Poin)",
+                rule: "Level Latihan: Urutkan 4 paket berdasarkan jarak terdekat ke terjauh. Selesaikan untuk pemanasan!",
+                maxPoints: 0, // Bonus level = 0 points
+                packets: [
+                    { id: 'p1', name: 'Paket A', dist: '5 km', val: 5 },
+                    { id: 'p2', name: 'Paket B', dist: '2 km', val: 2 },
+                    { id: 'p3', name: 'Paket C', dist: '8 km', val: 8 },
+                    { id: 'p4', name: 'Paket D', dist: '4 km', val: 4 }
+                ],
+                solution: ['p2', 'p4', 'p1', 'p3'],
+                analysis: {
+                    decom: "Memecah paket menjadi atribut Jarak untuk pemanasan.",
+                    pattern: "Mengenali deret angka naik: terkecil ke terbesar.",
+                    abstrac: "Mengabaikan nama, fokus pada angka kilometer.",
+                    algo: "Bandingkan jarak terkecil dan letakkan berurutan."
+                }
+            },
+            2: {
+                badge: "🟢 Level 2: Prioritas Dasar",
+                title: "Pengelompokan Prioritas",
+                rule: "Urutkan berdasarkan Prioritas (Tinggi ➔ Sedang ➔ Rendah). Jika sama, jarak terdekat.",
+                maxPoints: 10,
+                packets: [
+                    { id: 'p1', name: 'Paket A', dist: '6 km', priority: 'Rendah' },
+                    { id: 'p2', name: 'Paket B', dist: '3 km', priority: 'Tinggi' },
+                    { id: 'p3', name: 'Paket C', dist: '2 km', priority: 'Sedang' },
+                    { id: 'p4', name: 'Paket D', dist: '1 km', priority: 'Tinggi' }
+                ],
+                solution: ['p4', 'p2', 'p3', 'p1'],
+                analysis: {
+                    decom: "Memisahkan atribut Prioritas dan Jarak.",
+                    pattern: "Kelompok Tinggi diutamakan sebelum Sedang dan Rendah.",
+                    abstrac: "Mengabstraksi warna kemasan.",
+                    algo: "Pilih Tinggi jarak terkecil, lalu Sedang, lalu Rendah."
+                }
+            },
+            3: {
+                badge: "🟡 Level 3: Siaga Deadline",
+                title: "Kronologi Waktu (Deadline)",
+                rule: "Urutkan 4 paket berdasarkan Deadline waktu tercepat ke terlambat.",
+                maxPoints: 10,
+                packets: [
+                    { id: 'p1', name: 'Paket A', deadline: '11.00' },
+                    { id: 'p2', name: 'Paket B', deadline: '09.30' },
+                    { id: 'p3', name: 'Paket C', deadline: '10.15' },
+                    { id: 'p4', name: 'Paket D', deadline: '12.00' }
+                ],
+                solution: ['p2', 'p3', 'p1', 'p4'],
+                analysis: {
+                    decom: "Fokus pada variabel waktu deadline.",
+                    pattern: "Kronologi jam dari pagi ke siang.",
+                    abstrac: "Mengabaikan berat paket.",
+                    algo: "Bandingkan jam deadline dan susun menaik."
+                }
+            },
+            4: {
+                badge: "🟡 Level 4: Multi-Atribut",
+                title: "Prioritas + Deadline",
+                rule: "Aturan: Prioritas Tinggi didahulukan. Jika prioritas sama, pilih deadline tercepat.",
+                maxPoints: 10,
+                packets: [
+                    { id: 'p1', name: 'Paket A', priority: 'Sedang', deadline: '10.00' },
+                    { id: 'p2', name: 'Paket B', priority: 'Tinggi', deadline: '11.00' },
+                    { id: 'p3', name: 'Paket C', priority: 'Tinggi', deadline: '09.30' },
+                    { id: 'p4', name: 'Paket D', priority: 'Rendah', deadline: '09.00' }
+                ],
+                solution: ['p3', 'p2', 'p1', 'p4'],
+                analysis: {
+                    decom: "Menggabungkan evaluasi Prioritas dan Deadline.",
+                    pattern: "Filter prioritas tertinggi lebih dulu, urutkan deadline di dalamnya.",
+                    abstrac: "Mengabaikan jenis tujuan.",
+                    algo: "Kondisional bertingkat IF-ELSE untuk menyusun urutan."
+                }
+            },
+            5: {
+                badge: "🟠 Level 5: Profesional Kompleks",
+                title: "5 Paket: Tujuan & Jarak",
+                rule: "Urutkan 5 paket berdasarkan jarak terdekat ke terjauh.",
+                maxPoints: 10,
+                packets: [
+                    { id: 'p1', name: 'Paket A', dest: 'Toko', dist: '7 km' },
+                    { id: 'p2', name: 'Paket B', dest: 'Rumah', dist: '2 km' },
+                    { id: 'p3', name: 'Paket C', dest: 'Gudang', dist: '9 km' },
+                    { id: 'p4', name: 'Paket D', dest: 'Rumah', dist: '3 km' },
+                    { id: 'p5', name: 'Paket E', dest: 'Kantor', dist: '5 km' }
+                ],
+                solution: ['p2', 'p4', 'p5', 'p1', 'p3'],
+                analysis: {
+                    decom: "Mengurai 5 data paket dengan tujuan bervariasi.",
+                    pattern: "Pola kenaikan nilai jarak numerik.",
+                    abstrac: "Mengabaikan jenis tempat tujuan (Rumah/Toko).",
+                    algo: "Pencarian nilai minimum berulang (Selection Sort)."
+                }
+            },
+            6: {
+                badge: "🟠 Level 6: Rute Tertutup",
+                title: "Pengecualian Rute (Exception)",
+                rule: "🚨 Jalan ke Paket B (Toko) ditutup! Urutkan 4 paket tersisa berdasarkan jarak terdekat.",
+                maxPoints: 10,
+                eventMsg: "🚨 Rute Toko ditutup sementara!",
+                packets: [
+                    { id: 'p1', name: 'Paket A', dist: '4 km', status: 'Lancar' },
+                    { id: 'p2', name: 'Paket B', dist: '1 km', status: 'Tutup' },
+                    { id: 'p3', name: 'Paket C', dist: '6 km', status: 'Lancar' },
+                    { id: 'p4', name: 'Paket D', dist: '3 km', status: 'Lancar' }
+                ],
+                solution: ['p4', 'p1', 'p3', 'p2'],
+                analysis: {
+                    decom: "Mengecualikan paket dengan status rute bermasalah.",
+                    pattern: "Mengenali parameter status jalan (Tutup vs Lancar).",
+                    abstrac: "Fokus pada kelayakan jalan.",
+                    algo: "Tambahkan pengecualian IF status == Tutup letakkan di akhir."
+                }
+            },
+            7: {
+                badge: "🔴 Level 7: Master Jadwal",
+                title: "6 Paket: Deadline & Prioritas",
+                rule: "Urutkan 6 paket berdasarkan deadline tercepat ke terlambat.",
+                maxPoints: 12,
+                packets: [
+                    { id: 'p1', name: 'Paket 1', deadline: '10.30' },
+                    { id: 'p2', name: 'Paket 2', deadline: '09.00' },
+                    { id: 'p3', name: 'Paket 3', deadline: '11.15' },
+                    { id: 'p4', name: 'Paket 4', deadline: '09.45' },
+                    { id: 'p5', name: 'Paket 5', deadline: '12.00' },
+                    { id: 'p6', name: 'Paket 6', deadline: '10.00' }
+                ],
+                solution: ['p2', 'p4', 'p6', 'p1', 'p3', 'p5'],
+                analysis: {
+                    decom: "Skala data lebih besar (6 paket).",
+                    pattern: "Kronologi waktu secara presisi.",
+                    abstrac: "Mengabaikan ID paket, fokus pada waktu.",
+                    algo: "Algoritma pengurutan waktu berurutan."
+                }
+            },
+            8: {
+                badge: "🔴 Level 8: Kondisi Lalu Lintas",
+                title: "Prioritas dan Macet",
+                rule: "Utamakan Tinggi ➔ Sedang ➔ Rendah. Paket dengan status 'Macet' dikirim paling akhir dalam kelompoknya.",
+                maxPoints: 13,
+                eventMsg: "🚧 Waspada kemacetan di beberapa titik!",
+                packets: [
+                    { id: 'p1', name: 'P-A', priority: 'Tinggi', road: 'Macet' },
+                    { id: 'p2', name: 'P-B', priority: 'Tinggi', road: 'Lancar' },
+                    { id: 'p3', name: 'P-C', priority: 'Sedang', road: 'Lancar' },
+                    { id: 'p4', name: 'P-D', priority: 'Rendah', road: 'Lancar' }
+                ],
+                solution: ['p2', 'p1', 'p3', 'p4'],
+                analysis: {
+                    decom: "Evaluasi ganda: Prioritas + Kondisi Lalu Lintas.",
+                    pattern: "Pengaruh hambatan jalan terhadap urutan.",
+                    abstrac: "Mengabaikan nama paket ringkas.",
+                    algo: "Logika penalti rute macet pada penyusunan antrean."
+                }
+            },
+            9: {
+                badge: "🟣 Level 9: Grandmaster Kurir",
+                title: "8 Paket: Kombinasi Kompleks",
+                rule: "Urutkan 8 paket berdasarkan Prioritas (Tinggi ➔ Sedang ➔ Rendah) lalu jarak terdekat.",
+                maxPoints: 12,
+                packets: [
+                    { id: 'p1', name: 'P-1', dist: '5 km', priority: 'Sedang' },
+                    { id: 'p2', name: 'P-2', dist: '2 km', priority: 'Tinggi' },
+                    { id: 'p3', name: 'P-3', dist: '8 km', priority: 'Rendah' },
+                    { id: 'p4', name: 'P-4', dist: '1 km', priority: 'Tinggi' },
+                    { id: 'p5', name: 'P-5', dist: '3 km', priority: 'Sedang' },
+                    { id: 'p6', name: 'P-6', dist: '4 km', priority: 'Tinggi' },
+                    { id: 'p7', name: 'P-7', dist: '6 km', priority: 'Rendah' },
+                    { id: 'p8', name: 'P-8', dist: '2 km', priority: 'Sedang' }
+                ],
+                solution: ['p4', 'p2', 'p6', 'p8', 'p5', 'p1', 'p7', 'p3'],
+                analysis: {
+                    decom: "Pecah 8 data menjadi 3 kelompok prioritas dan sub-jarak.",
+                    pattern: "Pengelompokan hierarki bertingkat.",
+                    abstrac: "Fokus pada struktur data array multi-atribut.",
+                    algo: "Sorting multi-kunci (Multi-key sorting algorithm)."
+                }
+            },
+            10: {
+                badge: "👑 Level 10: Kurir Legend (Boss)",
+                title: "Final Boss: 10 Paket Optimasi Penuh",
+                rule: "Ujian Akhir: Urutkan 10 paket berdasarkan Deadline tercepat ke terlambat.",
+                maxPoints: 13,
+                eventMsg: "👑 BOSS BATTLE: Selesaikan dengan algoritma secepat kilat!",
+                packets: [
+                    { id: 'p1', name: 'Paket 01', deadline: '10.00' },
+                    { id: 'p2', name: 'Paket 02', deadline: '08.30' },
+                    { id: 'p3', name: 'Paket 03', deadline: '11.00' },
+                    { id: 'p4', name: 'Paket 04', deadline: '09.15' },
+                    { id: 'p5', name: 'Paket 05', deadline: '12.00' },
+                    { id: 'p6', name: 'Paket 06', deadline: '09.00' },
+                    { id: 'p7', name: 'Paket 07', deadline: '10.30' },
+                    { id: 'p8', name: 'Paket 08', deadline: '08.45' },
+                    { id: 'p9', name: 'Paket 09', deadline: '11.30' },
+                    { id: 'p10', name: 'Paket 10', deadline: '09.45' }
+                ],
+                solution: ['p2', 'p8', 'p6', 'p4', 'p10', 'p1', 'p7', 'p3', 'p9', 'p5'],
+                analysis: {
+                    decom: "Sintesis penuh 4 Pilar Berpikir Komputasional pada skala 10 data.",
+                    pattern: "Mengenali kronologi waktu padat secara efisien.",
+                    abstrac: "Menyaring informasi dari dataset yang besar.",
+                    algo: "Penerapan algoritma pengurutan optimal tingkat lanjut."
+                }
+            }
+        };
+
+        let currentLevelPool = [];
+        let currentSlots = [];
+
+        // PROCTORING / TAB SWITCH DETECTION
+        document.addEventListener("visibilitychange", () => {
+            if (gameState.examActive && document.hidden) {
+                handleViolation("Keluar dari Halaman / Berpindah Tab Terdeteksi!");
+            }
+        });
+
+        window.addEventListener("blur", () => {
+            if (gameState.examActive) {
+                handleViolation("Jendela Ujian Kehilangan Fokus (Blur / Pindah Aplikasi)!");
+            }
+        });
+
+        function handleViolation(reason) {
+            if (!gameState.examActive) return;
+            studentData.violations++;
+            document.getElementById('display-violations').innerText = `${studentData.violations}/${MAX_VIOLATIONS} Pelanggaran`;
+
+            if (studentData.violations >= MAX_VIOLATIONS) {
+                gameState.examActive = false;
+                clearInterval(gameState.assessmentTimerInterval);
+                showMsgModal("Ujian Dihentikan", "Anda telah melakukan pelanggaran meninggalkan halaman ujian sebanyak 3 kali. Sesi ujian otomatis dikunci dan dikirim.", "🚨");
+                setTimeout(() => {
+                    finishAssessmentAndSubmit();
+                }, 2000);
+            } else {
+                showMsgModal("Peringatan Pelanggaran!", `${reason}\nPelanggaran ke-${studentData.violations} dari ${MAX_VIOLATIONS}. Jika mencapai 3 kali, ujian akan otomatis dikunci!`, "⚠️");
+            }
+        }
+
+        function startAssessment() {
+            const name = document.getElementById('input-name').value.trim();
+            const nis = document.getElementById('input-nis').value.trim();
+            const studentClass = document.getElementById('select-class').value;
+
+            if(!name || !nis) {
+                showMsgModal("Data Belum Lengkap", "Harap masukkan Nama Lengkap dan Nomor Induk Siswa (NIS) sebelum memulai asesmen.", "⚠️");
+                return;
+            }
+
+            studentData.name = name;
+            studentData.nis = nis;
+            studentData.studentClass = studentClass;
+            studentData.sheetsUrl = DEFAULT_SHEETS_URL;
+            studentData.violations = 0;
+            gameState.examActive = true;
+
+            document.getElementById('display-student-name').innerText = name;
+            document.getElementById('display-student-class').innerText = studentClass;
+            document.getElementById('display-violations').innerText = `0/${MAX_VIOLATIONS} Pelanggaran`;
+
+            document.getElementById('screen-welcome').classList.add('hidden');
+            document.getElementById('stats-bar').classList.remove('hidden');
+            
+            launchGameLevel(1);
+            startAssessmentTimer();
+        }
+
+        function startAssessmentTimer() {
+            clearInterval(gameState.assessmentTimerInterval);
+            let timeLeft = ASSESSMENT_TOTAL_TIME;
+
+            gameState.assessmentTimerInterval = setInterval(() => {
+                if (!gameState.examActive) return;
+                gameState.totalSecondsElapsed++;
+                timeLeft--;
+
+                let m = Math.floor(timeLeft / 60).toString().padStart(2, '0');
+                let s = (timeLeft % 60).toString().padStart(2, '0');
+                document.getElementById('timer').innerText = `${m}:${s}`;
+
+                if(timeLeft <= 0) {
+                    gameState.examActive = false;
+                    clearInterval(gameState.assessmentTimerInterval);
+                    handleTimeOutAssessment();
+                }
+            }, 1000);
+        }
+
+        function handleTimeOutAssessment() {
+            showMsgModal("Waktu Asesmen Habis", "Waktu 50 menit telah berakhir. Asesmen Anda akan otomatis direkap dan dikirim ke spreadsheet.", "⏱️");
+            finishAssessmentAndSubmit();
+        }
+
+        function launchGameLevel(lvlNum) {
+            gameState.currentLevel = lvlNum;
+            document.getElementById('screen-reflection').classList.add('hidden');
+            document.getElementById('screen-game').classList.remove('hidden');
+
+            const lvl = LEVELS_DATA[lvlNum];
+
+            document.getElementById('level-badge').innerText = lvl.badge;
+            document.getElementById('level-title').innerText = lvl.title;
+            document.getElementById('level-rule-desc').innerText = lvl.rule;
+
+            const eventAlert = document.getElementById('event-alert');
+            if(lvl.eventMsg) {
+                eventAlert.classList.remove('hidden');
+                document.getElementById('event-text').innerText = lvl.eventMsg;
+            } else {
+                eventAlert.classList.add('hidden');
+            }
+
+            currentLevelPool = [...lvl.packets];
+            currentSlots = new Array(lvl.packets.length).fill(null);
+
+            renderGamePoolAndSlots();
+        }
+
+        function renderGamePoolAndSlots() {
+            const poolEl = document.getElementById('packet-pool');
+            poolEl.innerHTML = '';
+            currentLevelPool.forEach((pkt, idx) => {
+                const card = document.createElement('div');
+                card.className = `bg-slate-900/80 hover:bg-slate-900 border border-slate-700 hover:border-amber-500/60 p-2.5 sm:p-3 rounded-2xl cursor-pointer card-pop select-none shadow-md flex flex-col justify-between`;
+                card.onclick = () => selectPacketToSlot(idx);
+                
+                let detailsHTML = '';
+                if(pkt.dist) detailsHTML += `<span class="text-xs font-bold text-amber-400">📏 ${pkt.dist}</span> `;
+                if(pkt.priority) detailsHTML += `<span class="text-[10px] bg-indigo-500/20 text-indigo-300 px-1 py-0.5 rounded font-semibold">${pkt.priority}</span> `;
+                if(pkt.deadline) detailsHTML += `<span class="text-[10px] bg-rose-500/20 text-rose-300 px-1 py-0.5 rounded font-semibold">⏰ ${pkt.deadline}</span> `;
+                if(pkt.status) detailsHTML += `<span class="text-[10px] bg-amber-500/20 text-amber-300 px-1 py-0.5 rounded font-semibold">🚦 ${pkt.status}</span> `;
+
+                card.innerHTML = `
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="text-xs font-extrabold text-white">${pkt.name}</span>
+                        <span class="text-[10px] text-slate-400">${pkt.dest || ''}</span>
+                    </div>
+                    <div>${detailsHTML}</div>
+                `;
+                poolEl.appendChild(card);
+            });
+
+            const slotsEl = document.getElementById('delivery-slots');
+            slotsEl.innerHTML = '';
+            let filledCount = 0;
+
+            currentSlots.forEach((slotItem, slotIdx) => {
+                const slotBox = document.createElement('div');
+                slotBox.className = `border-2 border-dashed rounded-2xl p-2 flex flex-col items-center justify-center cursor-pointer transition-all min-h-[70px] `;
+                
+                if(slotItem) {
+                    filledCount++;
+                    slotBox.className += ` bg-indigo-950/60 border-indigo-500/60 text-white`;
+                    slotBox.onclick = () => removePacketFromSlot(slotIdx);
+                    slotBox.innerHTML = `
+                        <span class="text-[10px] text-indigo-300 font-bold">#${slotIdx+1}</span>
+                        <span class="text-xs font-extrabold mt-0.5">${slotItem.name}</span>
+                        <span class="text-[10px] text-slate-400">${slotItem.dist || slotItem.deadline || ''}</span>
+                    `;
+                } else {
+                    slotBox.className += ` bg-slate-900/30 border-slate-700 hover:border-slate-500 text-slate-500`;
+                    slotBox.innerHTML = `
+                        <span class="text-xs font-bold">Slot ${slotIdx+1}</span>
+                        <span class="text-[10px]">Klik paket</span>
+                    `;
+                }
+                slotsEl.appendChild(slotBox);
+            });
+
+            document.getElementById('slot-counter').innerText = `${filledCount} / ${currentLevelPool.length + filledCount} Terisi`;
+        }
+
+        function selectPacketToSlot(poolIdx) {
+            const pkt = currentLevelPool[poolIdx];
+            if(!pkt) return;
+            const emptyIdx = currentSlots.findIndex(s => s === null);
+            if(emptyIdx === -1) return;
+
+            currentSlots[emptyIdx] = pkt;
+            currentLevelPool.splice(poolIdx, 1);
+            renderGamePoolAndSlots();
+        }
+
+        function removePacketFromSlot(slotIdx) {
+            const pkt = currentSlots[slotIdx];
+            if(!pkt) return;
+
+            currentSlots[slotIdx] = null;
+            currentLevelPool.push(pkt);
+            renderGamePoolAndSlots();
+        }
+
+        function resetCurrentLevel() {
+            launchGameLevel(gameState.currentLevel);
+        }
+
+        function submitDeliveryOrder() {
+            if(currentSlots.some(s => s === null)) {
+                showMsgModal("Belum Lengkap", "Semua slot pengiriman harus terisi penuh sebelum berangkat!", "⚠️");
+                return;
+            }
+
+            const lvl = LEVELS_DATA[gameState.currentLevel];
+            let isCorrect = true;
+
+            currentSlots.forEach((slot, idx) => {
+                if(slot.id !== lvl.solution[idx]) isCorrect = false;
+            });
+
+            if(isCorrect) {
+                gameState.comboCount++;
+                let gain = lvl.maxPoints; // Level-specific points summing up to 100 max
+                studentData.score += gain;
+                if(studentData.score > 100) studentData.score = 100; // Cap at 100 max score
+                
+                if(gameState.currentLevel >= studentData.levelReached && gameState.currentLevel < 10) {
+                    studentData.levelReached = gameState.currentLevel + 1;
+                }
+                updateHUDStats();
+
+                document.getElementById('reflection-score-gain').innerText = `+${gain} Poin (Total: ${studentData.score} / 100)`;
+                document.getElementById('analysis-decom').innerText = lvl.analysis.decom;
+                document.getElementById('analysis-pattern').innerText = lvl.analysis.pattern;
+                document.getElementById('analysis-abstrac').innerText = lvl.analysis.abstrac;
+                document.getElementById('analysis-algo').innerText = lvl.analysis.algo;
+
+                document.getElementById('screen-game').classList.add('hidden');
+                document.getElementById('screen-reflection').classList.remove('hidden');
+            } else {
+                gameState.comboCount = 0;
+                studentData.errors++;
+                gameState.lives--;
+                updateHUDStats();
+
+                if(gameState.lives <= 0) {
+                    showMsgModal("Nyawa Habis", "Anda kehilangan seluruh nyawa di level ini. Mengulang dari awal level.", "❌");
+                    resetCurrentLevel();
+                } else {
+                    showMsgModal("Urutan Kurang Tepat", "Susunan paket belum sesuai aturan level ini. Silakan periksa kembali!", "❌");
+                    resetCurrentLevel();
+                }
+            }
+        }
+
+        function proceedNextLevel() {
+            if(gameState.currentLevel < 10) {
+                launchGameLevel(gameState.currentLevel + 1);
+            } else {
+                finishAssessmentAndSubmit();
+            }
+        }
+
+        function finishAssessmentAndSubmit() {
+            gameState.examActive = false;
+            clearInterval(gameState.assessmentTimerInterval);
+            document.getElementById('screen-game').classList.add('hidden');
+            document.getElementById('screen-reflection').classList.add('hidden');
+            document.getElementById('screen-victory').classList.remove('hidden');
+
+            document.getElementById('vic-student-info').innerText = `${studentData.name} (${studentData.nis})`;
+            document.getElementById('vic-class-info').innerText = studentData.studentClass;
+            document.getElementById('vic-score').innerText = studentData.score.toLocaleString();
+            document.getElementById('vic-level').innerText = `${studentData.levelReached} / 10`;
+            document.getElementById('vic-violations').innerText = studentData.violations;
+            document.getElementById('vic-errors').innerText = studentData.errors;
+
+            // Send to Google Sheets webhook with violation history
+            sendDataToGoogleSheets();
+        }
+
+        function sendDataToGoogleSheets() {
+            const statusEl = document.getElementById('vic-sheets-status');
+            statusEl.innerText = "Mengirim ke Spreadsheet kurir_pintar...";
+            statusEl.className = "font-bold text-amber-400";
+
+            const payload = {
+                timestamp: new Date().toISOString(),
+                nama: studentData.name,
+                nis: studentData.nis,
+                kelas: studentData.studentClass,
+                skor: studentData.score,
+                levelTercapai: studentData.levelReached,
+                kesalahan: studentData.errors,
+                pelanggaranTab: studentData.violations,
+                waktuPengerjaanDetik: gameState.totalSecondsElapsed
+            };
+
+            fetch(studentData.sheetsUrl, {
+                method: "POST",
+                mode: "no-cors",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(payload)
+            }).then(() => {
+                statusEl.innerText = "Terkirim Otomatis ke Spreadsheet! ✅";
+                statusEl.className = "font-bold text-emerald-400";
+            }).catch(err => {
+                console.error(err);
+                statusEl.innerText = "Gagal Mengirim (Cek Koneksi)";
+                statusEl.className = "font-bold text-rose-400";
+            });
+        }
+
+        function submitToSpreadsheetManually() {
+            sendDataToGoogleSheets();
+        }
+
+        function updateHUDStats() {
+            document.getElementById('display-score').innerText = studentData.score;
+            document.getElementById('display-violations').innerText = `${studentData.violations}/${MAX_VIOLATIONS} Pelanggaran`;
+        }
+
+        function openLevelSelectModal() {
+            const gridEl = document.getElementById('level-grid-buttons');
+            gridEl.innerHTML = '';
+
+            for(let i=1; i<=10; i++) {
+                const btn = document.createElement('button');
+                const isCurrent = gameState.currentLevel === i;
+                const isUnlocked = i <= studentData.levelReached;
+
+                btn.className = `p-3 rounded-2xl border text-xs font-bold transition-all flex flex-col items-center justify-center space-y-1 ${
+                    isCurrent 
+                    ? 'bg-indigo-600 border-indigo-400 text-white shadow-lg shadow-indigo-600/30 ring-2 ring-indigo-400' 
+                    : isUnlocked
+                    ? 'bg-slate-900/80 hover:bg-slate-900 border-slate-700 text-slate-300 hover:border-slate-500'
+                    : 'bg-slate-900/30 border-slate-800 text-slate-600'
+                }`;
+                btn.innerHTML = `
+                    <span class="text-sm font-extrabold">Level ${i}</span>
+                    <span class="text-[9px] text-slate-400">${isUnlocked ? 'Tersedia' : '🔒'}</span>
+                `;
+                btn.onclick = () => {
+                    if(!isUnlocked) {
+                        showMsgModal("Level Terkunci", "Selesaikan level sebelumnya terlebih dahulu!", "🔒");
+                        return;
+                    }
+                    closeLevelSelectModal();
+                    launchGameLevel(i);
+                };
+                gridEl.appendChild(btn);
+            }
+            document.getElementById('modal-level-select').classList.remove('hidden');
+        }
+
+        function closeLevelSelectModal() {
+            document.getElementById('modal-level-select').classList.add('hidden');
+        }
+
+        function openTeacherMode() {
+            document.getElementById('modal-teacher-auth').classList.remove('hidden');
+            document.getElementById('input-teacher-pass').value = '';
+            document.getElementById('input-teacher-pass').focus();
+        }
+
+        function closeTeacherAuthModal() {
+            document.getElementById('modal-teacher-auth').classList.add('hidden');
+        }
+
+        function verifyTeacherPassword() {
+            const pass = document.getElementById('input-teacher-pass').value;
+            if(pass === "kodingkkarnv") {
+                closeTeacherAuthModal();
+                showTeacherDashboard();
+            } else {
+                showMsgModal("Akses Ditolak", "Kata sandi Mode Guru salah!", "❌");
+            }
+        }
+
+        function showTeacherDashboard() {
+            document.getElementById('teach-name').innerText = studentData.name || "Belum diisi";
+            document.getElementById('teach-class').innerText = studentData.studentClass;
+            
+            const gridEl = document.getElementById('teacher-level-grid');
+            gridEl.innerHTML = '';
+            for(let i=1; i<=10; i++) {
+                const btn = document.createElement('button');
+                btn.className = `p-2.5 rounded-xl border text-xs font-bold transition-all flex items-center justify-center bg-slate-900 hover:bg-indigo-600 border-slate-700 hover:border-indigo-400 text-slate-200`;
+                btn.innerHTML = `<span>Level ${i}</span>`;
+                btn.onclick = () => {
+                    closeTeacherMode();
+                    document.getElementById('screen-welcome').classList.add('hidden');
+                    document.getElementById('stats-bar').classList.remove('hidden');
+                    if(!studentData.name) {
+                        studentData.name = "Siswa Uji Coba Guru";
+                        studentData.nis = "99999";
+                        document.getElementById('display-student-name').innerText = studentData.name;
+                        document.getElementById('display-student-class').innerText = studentData.studentClass;
+                    }
+                    studentData.levelReached = 10; // Unlock all for testing
+                    gameState.examActive = true;
+                    launchGameLevel(i);
+                };
+                gridEl.appendChild(btn);
+            }
+
+            document.getElementById('modal-teacher').classList.remove('hidden');
+        }
+
+        function closeTeacherMode() {
+            document.getElementById('modal-teacher').classList.add('hidden');
+        }
+
+        function showMsgModal(title, desc, icon) {
+            document.getElementById('modal-title').innerText = title;
+            document.getElementById('modal-desc').innerText = desc;
+            document.getElementById('modal-icon').innerText = icon;
+            document.getElementById('modal-msg').classList.remove('hidden');
+        }
+
+        function closeMsgModal() {
+            document.getElementById('modal-msg').classList.add('hidden');
+        }
+    </script>
+</body>
+</html>
