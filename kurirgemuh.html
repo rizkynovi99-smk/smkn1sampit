@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -105,7 +106,7 @@
             <div class="w-full bg-slate-800 border border-slate-700 rounded-2xl p-4 mb-4 shadow-lg flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                 <div>
                     <div class="flex items-center space-x-2">
-                        <span id="level-badge" class="text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">🟢 Level 1</span>
+                        <span id="level-badge" class="text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">🟢 Level 1 (Bonus)</span>
                         <button onclick="openLevelSelectModal()" class="bg-slate-700 hover:bg-slate-600 text-slate-200 px-2.5 py-1 rounded-lg text-xs font-bold border border-slate-600 transition-all flex items-center space-x-1">
                             <span>🗺️ Pilih Level</span>
                         </button>
@@ -157,26 +158,26 @@
                 <div class="text-center mb-5">
                     <div class="inline-block bg-emerald-500/20 text-emerald-400 p-3.5 rounded-2xl text-3xl mb-2 border border-emerald-500/30">🎉</div>
                     <h3 id="reflection-header-title" class="text-xl font-bold text-white">Misi Level Berhasil!</h3>
-                    <p class="text-xs text-slate-400 mt-1">Skor Diperoleh: <span id="reflection-score-gain" class="text-amber-400 font-bold">+10</span> poin</p>
+                    <p class="text-xs text-slate-400 mt-1">Skor Diperoleh: <span id="reflection-score-gain" class="text-amber-400 font-bold">+0</span> poin</p>
                 </div>
 
                 <!-- 4 Pillars Breakdown -->
                 <div class="bg-slate-900/70 border border-slate-700 rounded-2xl p-4 mb-5 space-y-3">
                     <div class="text-xs font-bold text-indigo-300 uppercase tracking-wider flex items-center space-x-1">
-                        <span>🧠</span> <span>Analisis 4 Pilar Berpikir Komputasional</span>
+                        <span>🧠</span> <span id="reflection-pillar-title">Analisis 4 Pilar Berpikir Komputasional</span>
                     </div>
                     <div class="space-y-2 text-xs">
-                        <div class="bg-slate-800/80 p-2.5 rounded-xl border border-slate-700">
-                            <span class="font-bold text-emerald-400">🔨 Dekomposisi:</span> <span id="analysis-decom" class="text-slate-300">Memecah paket berdasarkan atribut data.</span>
+                        <div id="box-decom" class="bg-slate-800/80 p-2.5 rounded-xl border border-slate-700">
+                            <span class="font-bold text-emerald-400">🔨 Dekomposisi:</span> <span id="analysis-decom" class="text-slate-300">-</span>
                         </div>
-                        <div class="bg-slate-800/80 p-2.5 rounded-xl border border-slate-700">
-                            <span class="font-bold text-amber-400">🔎 Pengenalan Pola:</span> <span id="analysis-pattern" class="text-slate-300">Menemukan pola urutan data.</span>
+                        <div id="box-pattern" class="bg-slate-800/80 p-2.5 rounded-xl border border-slate-700">
+                            <span class="font-bold text-amber-400">🔎 Pengenalan Pola:</span> <span id="analysis-pattern" class="text-slate-300">-</span>
                         </div>
-                        <div class="bg-slate-800/80 p-2.5 rounded-xl border border-slate-700">
-                            <span class="font-bold text-orange-400">🎯 Abstraksi:</span> <span id="analysis-abstrac" class="text-slate-300">Mengabaikan atribut tidak penting.</span>
+                        <div id="box-abstrac" class="bg-slate-800/80 p-2.5 rounded-xl border border-slate-700">
+                            <span class="font-bold text-orange-400">🎯 Abstraksi:</span> <span id="analysis-abstrac" class="text-slate-300">-</span>
                         </div>
-                        <div class="bg-slate-800/80 p-2.5 rounded-xl border border-slate-700">
-                            <span class="font-bold text-rose-400">📋 Algoritma:</span> <span id="analysis-algo" class="text-slate-300">Mengikuti prosedur sistematis.</span>
+                        <div id="box-algo" class="bg-slate-800/80 p-2.5 rounded-xl border border-slate-700">
+                            <span class="font-bold text-rose-400">📋 Algoritma:</span> <span id="analysis-algo" class="text-slate-300">-</span>
                         </div>
                     </div>
                 </div>
@@ -187,13 +188,13 @@
             </div>
         </div>
 
-        <!-- SCREEN 4: FINAL VICTORY & SPREADSHEET SUBMISSION -->
+        <!-- SCREEN 4: FINAL VICTORY & 4-PILLARS SUMMARY -->
         <div id="screen-victory" class="hidden w-full max-w-xl bg-slate-800/95 border border-slate-700 rounded-3xl p-6 sm:p-8 shadow-2xl backdrop-blur text-center">
             <div class="inline-block bg-amber-500/20 text-amber-400 p-4 rounded-3xl text-4xl mb-3 border border-amber-500/30">👑</div>
-            <h2 id="victory-main-title" class="text-2xl font-extrabold text-white mb-1">Asesmen Selesai!</h2>
-            <p id="victory-badge-title" class="text-xs text-amber-300 font-bold mb-4 uppercase tracking-wider">Gelar: Kurir Legend</p>
+            <h2 class="text-2xl font-extrabold text-white mb-1">Asesmen 10 Level Selesai!</h2>
+            <p class="text-xs text-amber-300 font-bold mb-4 uppercase tracking-wider">Gelar: Master Kurir & Computational Thinking</p>
 
-            <div class="bg-slate-900/60 border border-slate-700 rounded-2xl p-4 mb-5 text-left space-y-2">
+            <div class="bg-slate-900/60 border border-slate-700 rounded-2xl p-4 mb-4 text-left space-y-2">
                 <div class="text-xs font-bold text-indigo-300 uppercase tracking-wider">📊 Rekapitulasi Siswa:</div>
                 <div class="flex justify-between text-xs text-slate-300">
                     <span>Nama / NIS:</span> <span id="vic-student-info" class="font-bold text-white">-</span>
@@ -205,17 +206,27 @@
                     <span>Total Skor:</span> <span id="vic-score" class="font-bold text-amber-400">0</span>
                 </div>
                 <div class="flex justify-between text-xs text-slate-300">
-                    <span>Level Tercapai:</span> <span id="vic-level" class="font-bold text-emerald-400">10 / 10</span>
-                </div>
-                <div class="flex justify-between text-xs text-slate-300">
                     <span>Total Pelanggaran Tab:</span> <span id="vic-violations" class="font-bold text-rose-400">0</span>
-                </div>
-                <div class="flex justify-between text-xs text-slate-300">
-                    <span>Kesalahan Susun:</span> <span id="vic-errors" class="font-bold text-orange-400">0</span>
                 </div>
                 <div class="flex justify-between text-xs text-slate-300 pt-2 border-t border-slate-800">
                     <span>Status Google Sheets:</span> <span id="vic-sheets-status" class="font-bold text-amber-400">Menunggu pengiriman...</span>
                 </div>
+            </div>
+
+            <!-- 4 Pillars Summary Box -->
+            <div class="bg-indigo-950/40 border border-indigo-500/30 rounded-2xl p-4 mb-5 text-left space-y-2">
+                <div class="text-xs font-bold text-indigo-300 uppercase tracking-wider flex items-center space-x-1">
+                    <span>🧠</span> <span>Rangkuman 4 Pilar Berpikir Komputasional</span>
+                </div>
+                <p class="text-[11px] text-slate-300 leading-relaxed">
+                    Sepanjang 10 level tantangan pengiriman kurir, Anda telah menerapkan:
+                </p>
+                <ul class="text-[11px] text-slate-300 space-y-1 list-disc list-inside">
+                    <li><strong class="text-emerald-400">Dekomposisi:</strong> Memecah atribut paket (jarak, prioritas, deadline, kondisi jalan) ke dalam sub-elemen terstruktur.</li>
+                    <li><strong class="text-amber-400">Pengenalan Pola:</strong> Mengenali urutan kronologis waktu, hierarki prioritas, dan pola rute darurat.</li>
+                    <li><strong class="text-orange-400">Abstraksi:</strong> Menyaring informasi esensial (mengabaikan warna atau nama tidak penting) untuk fokus pada aturan pengiriman.</li>
+                    <li><strong class="text-rose-400">Algoritma:</strong> Menyusun prosedur langkah demi langkah secara sistematis untuk menghasilkan rute pengiriman paling efisien.</li>
+                </ul>
             </div>
 
             <div class="flex gap-3">
@@ -302,9 +313,8 @@
         Sorting Challenge: Kurir Pintar (Asesmen Individu 50 Menit) • Laboratorium CT 🧠📦
     </footer>
 
-    <!-- GAME ENGINE & PROCTORING SCRIPT -->
     <script>
-        // Default Webhook URL terhubung otomatis ke spreadsheet kurir_pintar
+        // Updated default deployment webhook URL for kurir_pintar spreadsheet
         const DEFAULT_SHEETS_URL = "https://script.google.com/macros/s/AKfycbyBU10bpxL3uzhuFdtZ-sYes-k7dCVVMB6heasE3odNF6BS2SZuSC5P85aAE6eP5gtytA/exec";
 
         let studentData = {
@@ -330,218 +340,8 @@
         const ASSESSMENT_TOTAL_TIME = 50 * 60; // 50 minutes in seconds
         const MAX_VIOLATIONS = 3;
 
-        // 10 Progressive Computational Thinking Levels Dataset
-        const LEVELS_DATA = {
-            1: {
-                badge: "🟢 Level 1: Bonus Latihan",
-                title: "Pengenalan Jarak Dasar (Bonus / 0 Poin)",
-                rule: "Level Latihan: Urutkan 4 paket berdasarkan jarak terdekat ke terjauh. Selesaikan untuk pemanasan!",
-                maxPoints: 0, // Bonus level = 0 points
-                packets: [
-                    { id: 'p1', name: 'Paket A', dist: '5 km', val: 5 },
-                    { id: 'p2', name: 'Paket B', dist: '2 km', val: 2 },
-                    { id: 'p3', name: 'Paket C', dist: '8 km', val: 8 },
-                    { id: 'p4', name: 'Paket D', dist: '4 km', val: 4 }
-                ],
-                solution: ['p2', 'p4', 'p1', 'p3'],
-                analysis: {
-                    decom: "Memecah paket menjadi atribut Jarak untuk pemanasan.",
-                    pattern: "Mengenali deret angka naik: terkecil ke terbesar.",
-                    abstrac: "Mengabaikan nama, fokus pada angka kilometer.",
-                    algo: "Bandingkan jarak terkecil dan letakkan berurutan."
-                }
-            },
-            2: {
-                badge: "🟢 Level 2: Prioritas Dasar",
-                title: "Pengelompokan Prioritas",
-                rule: "Urutkan berdasarkan Prioritas (Tinggi ➔ Sedang ➔ Rendah). Jika sama, jarak terdekat.",
-                maxPoints: 10,
-                packets: [
-                    { id: 'p1', name: 'Paket A', dist: '6 km', priority: 'Rendah' },
-                    { id: 'p2', name: 'Paket B', dist: '3 km', priority: 'Tinggi' },
-                    { id: 'p3', name: 'Paket C', dist: '2 km', priority: 'Sedang' },
-                    { id: 'p4', name: 'Paket D', dist: '1 km', priority: 'Tinggi' }
-                ],
-                solution: ['p4', 'p2', 'p3', 'p1'],
-                analysis: {
-                    decom: "Memisahkan atribut Prioritas dan Jarak.",
-                    pattern: "Kelompok Tinggi diutamakan sebelum Sedang dan Rendah.",
-                    abstrac: "Mengabstraksi warna kemasan.",
-                    algo: "Pilih Tinggi jarak terkecil, lalu Sedang, lalu Rendah."
-                }
-            },
-            3: {
-                badge: "🟡 Level 3: Siaga Deadline",
-                title: "Kronologi Waktu (Deadline)",
-                rule: "Urutkan 4 paket berdasarkan Deadline waktu tercepat ke terlambat.",
-                maxPoints: 10,
-                packets: [
-                    { id: 'p1', name: 'Paket A', deadline: '11.00' },
-                    { id: 'p2', name: 'Paket B', deadline: '09.30' },
-                    { id: 'p3', name: 'Paket C', deadline: '10.15' },
-                    { id: 'p4', name: 'Paket D', deadline: '12.00' }
-                ],
-                solution: ['p2', 'p3', 'p1', 'p4'],
-                analysis: {
-                    decom: "Fokus pada variabel waktu deadline.",
-                    pattern: "Kronologi jam dari pagi ke siang.",
-                    abstrac: "Mengabaikan berat paket.",
-                    algo: "Bandingkan jam deadline dan susun menaik."
-                }
-            },
-            4: {
-                badge: "🟡 Level 4: Multi-Atribut",
-                title: "Prioritas + Deadline",
-                rule: "Aturan: Prioritas Tinggi didahulukan. Jika prioritas sama, pilih deadline tercepat.",
-                maxPoints: 10,
-                packets: [
-                    { id: 'p1', name: 'Paket A', priority: 'Sedang', deadline: '10.00' },
-                    { id: 'p2', name: 'Paket B', priority: 'Tinggi', deadline: '11.00' },
-                    { id: 'p3', name: 'Paket C', priority: 'Tinggi', deadline: '09.30' },
-                    { id: 'p4', name: 'Paket D', priority: 'Rendah', deadline: '09.00' }
-                ],
-                solution: ['p3', 'p2', 'p1', 'p4'],
-                analysis: {
-                    decom: "Menggabungkan evaluasi Prioritas dan Deadline.",
-                    pattern: "Filter prioritas tertinggi lebih dulu, urutkan deadline di dalamnya.",
-                    abstrac: "Mengabaikan jenis tujuan.",
-                    algo: "Kondisional bertingkat IF-ELSE untuk menyusun urutan."
-                }
-            },
-            5: {
-                badge: "🟠 Level 5: Profesional Kompleks",
-                title: "5 Paket: Tujuan & Jarak",
-                rule: "Urutkan 5 paket berdasarkan jarak terdekat ke terjauh.",
-                maxPoints: 10,
-                packets: [
-                    { id: 'p1', name: 'Paket A', dest: 'Toko', dist: '7 km' },
-                    { id: 'p2', name: 'Paket B', dest: 'Rumah', dist: '2 km' },
-                    { id: 'p3', name: 'Paket C', dest: 'Gudang', dist: '9 km' },
-                    { id: 'p4', name: 'Paket D', dest: 'Rumah', dist: '3 km' },
-                    { id: 'p5', name: 'Paket E', dest: 'Kantor', dist: '5 km' }
-                ],
-                solution: ['p2', 'p4', 'p5', 'p1', 'p3'],
-                analysis: {
-                    decom: "Mengurai 5 data paket dengan tujuan bervariasi.",
-                    pattern: "Pola kenaikan nilai jarak numerik.",
-                    abstrac: "Mengabaikan jenis tempat tujuan (Rumah/Toko).",
-                    algo: "Pencarian nilai minimum berulang (Selection Sort)."
-                }
-            },
-            6: {
-                badge: "🟠 Level 6: Rute Tertutup",
-                title: "Pengecualian Rute (Exception)",
-                rule: "🚨 Paket B (Toko) ditutup! Urutkan paket tersisa berdasarkan jarak terdekat. tujutan paket yang tutup tetapkan terakhir",
-                maxPoints: 10,
-                eventMsg: "🚨 Toko ditutup sementara!",
-                packets: [
-                    { id: 'p1', name: 'Paket A', dist: '4 km', status: 'Lancar' },
-                    { id: 'p2', name: 'Paket B', dist: '1 km', status: 'Tutup' },
-                    { id: 'p3', name: 'Paket C', dist: '6 km', status: 'Lancar' },
-                    { id: 'p4', name: 'Paket D', dist: '3 km', status: 'Lancar' }
-                ],
-                solution: ['p4', 'p1', 'p3', 'p2'],
-                analysis: {
-                    decom: "Mengecualikan paket dengan status rute bermasalah.",
-                    pattern: "Mengenali parameter status jalan (Tutup vs Lancar).",
-                    abstrac: "Fokus pada kelayakan jalan.",
-                    algo: "Tambahkan pengecualian IF status == Tutup letakkan di akhir."
-                }
-            },
-            7: {
-                badge: "🔴 Level 7: Master Jadwal",
-                title: "6 Paket: Deadline & Prioritas",
-                rule: "Urutkan 6 paket berdasarkan deadline tercepat ke terlambat.",
-                maxPoints: 12,
-                packets: [
-                    { id: 'p1', name: 'Paket 1', deadline: '10.30' },
-                    { id: 'p2', name: 'Paket 2', deadline: '09.00' },
-                    { id: 'p3', name: 'Paket 3', deadline: '11.15' },
-                    { id: 'p4', name: 'Paket 4', deadline: '09.45' },
-                    { id: 'p5', name: 'Paket 5', deadline: '12.00' },
-                    { id: 'p6', name: 'Paket 6', deadline: '10.00' }
-                ],
-                solution: ['p2', 'p4', 'p6', 'p1', 'p3', 'p5'],
-                analysis: {
-                    decom: "Skala data lebih besar (6 paket).",
-                    pattern: "Kronologi waktu secara presisi.",
-                    abstrac: "Mengabaikan ID paket, fokus pada waktu.",
-                    algo: "Algoritma pengurutan waktu berurutan."
-                }
-            },
-            8: {
-                badge: "🔴 Level 8: Kondisi Lalu Lintas",
-                title: "Prioritas dan Macet",
-                rule: "Utamakan Tinggi ➔ Sedang ➔ Rendah. Paket dengan status 'Macet' dikirim paling akhir dalam kelompoknya.",
-                maxPoints: 13,
-                eventMsg: "🚧 Waspada kemacetan di beberapa titik!",
-                packets: [
-                    { id: 'p1', name: 'P-A', priority: 'Tinggi', road: 'Macet' },
-                    { id: 'p2', name: 'P-B', priority: 'Tinggi', road: 'Lancar' },
-                    { id: 'p3', name: 'P-C', priority: 'Sedang', road: 'Lancar' },
-                    { id: 'p4', name: 'P-D', priority: 'Rendah', road: 'Lancar' }
-                ],
-                solution: ['p2', 'p1', 'p3', 'p4'],
-                analysis: {
-                    decom: "Evaluasi ganda: Prioritas + Kondisi Lalu Lintas.",
-                    pattern: "Pengaruh hambatan jalan terhadap urutan.",
-                    abstrac: "Mengabaikan nama paket ringkas.",
-                    algo: "Logika penalti rute macet pada penyusunan antrean."
-                }
-            },
-            9: {
-                badge: "🟣 Level 9: Grandmaster Kurir",
-                title: "8 Paket: Kombinasi Kompleks",
-                rule: "Urutkan 8 paket berdasarkan Prioritas (Tinggi ➔ Sedang ➔ Rendah) lalu jarak terdekat.",
-                maxPoints: 12,
-                packets: [
-                    { id: 'p1', name: 'P-1', dist: '5 km', priority: 'Sedang' },
-                    { id: 'p2', name: 'P-2', dist: '2 km', priority: 'Tinggi' },
-                    { id: 'p3', name: 'P-3', dist: '8 km', priority: 'Rendah' },
-                    { id: 'p4', name: 'P-4', dist: '1 km', priority: 'Tinggi' },
-                    { id: 'p5', name: 'P-5', dist: '3 km', priority: 'Sedang' },
-                    { id: 'p6', name: 'P-6', dist: '4 km', priority: 'Tinggi' },
-                    { id: 'p7', name: 'P-7', dist: '6 km', priority: 'Rendah' },
-                    { id: 'p8', name: 'P-8', dist: '2 km', priority: 'Sedang' }
-                ],
-                solution: ['p4', 'p2', 'p6', 'p8', 'p5', 'p1', 'p7', 'p3'],
-                analysis: {
-                    decom: "Pecah 8 data menjadi 3 kelompok prioritas dan sub-jarak.",
-                    pattern: "Pengelompokan hierarki bertingkat.",
-                    abstrac: "Fokus pada struktur data array multi-atribut.",
-                    algo: "Sorting multi-kunci (Multi-key sorting algorithm)."
-                }
-            },
-            10: {
-                badge: "👑 Level 10: Kurir Legend (Boss)",
-                title: "Final Boss: 10 Paket Optimasi Penuh",
-                rule: "Ujian Akhir: Urutkan 10 paket berdasarkan Deadline tercepat ke terlambat.",
-                maxPoints: 13,
-                eventMsg: "👑 BOSS BATTLE: Selesaikan dengan algoritma secepat kilat!",
-                packets: [
-                    { id: 'p1', name: 'Paket 01', deadline: '10.00' },
-                    { id: 'p2', name: 'Paket 02', deadline: '08.30' },
-                    { id: 'p3', name: 'Paket 03', deadline: '11.00' },
-                    { id: 'p4', name: 'Paket 04', deadline: '09.15' },
-                    { id: 'p5', name: 'Paket 05', deadline: '12.00' },
-                    { id: 'p6', name: 'Paket 06', deadline: '09.00' },
-                    { id: 'p7', name: 'Paket 07', deadline: '10.30' },
-                    { id: 'p8', name: 'Paket 08', deadline: '08.45' },
-                    { id: 'p9', name: 'Paket 09', deadline: '11.30' },
-                    { id: 'p10', name: 'Paket 10', deadline: '09.45' }
-                ],
-                solution: ['p2', 'p8', 'p6', 'p4', 'p10', 'p1', 'p7', 'p3', 'p9', 'p5'],
-                analysis: {
-                    decom: "Sintesis penuh 4 Pilar Berpikir Komputasional pada skala 10 data.",
-                    pattern: "Mengenali kronologi waktu padat secara efisien.",
-                    abstrac: "Menyaring informasi dari dataset yang besar.",
-                    algo: "Penerapan algoritma pengurutan optimal tingkat lanjut."
-                }
-            }
-        };
-
-        let currentLevelPool = [];
-        let currentSlots = [];
+        let lastViolationTime = 0;
+        const VIOLATION_DEBOUNCE_MS = 1500;
 
         // PROCTORING / TAB SWITCH DETECTION
         document.addEventListener("visibilitychange", () => {
@@ -551,13 +351,20 @@
         });
 
         window.addEventListener("blur", () => {
-            if (gameState.examActive) {
+            if (gameState.examActive && document.hasFocus() === false) {
                 handleViolation("Jendela Ujian Kehilangan Fokus (Blur / Pindah Aplikasi)!");
             }
         });
 
         function handleViolation(reason) {
             if (!gameState.examActive) return;
+            
+            const now = Date.now();
+            if (now - lastViolationTime < VIOLATION_DEBOUNCE_MS) {
+                return;
+            }
+            lastViolationTime = now;
+
             studentData.violations++;
             document.getElementById('display-violations').innerText = `${studentData.violations}/${MAX_VIOLATIONS} Pelanggaran`;
 
@@ -567,11 +374,224 @@
                 showMsgModal("Ujian Dihentikan", "Anda telah melakukan pelanggaran meninggalkan halaman ujian sebanyak 3 kali. Sesi ujian otomatis dikunci dan dikirim.", "🚨");
                 setTimeout(() => {
                     finishAssessmentAndSubmit();
-                }, 2000);
+                }, 1500);
             } else {
                 showMsgModal("Peringatan Pelanggaran!", `${reason}\nPelanggaran ke-${studentData.violations} dari ${MAX_VIOLATIONS}. Jika mencapai 3 kali, ujian akan otomatis dikunci!`, "⚠️");
             }
         }
+
+        // 10 PERFECTED LEVELS DATA WITH CLEAR LOGIC & 4-PILLARS EXPLANATIONS
+        const LEVELS_DATA = {
+            1: {
+                badge: "🟢 Level 1 (Bonus)",
+                title: "Kurir Pemula: Jarak Sederhana",
+                rule: "Urutkan 4 paket berdasarkan jarak dari yang terdekat ke terjauh.",
+                maxPoints: 0,
+                packets: [
+                    { id: "A", name: "Paket A", dist: "5 km" },
+                    { id: "B", name: "Paket B", dist: "2 km" },
+                    { id: "C", name: "Paket C", dist: "8 km" },
+                    { id: "D", name: "Paket D", dist: "4 km" }
+                ],
+                solution: ["B", "D", "A", "C"],
+                analysis: {
+                    decom: "Memisahkan atribut jarak (km) dari setiap paket secara individual.",
+                    pattern: "Mengenali pola urutan nilai numerik dari kecil ke besar (2, 4, 5, 8).",
+                    abstrac: "Mengabaikan nama paket (A, B, C, D) dan fokus murni pada jarak.",
+                    algo: "Membandingkan seluruh jarak, memilih yang terkecil, dan menyusun bertahap."
+                }
+            },
+            2: {
+                badge: "🟡 Level 2",
+                title: "Kurir Siaga: Prioritas & Jarak",
+                rule: "Urutkan berdasarkan Prioritas (Tinggi → Sedang → Rendah). Jika prioritas sama, urutkan dari jarak terdekat.",
+                maxPoints: 10,
+                packets: [
+                    { id: "A", name: "Paket A", dist: "6 km", priority: "Rendah" },
+                    { id: "B", name: "Paket B", dist: "3 km", priority: "Tinggi" },
+                    { id: "C", name: "Paket C", dist: "2 km", priority: "Sedang" },
+                    { id: "D", name: "Paket D", dist: "1 km", priority: "Tinggi" }
+                ],
+                solution: ["D", "B", "C", "A"],
+                analysis: {
+                    decom: "Memecah kriteria menjadi Prioritas utama dan Jarak sekunder.",
+                    pattern: "Mengelompokkan tingkat prioritas secara hierarkis (Tinggi dulu, lalu Sedang, lalu Rendah).",
+                    abstrac: "Mengabaikan nama paket, fokus pada hierarki tingkat kepentingan.",
+                    algo: "Filter kelompok prioritas tertinggi (D & B, lalu D lebih dekat dari B), lalu Sedang (C), lalu Rendah (A)."
+                }
+            },
+            3: {
+                badge: "🟠 Level 3",
+                title: "Kurir Profesional: Siaga Deadline",
+                rule: "Urutkan berdasarkan deadline waktu tercepat ke terlambat (pagi ke siang).",
+                maxPoints: 10,
+                packets: [
+                    { id: "A", name: "Paket A", deadline: "11.00" },
+                    { id: "B", name: "Paket B", deadline: "09.30" },
+                    { id: "C", name: "Paket C", deadline: "10.15" },
+                    { id: "D", name: "Paket D", deadline: "12.00" }
+                ],
+                solution: ["B", "C", "A", "D"],
+                analysis: {
+                    decom: "Memisahkan informasi format jam deadline dari setiap paket.",
+                    pattern: "Mengenali waktu kronologis dari pagi menuju siang (09.30 → 10.15 → 11.00 → 12.00).",
+                    abstrac: "Mengabaikan atribut lain dan fokus pada batas waktu pengiriman.",
+                    algo: "Bandingkan format waktu secara ascending (09.30, 10.15, 11.00, 12.00)."
+                }
+            },
+            4: {
+                badge: "🟠 Level 4",
+                title: "Kurir Master: Multi-Atribut",
+                rule: "Prioritas Tinggi didahulukan. Jika prioritas sama, pilih deadline tercepat.",
+                maxPoints: 10,
+                packets: [
+                    { id: "A", name: "Paket A", priority: "Sedang", deadline: "10.00" },
+                    { id: "B", name: "Paket B", priority: "Tinggi", deadline: "11.00" },
+                    { id: "C", name: "Paket C", priority: "Tinggi", deadline: "09.30" },
+                    { id: "D", name: "Paket D", priority: "Rendah", deadline: "09.00" }
+                ],
+                solution: ["C", "B", "A", "D"],
+                analysis: {
+                    decom: "Mengevaluasi kondisi bertingkat (Logika IF-THEN / Kriteria majemuk).",
+                    pattern: "Pencocokan multi-kondisi (Prioritas Tinggi > Sedang > Rendah, lalu deadline tercepat).",
+                    abstrac: "Mengabaikan jarak karena tidak relevan pada aturan level ini.",
+                    algo: "Kelompokkan Prioritas Tinggi (C: 09.30 & B: 11.00, pilih C karena deadline lebih cepat), lalu Sedang (A), lalu Rendah (D)."
+                }
+            },
+            5: {
+                badge: "🔴 Level 5",
+                title: "Kurir Kompleks: 5 Paket Jarak",
+                rule: "Urutkan 5 paket berdasarkan jarak terdekat ke terj.",
+                maxPoints: 10,
+                packets: [
+                    { id: "A", name: "Paket A", dist: "7 km" },
+                    { id: "B", name: "Paket B", dist: "2 km" },
+                    { id: "C", name: "Paket C", dist: "9 km" },
+                    { id: "D", name: "Paket D", dist: "3 km" },
+                    { id: "E", name: "Paket E", dist: "5 km" }
+                ],
+                solution: ["B", "D", "E", "A", "C"],
+                analysis: {
+                    decom: "Memecah array 5 elemen untuk diurutkan satu per satu.",
+                    pattern: "Penerapan algoritma sorting linear array ascending (2, 3, 5, 7, 9).",
+                    abstrac: "Fokus mutlak pada besaran nilai jarak numerik (km).",
+                    algo: "Menjalankan prosedur Selection Sort manual dari elemen terkecil ke terbesar."
+                }
+            },
+            6: {
+                badge: "🔴 Level 6",
+                title: "Kurir Rute Khusus: Penutupan Jalan",
+                rule: "Paket B berstatus rute 'Tutup'! Urutkan 4 paket berdasarkan jarak terdekat, namun paket dengan status 'Tutup' wajib diletakkan di urutan terakhir.",
+                eventMsg: "🚨 Jalan ke Paket B Ditutup!",
+                maxPoints: 10,
+                packets: [
+                    { id: "A", name: "Paket A", dist: "4 km", status: "Lancar" },
+                    { id: "B", name: "Paket B", dist: "1 km", status: "Tutup" },
+                    { id: "C", name: "Paket C", dist: "6 km", status: "Lancar" },
+                    { id: "D", name: "Paket D", dist: "3 km", status: "Lancar" }
+                ],
+                solution: ["D", "A", "C", "B"],
+                analysis: {
+                    decom: "Memisahkan status jalan (Tutup vs Lancar) dan atribut jarak.",
+                    pattern: "Menerapkan filter pengecualian (Exception Handling dalam logika if-else).",
+                    abstrac: "Mengabaikan jarak singkat Paket B karena rute bermasalah.",
+                    algo: "Kondisional: Jika status == 'Tutup', tempatkan di slot terakhir. Urutkan sisanya berdasarkan jarak (3km, 4km, 6km)."
+                }
+            },
+            7: {
+                badge: "🟣 Level 7",
+                title: "Master Jadwal: 6 Paket Deadline",
+                rule: "Urutkan 6 paket berdasarkan deadline waktu tercepat ke terlambat.",
+                maxPoints: 10,
+                packets: [
+                    { id: "P1", name: "Paket A", deadline: "10.30" },
+                    { id: "P2", name: "Paket B", deadline: "09.00" },
+                    { id: "P3", name: "Paket C", deadline: "11.15" },
+                    { id: "P4", name: "Paket D", deadline: "09.45" },
+                    { id: "P5", name: "Paket E", deadline: "12.00" },
+                    { id: "P6", name: "Paket F", deadline: "10.00" }
+                ],
+                solution: ["P2", "P4", "P6", "P1", "P3", "P5"],
+                analysis: {
+                    decom: "Analisis dataset waktu berskala 6 elemen secara berurutan.",
+                    pattern: "Pencarian nilai waktu minimum secara iteratif (09.00, 09.45, 10.00, 10.30, 11.15, 12.00).",
+                    abstrac: "Mengabaikan nama paket dan fokus murni pada nilai waktu kronologis.",
+                    algo: "Sorting berbasis waktu kronologis secara komprehensif dari yang paling pagi."
+                }
+            },
+            8: {
+                badge: "🟣 Level 8",
+                title: "Kurir Prioritas & Kondisi Lalu Lintas",
+                rule: "Urutkan berdasarkan Prioritas (Tinggi → Sedang → Rendah). Ketentuan Khusus: Paket dengan status 'Macet' wajib dikirim paling akhir dalam kelompok prioritasnya.",
+                eventMsg: "🧭 Tantangan Kondisi Jalan & Prioritas",
+                maxPoints: 10,
+                packets: [
+                    { id: "P1", name: "Paket A", priority: "Tinggi", status: "Macet" },
+                    { id: "P2", name: "Paket B", priority: "Tinggi", status: "Lancar" },
+                    { id: "P3", name: "Paket C", priority: "Sedang", status: "Lancar" },
+                    { id: "P4", name: "Paket D", priority: "Rendah", status: "Lancar" }
+                ],
+                solution: ["P2", "P1", "P3", "P4"],
+                analysis: {
+                    decom: "Memecah kriteria prioritas dan status lalu lintas (Lancar vs Macet).",
+                    pattern: "Penerapan prioritas utama dengan aturan penalti status jalan.",
+                    abstrac: "Menyaring paket berdasarkan tingkat kepentingannya terlebih dahulu, lalu memperhatikan hambatan jalan.",
+                    algo: "Kelompokkan Prioritas Tinggi (P2 Lancar duluan, baru P1 Macet di akhir kelompoknya), lalu Sedang (P3), lalu Rendah (P4)."
+                }
+            },
+            9: {
+                badge: "👑 Level 9",
+                title: "Grandmaster Kurir: 8 Paket Kompleks",
+                rule: "Prioritas (Tinggi → Sedang → Rendah). Jika prioritas sama, urutkan dari jarak terdekat ke terjauh.",
+                maxPoints: 15,
+                packets: [
+                    { id: "P1", name: "Paket A", priority: "Sedang", dist: "5 km" },
+                    { id: "P2", name: "Paket B", priority: "Tinggi", dist: "2 km" },
+                    { id: "P3", name: "Paket C", priority: "Rendah", dist: "8 km" },
+                    { id: "P4", name: "Paket D", priority: "Tinggi", dist: "1 km" },
+                    { id: "P5", name: "Paket E", priority: "Sedang", dist: "3 km" },
+                    { id: "P6", name: "Paket F", priority: "Tinggi", dist: "4 km" },
+                    { id: "P7", name: "Paket G", priority: "Rendah", dist: "6 km" },
+                    { id: "P8", name: "Paket H", priority: "Sedang", dist: "2 km" }
+                ],
+                solution: ["P4", "P2", "P6", "P5", "P8", "P1", "P7", "P3"],
+                analysis: {
+                    decom: "Pemilahan data multi-kategori bervolume besar (8 paket) dengan dua parameter.",
+                    pattern: "Pengelompokan bertingkat (Bucket Sorting berdasarkan prioritas, disusul jarak).",
+                    abstrac: "Mengabaikan ID paket dan fokus pada kombinasi prioritas dan jarak.",
+                    algo: "Urutkan Prioritas Tinggi (P4 [1km], P2 [2km], P6 [4km]), lalu Sedang (P5 [3km], P8 [2km], P1 [5km] -> diurutkan jarak: P8, P5, P1), lalu Rendah (P7 [6km], P3 [8km])."
+                }
+            },
+            10: {
+                badge: "👑 Level 10",
+                title: "Final Boss: Master 10 Paket Deadline",
+                rule: "Urutkan 10 paket berdasarkan deadline waktu tercepat ke terlambat.",
+                eventMsg: "👑 Ujian Puncak Berpikir Komputasional!",
+                maxPoints: 15,
+                packets: [
+                    { id: "P1", name: "Paket 1", deadline: "10.00" },
+                    { id: "P2", name: "Paket 2", deadline: "08.30" },
+                    { id: "P3", name: "Paket 3", deadline: "11.00" },
+                    { id: "P4", name: "Paket 4", deadline: "09.15" },
+                    { id: "P5", name: "Paket 5", deadline: "12.00" },
+                    { id: "P6", name: "Paket 6", deadline: "09.00" },
+                    { id: "P7", name: "Paket 7", deadline: "10.30" },
+                    { id: "P8", name: "Paket 8", deadline: "08.45" },
+                    { id: "P9", name: "Paket 9", deadline: "11.30" },
+                    { id: "P10", name: "Paket 10", deadline: "09.45" }
+                ],
+                solution: ["P2", "P8", "P6", "P4", "P10", "P1", "P7", "P3", "P9", "P5"],
+                analysis: {
+                    decom: "Analisis sistematis array 10 elemen waktu secara komprehensif.",
+                    pattern: "Pencarian elemen minimum berulang (Full Array Sorting dari 08.30 hingga 12.00).",
+                    abstrac: "Abstraksi penuh terhadap gangguan visual, fokus pada nilai waktu kritis.",
+                    algo: "Prosedur pengurutan terstruktur skala besar: P2(08.30), P8(08.45), P6(09.00), P4(09.15), P10(09.45), P1(10.00), P7(10.30), P3(11.00), P9(11.30), P5(12.00)."
+                }
+            }
+        };
+
+        let currentLevelPool = [];
+        let currentSlots = [];
 
         function startAssessment() {
             const name = document.getElementById('input-name').value.trim();
@@ -662,16 +682,18 @@
                 
                 let detailsHTML = '';
                 if(pkt.dist) detailsHTML += `<span class="text-xs font-bold text-amber-400">📏 ${pkt.dist}</span> `;
-                if(pkt.priority) detailsHTML += `<span class="text-[10px] bg-indigo-500/20 text-indigo-300 px-1 py-0.5 rounded font-semibold">${pkt.priority}</span> `;
-                if(pkt.deadline) detailsHTML += `<span class="text-[10px] bg-rose-500/20 text-rose-300 px-1 py-0.5 rounded font-semibold">⏰ ${pkt.deadline}</span> `;
-                if(pkt.status) detailsHTML += `<span class="text-[10px] bg-amber-500/20 text-amber-300 px-1 py-0.5 rounded font-semibold">🚦 ${pkt.status}</span> `;
+                if(pkt.priority) detailsHTML += `<span class="text-[10px] bg-indigo-500/20 text-indigo-300 px-1.5 py-0.5 rounded font-semibold">${pkt.priority}</span> `;
+                if(pkt.deadline) detailsHTML += `<span class="text-[10px] bg-rose-500/20 text-rose-300 px-1.5 py-0.5 rounded font-semibold">⏰ ${pkt.deadline}</span> `;
+                if(pkt.status) {
+                    const statusColor = pkt.status === "Tutup" || pkt.status === "Macet" ? "bg-rose-500/20 text-rose-300" : "bg-emerald-500/20 text-emerald-300";
+                    detailsHTML += `<span class="text-[10px] ${statusColor} px-1.5 py-0.5 rounded font-semibold">🚦 ${pkt.status}</span> `;
+                }
 
                 card.innerHTML = `
                     <div class="flex justify-between items-center mb-1">
                         <span class="text-xs font-extrabold text-white">${pkt.name}</span>
-                        <span class="text-[10px] text-slate-400">${pkt.dest || ''}</span>
                     </div>
-                    <div>${detailsHTML}</div>
+                    <div class="flex flex-wrap gap-1 mt-1">${detailsHTML}</div>
                 `;
                 poolEl.appendChild(card);
             });
@@ -691,7 +713,7 @@
                     slotBox.innerHTML = `
                         <span class="text-[10px] text-indigo-300 font-bold">#${slotIdx+1}</span>
                         <span class="text-xs font-extrabold mt-0.5">${slotItem.name}</span>
-                        <span class="text-[10px] text-slate-400">${slotItem.dist || slotItem.deadline || ''}</span>
+                        <span class="text-[10px] text-slate-400">${slotItem.dist || slotItem.deadline || slotItem.priority || ''}</span>
                     `;
                 } else {
                     slotBox.className += ` bg-slate-900/30 border-slate-700 hover:border-slate-500 text-slate-500`;
@@ -755,6 +777,7 @@
                 updateHUDStats();
 
                 document.getElementById('reflection-score-gain').innerText = `+${gain} Poin (Total: ${studentData.score} / 100)`;
+                document.getElementById('reflection-pillar-title').innerText = `Analisis 4 Pilar Berpikir Komputasional (Level ${gameState.currentLevel})`;
                 document.getElementById('analysis-decom').innerText = lvl.analysis.decom;
                 document.getElementById('analysis-pattern').innerText = lvl.analysis.pattern;
                 document.getElementById('analysis-abstrac').innerText = lvl.analysis.abstrac;
@@ -796,11 +819,9 @@
             document.getElementById('vic-student-info').innerText = `${studentData.name} (${studentData.nis})`;
             document.getElementById('vic-class-info').innerText = studentData.studentClass;
             document.getElementById('vic-score').innerText = studentData.score.toLocaleString();
-            document.getElementById('vic-level').innerText = `${studentData.levelReached} / 10`;
             document.getElementById('vic-violations').innerText = studentData.violations;
-            document.getElementById('vic-errors').innerText = studentData.errors;
 
-            // Send to Google Sheets webhook with violation history
+            // Send to Google Sheets webhook with robust error handling
             sendDataToGoogleSheets();
         }
 
@@ -811,9 +832,9 @@
 
             const payload = {
                 timestamp: new Date().toISOString(),
-                nama: studentData.name,
-                nis: studentData.nis,
-                kelas: studentData.studentClass,
+                nama: studentData.name || "Tanpa Nama",
+                nis: studentData.nis || "-",
+                kelas: studentData.studentClass || "X DKV 1",
                 skor: studentData.score,
                 levelTercapai: studentData.levelReached,
                 kesalahan: studentData.errors,
@@ -832,7 +853,7 @@
                 statusEl.innerText = "Terkirim Otomatis ke Spreadsheet! ✅";
                 statusEl.className = "font-bold text-emerald-400";
             }).catch(err => {
-                console.error(err);
+                console.error("Transmission error:", err);
                 statusEl.innerText = "Gagal Mengirim (Cek Koneksi)";
                 statusEl.className = "font-bold text-rose-400";
             });
@@ -905,8 +926,8 @@
         }
 
         function showTeacherDashboard() {
-            document.getElementById('teach-name').innerText = studentData.name || "Belum diisi";
-            document.getElementById('teach-class').innerText = studentData.studentClass;
+            document.getElementById('teach-name').innerText = studentData.name || document.getElementById('input-name').value || "Siswa Uji Coba Guru";
+            document.getElementById('teach-class').innerText = document.getElementById('select-class').value;
             
             const gridEl = document.getElementById('teacher-level-grid');
             gridEl.innerHTML = '';
@@ -919,8 +940,9 @@
                     document.getElementById('screen-welcome').classList.add('hidden');
                     document.getElementById('stats-bar').classList.remove('hidden');
                     if(!studentData.name) {
-                        studentData.name = "Siswa Uji Coba Guru";
-                        studentData.nis = "99999";
+                        studentData.name = document.getElementById('input-name').value || "Siswa Uji Coba Guru";
+                        studentData.nis = document.getElementById('input-nis').value || "99999";
+                        studentData.studentClass = document.getElementById('select-class').value;
                         document.getElementById('display-student-name').innerText = studentData.name;
                         document.getElementById('display-student-class').innerText = studentData.studentClass;
                     }
