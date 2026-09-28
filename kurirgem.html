@@ -345,7 +345,6 @@
 
         let gameState = {
             currentLevel: 1,
-            lives: 3,
             comboCount: 0,
             totalSecondsElapsed: 0,
             assessmentTimerInterval: null,
@@ -803,16 +802,10 @@
             } else {
                 gameState.comboCount = 0;
                 studentData.errors++;
-                gameState.lives--;
                 updateHUDStats();
 
-                if(gameState.lives <= 0) {
-                    showMsgModal("Nyawa Habis", "Anda kehilangan seluruh nyawa di level ini. Mengulang dari awal level.", "❌");
-                    resetCurrentLevel();
-                } else {
-                    showMsgModal("Urutan Kurang Tepat", "Susunan paket belum sesuai aturan tingkat lanjut level ini. Silakan periksa kembali!", "❌");
-                    resetCurrentLevel();
-                }
+                showMsgModal("Urutan Kurang Tepat", "Susunan paket belum sesuai aturan tingkat lanjut level ini. Silakan periksa kembali dan coba lagi!", "❌");
+                // Tanpa sistem nyawa, siswa dapat bebas mereset dan mencoba ulang tanpa batas hingga benar.
             }
         }
 
