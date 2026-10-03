@@ -134,7 +134,7 @@
                 soal: "Poster asli ramai, 3 paragraf teks teknis, logo besar, & puisi ambigu. Apa inti pesan tunggal (core message) yang harus dipertahankan?",
                 pilihan: [
                     { text: "Aksi hemat energi secara instan & jelas", benar: true, desc: "Abstraksi menyaring gangguan dan mempertahankan inti pesan utama." },
-                    { text: "Semua paragraf teks teknis disimpan", benar: false, desc: "Paragraf teknis justru mengaburkan esensi pesan poster." },
+                    { text: "Semua paragraf teks teknis disimpan", benar: false, desc: "Paragraf teks teknis justru mengaburkan esensi pesan poster." },
                     { text: "Logo sponsor besar", benar: false, desc: "Logo adalah informasi sekunder, bukan inti pesan utama." },
                     { text: "Kalimat puitis panjang", benar: false, desc: "Kalimat ambigu memperlambat pemahaman pembaca." }
                 ]
@@ -293,10 +293,10 @@
 
             if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
                 results.multiHandLandmarks.forEach((landmarks, idx) => {
-                    // Use wrist (0) or index tip (8) for hand center
-                    const wrist = landmarks[0];
-                    const x = (1 - wrist.x) * cameraCanvas.width; // Mirror coordinate
-                    const y = wrist.y * cameraCanvas.height;
+                    // Use index finger tip (8) for precise fingertip tracking
+                    const indexTip = landmarks[8];
+                    const x = (1 - indexTip.x) * cameraCanvas.width; // Mirror coordinate
+                    const y = indexTip.y * cameraCanvas.height;
                     detectedCursors.push({ x, y, id: 'hand_' + idx });
                 });
             }
@@ -383,10 +383,10 @@
                     text: choice.text,
                     benar: choice.benar,
                     desc: choice.desc,
-                    x: spacing * (i + 1) - 65 + (Math.random() * 30 - 15),
-                    y: -140 - (i * 90),
-                    radius: 70,
-                    speed: 0.6 + Math.random() * 0.3,
+                    x: spacing * (i + 1) - 35 + (Math.random() * 20 - 10),
+                    y: -100 - (i * 70),
+                    radius: 35, // Smaller bubble radius
+                    speed: 1.8 + Math.random() * 0.8, // Faster falling speed
                     color: i % 2 === 0 ? 'rgba(79, 70, 229, 0.9)' : 'rgba(14, 165, 233, 0.9)'
                 });
             });
@@ -402,8 +402,8 @@
                 item.y += item.speed;
 
                 if (item.y > canvas.height + item.radius) {
-                    item.y = -80;
-                    item.x = Math.random() * (canvas.width - 140) + 70;
+                    item.y = -60;
+                    item.x = Math.random() * (canvas.width - 80) + 40;
                 }
 
                 // Draw Bubble Background
@@ -412,14 +412,14 @@
                 ctx.beginPath();
                 ctx.arc(item.x, item.y, item.radius, 0, 2 * Math.PI);
                 ctx.fill();
-                ctx.lineWidth = 3;
+                ctx.lineWidth = 2;
                 ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
                 ctx.stroke();
                 ctx.restore();
 
                 // Draw Bubble Text
                 ctx.fillStyle = '#FFFFFF';
-                ctx.font = 'bold 11px sans-serif';
+                ctx.font = 'bold 9px sans-serif';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
                 
@@ -428,27 +428,26 @@
                 let line2 = words.slice(Math.ceil(words.length / 2)).join(' ');
                 
                 if (line2) {
-                    ctx.fillText(line1, item.x, item.y - 8);
-                    ctx.fillText(line2, item.x, item.y + 8);
+                    ctx.fillText(line1, item.x, item.y - 5);
+                    ctx.fillText(line2, item.x, item.y + 5);
                 } else {
                     ctx.fillText(line1, item.x, item.y);
                 }
             });
 
-            // Draw multi-player palm hand cursors
+            // Draw multi-player hand cursors (Smaller and positioned precisely over fingertips)
             activeCursors.forEach((cursor, idx) => {
                 const colors = ['#10B981', '#38BDF8', '#F43F5E', '#FBBF24'];
                 const col = colors[idx % colors.length];
 
-                // Adjusted Y offset (-20px) to center the cursor ring perfectly in the middle of the palm
-                const cursorY = cursor.y - 20;
+                const cursorY = cursor.y;
                 const cursorX = cursor.x;
 
-                // Draw smaller, precise palm center ring
+                // Draw compact, precise fingertip cursor ring
                 ctx.strokeStyle = col;
-                ctx.lineWidth = 3;
+                ctx.lineWidth = 2;
                 ctx.beginPath();
-                ctx.arc(cursorX, cursorY, 24, 0, 2 * Math.PI);
+                ctx.arc(cursorX, cursorY, 10, 0, 2 * Math.PI);
                 ctx.stroke();
                 
                 ctx.fillStyle = col.replace('1)', '0.25)').replace('0.9)', '0.25)');
@@ -457,7 +456,7 @@
                 // Draw center dot for accuracy
                 ctx.fillStyle = '#FFFFFF';
                 ctx.beginPath();
-                ctx.arc(cursorX, cursorY, 4, 0, 2 * Math.PI);
+                ctx.arc(cursorX, cursorY, 2.5, 0, 2 * Math.PI);
                 ctx.fill();
             });
 
@@ -471,7 +470,7 @@
                 for (let item of fallingItems) {
                     const distX = cursor.x - item.x;
                     const distY = cursor.y - item.y;
-                    if (Math.sqrt(distX * distX + distY * distY) <= item.radius + 20) {
+                    if (Math.sqrt(distX * distX + distY * distY) <= item.radius + 10) {
                         handleChoiceSelection(item);
                         return;
                     }
