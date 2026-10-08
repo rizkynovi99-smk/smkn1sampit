@@ -3,222 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Hub Pembelajaran: Literasi Digital, Hukum Siber & HKI (Fase E)</title>
+  <title>Hub Pembelajaran Terpadu: Literasi Digital, Hukum, HKI & AI (Fase E)</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
   <style>
     body { font-family: 'Inter', system-ui, -apple-system, sans-serif; }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
   </style>
-<style>.lms-source-label {
-    position: absolute;
-    top: 8px;
-    right: 8px;
-    background-color: #e0e0e0;
-    color: #333;
-    border-radius: 10px;
-    padding: 4px 4px;
-    font-family: sans-serif;
-    font-size: 10px;
-    pointer-events: none;
-    font-weight: 500;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2), 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-</style></head>
-<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col antialiased selection:bg-cyan-500 selection:text-white" 
-      x-data="{ 
-        activeTab: 'home', 
-        quizSubmitted: false,
-        mcqAnswers: {},
-        tfAnswers: {},
-        score: 0,
-        reflectionText: '',
-        saved: false,
-        
-        // Quiz Data
-        mcqQuestions: [
-          {
-            id: 1,
-            q: 'Mengapa berpikir komputasional (*computational thinking*) perlu dipelajari sebelum mendalami literasi digital dan etika hukum siber?',
-            options: [
-              'A. Agar siswa bisa meretas aplikasi dengan cepat',
-              'B. Melatih otak memecahkan masalah secara sistematis sebagai pisau analisis kritis sebelum menyaring informasi',
-              'C. Karena koding tidak ada hubungannya dengan etika bermedia',
-              'D. Sebagai syarat wajib membuat akun media sosial'
-            ],
-            correct: 1,
-            rationale: 'Berpikir komputasional melatih dekomposisi dan logika terstruktur sehingga siswa memiliki kerangka analisis kritis sebelum mencerna informasi atau menilai kasus hukum.'
-          },
-          {
-            id: 2,
-            q: 'Berdasarkan revisi UU ITE terbaru (UU No. 1 Tahun 2024), apa ancaman hukuman maksimal bagi penyebar berita bohong (hoaks) yang merugikan masyarakat?',
-            options: [
-              'A. Penjara 1 tahun dan denda 10 juta rupiah',
-              'B. Penjara 6 tahun dan/atau denda maksimal 1 Miliar Rupiah',
-              'C. Peringatan tertulis tanpa sanksi hukum',
-              'D. Pencabutan kuota internet seumur hidup'
-            ],
-            correct: 1,
-            rationale: 'Pasal 28 ayat (1) jo. Pasal 45A UU ITE menetapkan pidana penjara maksimal 6 tahun dan/atau denda hingga Rp1 Miliar bagi penyebar hoaks merugikan.'
-          },
-          {
-            id: 3,
-            q: 'Manakah tindakan di bawah ini yang melanggar Undang-Undang Pelindungan Data Pribadi (UU No. 27 Tahun 2022)?',
-            options: [
-              'A. Menyimpan nomor HP sendiri di kontak gawai',
-              'B. Menyebarkan foto KTP dan NIK orang lain ke internet tanpa izin (*doxing*)',
-              'C. Menggunakan mode gelap pada aplikasi perpesanan',
-              'D. Mengunggah foto pemandangan alam ke Instagram'
-            ],
-            correct: 1,
-            rationale: 'Menyebarkan data spesifik seperti KTP dan NIK orang lain (*doxing*) melanggar UU PDP dan UU ITE dengan ancaman pidana berat.'
-          },
-          {
-            id: 4,
-            q: 'Apa yang dimaksud dengan Hak Kekayaan Intelektual (HKI / Copyright) dalam konteks pengembangan perangkat lunak dan koding?',
-            options: [
-              'A. Hak milik perangkat keras komputer seperti laptop dan mouse',
-              'B. Perlindungan hukum atas karya cipta kode program, algoritma asli, dan aset digital yang dibuat kreator',
-              'C. Aturan cara merakit komponen CPU',
-              'D. Hak untuk menggunakan Wi-Fi publik secara gratis'
-            ],
-            correct: 1,
-            rationale: 'HKI memberikan perlindungan hukum bagi pencipta kode program atau karya digital agar tidak diklaim atau dibajak secara ilegal oleh pihak lain.'
-          },
-          {
-            id: 5,
-            q: 'Apa fungsi utama dari lisensi *Open Source* seperti MIT License dalam dunia koding?',
-            options: [
-              'A. Melarang orang lain melihat baris kode program',
-              'B. Memperbolehkan penggunaan, modifikasi, dan distribusi kode dengan syarat tetap mencantumkan atribusi pembuat aslinya',
-              'C. Menjual lisensi kode seharga jutaan rupiah',
-              'D. Menghapus jejak digital pembuat kode'
-            ],
-            correct: 1,
-            rationale: 'MIT License adalah lisensi terbuka yang sangat permisif namun mewajibkan penyertaan hak cipta pembuat aslinya.'
-          },
-          {
-            id: 6,
-            q: 'Kasus musisi Jerinx SID yang divonis 1 tahun penjara karena menyebut IDI sebagai "kacung WHO" berkaitan dengan pelanggaran pasal apa?',
-            options: [
-              'A. Pasal Ujaran Kebencian SARA (Pasal 28 ayat 2 UU ITE)',
-              'B. Pasal Pencurian Kendaraan Bermotor',
-              'C. Pasal Pelanggaran Hak Cipta Lagu',
-              'D. Pasal Kebocoran Data Server Pemerintah'
-            ],
-            correct: 0,
-            rationale: 'Kasus tersebut diproses berdasarkan ketentuan ujaran kebencian/permusuhan kelompok dalam UU ITE.'
-          },
-          {
-            id: 7,
-            q: 'Manakah yang termasuk ke dalam kategori "Data Spesifik / Sangat Rahasia" menurut UU PDP?',
-            options: [
-              'A. Nama lengkap dan jenis kelamin',
-              'B. Agama dan alamat domisili',
-              'C. Data biometrik (sidik jari/wajah), catatan keuangan, dan password',
-              'D. Tanggal lahir'
-            ],
-            correct: 2,
-            rationale: 'Data biometrik, keuangan, kesehatan, dan password dikategorikan sebagai data pribadi spesifik yang memerlukan proteksi ekstra.'
-          },
-          {
-            id: 8,
-            q: 'Apa yang dimaksud dengan prinsip "3S" dalam etika bermedia digital?',
-            options: [
-              'A. Skip, Scroll, Stop',
-              'B. Saring, Sadari, Santun',
-              'C. Simpan, Share, Sembunyikan',
-              'D. Search, Select, System'
-            ],
-            correct: 1,
-            rationale: 'Prinsip 3S terdiri dari Saring informasi (cek fakta), Sadari jejak digital, dan Santun dalam berkomunikasi.'
-          },
-          {
-            id: 9,
-            q: 'Apa risiko terbesar jika seseorang mengabaikan aturan Hak Cipta dengan melakukan plagiasi kode program atau aset digital orang lain?',
-            options: [
-              'A. Komputer menjadi cepat panas',
-              'B. Terkena sanksi hukum perdata maupun pidana atas pelanggaran hak cipta',
-              'C. Jaringan internet otomatis terputus',
-              'D. Kapasitas harddisk bertambah'
-            ],
-            correct: 1,
-            rationale: 'Plagiasi kode atau aset digital tanpa izin melanggar undang-undang hak cipta dan dapat digugat secara hukum.'
-          },
-          {
-            id: 10,
-            q: 'Mengapa jejak digital (*digital footprint*) berbahaya jika tidak dikelola dengan bijak?',
-            options: [
-              'A. Karena dapat dihapus dalam 1 detik',
-              'B. Karena rekam jejak aktivitas daring bersifat permanen dan dapat diakses oleh sekolah atau HRD perusahaan di masa depan',
-              'C. Karena membuat gawai cepat rusak',
-              'D. Karena memperlambat kecepatan download'
-            ],
-            correct: 1,
-            rationale: 'Jejak digital terekam permanen di internet dan sering menjadi pertimbangan institusi atau perusahaan dalam menyeleksi kandidat.'
-          }
-        ],
-
-        tfQuestions: [
-          {
-            id: 1,
-            q: 'Semua gambar, video, dan artikel yang ditemukan di internet bebas diambil dan diakui sebagai milik sendiri tanpa mencantumkan sumber.',
-            correct: false,
-            rationale: 'Salah. Hal tersebut melanggar Hak Kekayaan Intelektual (HKI) dan prinsip plagiasi.'
-          },
-          {
-            id: 2,
-            q: 'Mengunggah foto KTP orang lain ke media sosial (*doxing*) merupakan pelanggaran terhadap UU PDP dan UU ITE.',
-            correct: true,
-            rationale: 'Benar. Doxing menyebarkan data privat dan dapat dijerat hukuman penjara serta denda berat.'
-          },
-          {
-            id: 3,
-            q: 'Berpikir komputasional tidak memiliki kaitan apa pun dengan kemampuan literasi digital seseorang.',
-            correct: false,
-            rationale: 'Salah. Berpikir komputasional memberikan fondasi logika dan dekomposisi untuk menganalisis informasi secara kritis.'
-          },
-          {
-            id: 4,
-            q: 'Lisensi perangkat lunak bebas (*Open Source*) melarang pengguna untuk memodifikasi kode program buatan aslinya.',
-            correct: false,
-            rationale: 'Salah. Lisensi open source justru mengizinkan modifikasi dan kolaborasi dengan tetap menjaga atribusi pembuatnya.'
-          },
-          {
-            id: 5,
-            q: 'Berdasarkan hukum di Indonesia, segala ketikan, komentar, dan unggahan di media sosial tercatat secara permanen dan dipantau oleh hukum.',
-            correct: true,
-            rationale: 'Benar. Internet bukan ruang tanpa hukum, dan jejak digital dilindungi serta diatur dalam koridor UU ITE.'
-          }
-        ],
-
-        submitQuiz() {
-          let currentScore = 0;
-          // Calculate MCQ
-          this.mcqQuestions.forEach(item => {
-            if (this.mcqAnswers[item.id] === item.correct) {
-              currentScore += 7; // 7 points each for 10 questions = 70 max
-            }
-          });
-          // Calculate TF
-          this.tfQuestions.forEach(item => {
-            if (this.tfAnswers[item.id] === item.correct) {
-              currentScore += 6; // 6 points each for 5 questions = 30 max -> Total 100
-            }
-          });
-          this.score = currentScore;
-          this.quizSubmitted = true;
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-        },
-
-        resetQuiz() {
-          this.mcqAnswers = {};
-          this.tfAnswers = {};
-          this.score = 0;
-          this.quizSubmitted = false;
-        }
-      }">
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col antialiased selection:bg-cyan-500 selection:text-white">
 
   <!-- HEADER NAVBAR -->
   <header class="sticky top-0 z-50 bg-slate-900/90 backdrop-blur-md border-b border-slate-800">
@@ -228,39 +23,39 @@
           <i class="fa-solid fa-shield-halved"></i>
         </div>
         <div>
-          <h1 class="font-extrabold text-lg text-white tracking-tight">Literasi Digital, Hukum & HKI</h1>
-          <p class="text-xs text-cyan-400 font-medium">Modul Pembelajaran Interaktif (Fase E / Kelas X)</p>
+          <h1 class="font-extrabold text-lg text-white tracking-tight">Hub Pembelajaran Terpadu</h1>
+          <p class="text-xs text-cyan-400 font-medium">Literasi Digital, Hukum, HKI & AI (Fase E / Kelas X)</p>
         </div>
       </div>
       <nav class="hidden xl:flex space-x-1">
-        <button @click="activeTab = 'home'" :class="activeTab === 'home' ? 'bg-cyan-500/10 text-cyan-400 border-cyan-500/40' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'" class="px-3 py-2 rounded-lg text-xs font-semibold border border-transparent transition-all">Beranda</button>
-        <button @click="activeTab = 'ct'" :class="activeTab === 'ct' ? 'bg-cyan-500/10 text-cyan-400 border-cyan-500/40' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'" class="px-3 py-2 rounded-lg text-xs font-semibold border border-transparent transition-all">1. Berpikir Komputasional</button>
-        <button @click="activeTab = 'law'" :class="activeTab === 'law' ? 'bg-cyan-500/10 text-cyan-400 border-cyan-500/40' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'" class="px-3 py-2 rounded-lg text-xs font-semibold border border-transparent transition-all">2. UU ITE & UU PDP</button>
-        <button @click="activeTab = 'hki'" :class="activeTab === 'hki' ? 'bg-cyan-500/10 text-cyan-400 border-cyan-500/40' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'" class="px-3 py-2 rounded-lg text-xs font-semibold border border-transparent transition-all">3. HKI & Lisensi</button>
-        <button @click="activeTab = 'ai'" :class="activeTab === 'ai' ? 'bg-cyan-500/10 text-cyan-400 border-cyan-500/40' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'" class="px-3 py-2 rounded-lg text-xs font-semibold border border-transparent transition-all">4. Prinsip & Etika AI</button>
-        <button @click="activeTab = 'simulator'" :class="activeTab === 'simulator' ? 'bg-cyan-500/10 text-cyan-400 border-cyan-500/40' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'" class="px-3 py-2 rounded-lg text-xs font-semibold border border-transparent transition-all">Simulator Kasus</button>
-        <button @click="activeTab = 'quiz'" :class="activeTab === 'quiz' ? 'bg-cyan-500/10 text-cyan-400 border-cyan-500/40' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'" class="px-3 py-2 rounded-lg text-xs font-semibold border border-transparent transition-all">Kuis Interaktif</button>
-        <button @click="activeTab = 'reflection'" :class="activeTab === 'reflection' ? 'bg-cyan-500/10 text-cyan-400 border-cyan-500/40' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'" class="px-3 py-2 rounded-lg text-xs font-semibold border border-transparent transition-all">Refleksi</button>
+        <button onclick="switchTab('home')" id="nav-home" class="nav-btn px-3 py-2 rounded-lg text-xs font-semibold border border-cyan-500/40 bg-cyan-500/10 text-cyan-400 transition-all">Beranda</button>
+        <button onclick="switchTab('ct')" id="nav-ct" class="nav-btn px-3 py-2 rounded-lg text-xs font-semibold border border-transparent text-slate-400 hover:text-white hover:bg-slate-800/60 transition-all">1. Komputasional</button>
+        <button onclick="switchTab('law')" id="nav-law" class="nav-btn px-3 py-2 rounded-lg text-xs font-semibold border border-transparent text-slate-400 hover:text-white hover:bg-slate-800/60 transition-all">2. UU ITE & PDP</button>
+        <button onclick="switchTab('hki')" id="nav-hki" class="nav-btn px-3 py-2 rounded-lg text-xs font-semibold border border-transparent text-slate-400 hover:text-white hover:bg-slate-800/60 transition-all">3. HKI & Lisensi</button>
+        <button onclick="switchTab('ai')" id="nav-ai" class="nav-btn px-3 py-2 rounded-lg text-xs font-semibold border border-transparent text-slate-400 hover:text-white hover:bg-slate-800/60 transition-all">4. Prinsip & Etika AI</button>
+        <button onclick="switchTab('simulator')" id="nav-simulator" class="nav-btn px-3 py-2 rounded-lg text-xs font-semibold border border-transparent text-slate-400 hover:text-white hover:bg-slate-800/60 transition-all">Simulator</button>
+        <button onclick="switchTab('quiz')" id="nav-quiz" class="nav-btn px-3 py-2 rounded-lg text-xs font-semibold border border-transparent text-slate-400 hover:text-white hover:bg-slate-800/60 transition-all">Kuis (15)</button>
+        <button onclick="switchTab('reflection')" id="nav-reflection" class="nav-btn px-3 py-2 rounded-lg text-xs font-semibold border border-transparent text-slate-400 hover:text-white hover:bg-slate-800/60 transition-all">Refleksi</button>
       </nav>
     </div>
   </header>
 
   <!-- MOBILE NAV -->
   <div class="xl:hidden bg-slate-900 border-b border-slate-800 px-4 py-3 flex overflow-x-auto space-x-2">
-    <button @click="activeTab = 'home'" :class="activeTab === 'home' ? 'bg-cyan-500 text-slate-950 font-bold' : 'bg-slate-800 text-slate-300'" class="px-3 py-1.5 rounded-lg text-xs whitespace-nowrap">Beranda</button>
-    <button @click="activeTab = 'ct'" :class="activeTab === 'ct' ? 'bg-cyan-500 text-slate-950 font-bold' : 'bg-slate-800 text-slate-300'" class="px-3 py-1.5 rounded-lg text-xs whitespace-nowrap">Komputasional</button>
-    <button @click="activeTab = 'law'" :class="activeTab === 'law' ? 'bg-cyan-500 text-slate-950 font-bold' : 'bg-slate-800 text-slate-300'" class="px-3 py-1.5 rounded-lg text-xs whitespace-nowrap">UU ITE & PDP</button>
-    <button @click="activeTab = 'hki'" :class="activeTab === 'hki' ? 'bg-cyan-500 text-slate-950 font-bold' : 'bg-slate-800 text-slate-300'" class="px-3 py-1.5 rounded-lg text-xs whitespace-nowrap">HKI & Lisensi</button>
-    <button @click="activeTab = 'ai'" :class="activeTab === 'ai' ? 'bg-cyan-500 text-slate-950 font-bold' : 'bg-slate-800 text-slate-300'" class="px-3 py-1.5 rounded-lg text-xs whitespace-nowrap">Prinsip AI</button>
-    <button @click="activeTab = 'simulator'" :class="activeTab === 'simulator' ? 'bg-cyan-500 text-slate-950 font-bold' : 'bg-slate-800 text-slate-300'" class="px-3 py-1.5 rounded-lg text-xs whitespace-nowrap">Simulator</button>
-    <button @click="activeTab = 'quiz'" :class="activeTab === 'quiz' ? 'bg-cyan-500 text-slate-950 font-bold' : 'bg-slate-800 text-slate-300'" class="px-3 py-1.5 rounded-lg text-xs whitespace-nowrap">Kuis (15)</button>
-    <button @click="activeTab = 'reflection'" :class="activeTab === 'reflection' ? 'bg-cyan-500 text-slate-950 font-bold' : 'bg-slate-800 text-slate-300'" class="px-3 py-1.5 rounded-lg text-xs whitespace-nowrap">Refleksi</button>
+    <button onclick="switchTab('home')" class="mob-btn px-3 py-1.5 rounded-lg text-xs whitespace-nowrap bg-cyan-500 text-slate-950 font-bold">Beranda</button>
+    <button onclick="switchTab('ct')" class="mob-btn px-3 py-1.5 rounded-lg text-xs whitespace-nowrap bg-slate-800 text-slate-300">Komputasional</button>
+    <button onclick="switchTab('law')" class="mob-btn px-3 py-1.5 rounded-lg text-xs whitespace-nowrap bg-slate-800 text-slate-300">UU ITE & PDP</button>
+    <button onclick="switchTab('hki')" class="mob-btn px-3 py-1.5 rounded-lg text-xs whitespace-nowrap bg-slate-800 text-slate-300">HKI & Lisensi</button>
+    <button onclick="switchTab('ai')" class="mob-btn px-3 py-1.5 rounded-lg text-xs whitespace-nowrap bg-slate-800 text-slate-300">Prinsip & Etika AI</button>
+    <button onclick="switchTab('simulator')" class="mob-btn px-3 py-1.5 rounded-lg text-xs whitespace-nowrap bg-slate-800 text-slate-300">Simulator</button>
+    <button onclick="switchTab('quiz')" class="mob-btn px-3 py-1.5 rounded-lg text-xs whitespace-nowrap bg-slate-800 text-slate-300">Kuis (15)</button>
+    <button onclick="switchTab('reflection')" class="mob-btn px-3 py-1.5 rounded-lg text-xs whitespace-nowrap bg-slate-800 text-slate-300">Refleksi</button>
   </div>
 
   <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full">
 
     <!-- HOME TAB -->
-    <section x-show="activeTab === 'home'" class="space-y-12">
+    <section id="tab-home" class="tab-content active space-y-12">
       <div class="bg-gradient-to-br from-slate-900 via-slate-900 to-cyan-950/40 border border-slate-800/80 rounded-3xl p-8 sm:p-12 relative overflow-hidden shadow-2xl">
         <div class="absolute -right-10 -bottom-10 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
         <div class="relative z-10 max-w-3xl space-y-6">
@@ -268,72 +63,71 @@
             <i class="fa-solid fa-graduation-cap"></i> Modul Pembelajaran Fase E (Kelas X SMK)
           </span>
           <h2 class="text-3xl sm:text-5xl font-extrabold text-white tracking-tight leading-tight">
-            Literasi Digital, Etika, Hukum Siber & Hak Kekayaan Intelektual (HKI)
+            Literasi Digital, Etika, Hukum Siber, HKI & Kecerdasan Artifisial
           </h2>
           <p class="text-slate-300 text-lg leading-relaxed">
-            Platform pembelajaran interaktif ini membekali Anda dengan kemampuan berpikir komputasional, pemahaman sanksi hukum (UU ITE & UU PDP), perlindungan hak cipta (HKI), serta etika bermedia yang bertanggung jawab.
+            Platform pembelajaran interaktif ini membekali Anda dengan kemampuan berpikir komputasional, pemahaman sanksi hukum (UU ITE & UU PDP), perlindungan hak cipta (HKI), serta prinsip kerja & etika AI (CP 5.1 & 5.2).
           </p>
           <div class="flex flex-wrap gap-4 pt-4">
-            <button @click="activeTab = 'ct'" class="bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold px-6 py-3.5 rounded-xl shadow-lg shadow-cyan-500/20 transition-all flex items-center space-x-2">
+            <button onclick="switchTab('ct')" class="bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold px-6 py-3.5 rounded-xl shadow-lg shadow-cyan-500/20 transition-all flex items-center space-x-2">
               <span>Mulai Belajar</span> <i class="fa-solid fa-arrow-right"></i>
             </button>
-            <button @click="activeTab = 'quiz'" class="bg-slate-800 hover:bg-slate-700 text-white font-semibold px-6 py-3.5 rounded-xl border border-slate-700 transition-all flex items-center space-x-2">
+            <button onclick="switchTab('quiz')" class="bg-slate-800 hover:bg-slate-700 text-white font-semibold px-6 py-3.5 rounded-xl border border-slate-700 transition-all flex items-center space-x-2">
               <span>Kerjakan Kuis Interaktif (15 Soal)</span> <i class="fa-solid fa-pen-to-square"></i>
             </button>
           </div>
         </div>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div @click="activeTab = 'ct'" class="bg-slate-900/60 border border-slate-800 hover:border-cyan-500/40 rounded-2xl p-6 cursor-pointer transition-all group flex flex-col justify-between">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div onclick="switchTab('ct')" class="bg-slate-900/60 border border-slate-800 hover:border-cyan-500/40 rounded-2xl p-6 cursor-pointer transition-all group flex flex-col justify-between">
           <div class="space-y-4">
             <div class="w-12 h-12 rounded-xl bg-cyan-500/10 text-cyan-400 flex items-center justify-center text-xl font-bold group-hover:scale-110 transition-transform">
               <i class="fa-solid fa-brain"></i>
             </div>
-            <h3 class="text-xl font-bold text-white group-hover:text-cyan-400 transition-colors">1. Berpikir Komputasional</h3>
-            <p class="text-slate-400 text-sm leading-relaxed">
-              Fondasi logika dan dekomposisi masalah sebelum masuk ke literasi digital dan analisis hukum.
-            </p>
+            <h3 class="text-lg font-bold text-white group-hover:text-cyan-400 transition-colors">1. Komputasional</h3>
+            <p class="text-slate-400 text-xs leading-relaxed">Fondasi dekomposisi masalah dan logika berpikir kritis sebelum mencerna informasi.</p>
           </div>
-          <div class="mt-6 flex items-center text-cyan-400 font-semibold text-xs">
-            <span>Pelajari</span> <i class="fa-solid fa-chevron-right ml-2"></i>
-          </div>
+          <div class="mt-6 flex items-center text-cyan-400 font-semibold text-xs"><span>Pelajari</span> <i class="fa-solid fa-chevron-right ml-2"></i></div>
         </div>
 
-        <div @click="activeTab = 'law'" class="bg-slate-900/60 border border-slate-800 hover:border-cyan-500/40 rounded-2xl p-6 cursor-pointer transition-all group flex flex-col justify-between">
+        <div onclick="switchTab('law')" class="bg-slate-900/60 border border-slate-800 hover:border-cyan-500/40 rounded-2xl p-6 cursor-pointer transition-all group flex flex-col justify-between">
           <div class="space-y-4">
             <div class="w-12 h-12 rounded-xl bg-cyan-500/10 text-cyan-400 flex items-center justify-center text-xl font-bold group-hover:scale-110 transition-transform">
               <i class="fa-solid fa-scale-balanced"></i>
             </div>
-            <h3 class="text-xl font-bold text-white group-hover:text-cyan-400 transition-colors">2. UU ITE & UU PDP</h3>
-            <p class="text-slate-400 text-sm leading-relaxed">
-              Kajian pasal hoaks, ujaran kebencian, pencemaran nama baik, doxing, dan sanksi pidana miliaran rupiah.
-            </p>
+            <h3 class="text-lg font-bold text-white group-hover:text-cyan-400 transition-colors">2. UU ITE & PDP</h3>
+            <p class="text-slate-400 text-xs leading-relaxed">Kajian pasal hoaks, ujaran kebencian, pencemaran nama baik, doxing & sanksi miliaran rupiah.</p>
           </div>
-          <div class="mt-6 flex items-center text-cyan-400 font-semibold text-xs">
-            <span>Pelajari</span> <i class="fa-solid fa-chevron-right ml-2"></i>
-          </div>
+          <div class="mt-6 flex items-center text-cyan-400 font-semibold text-xs"><span>Pelajari</span> <i class="fa-solid fa-chevron-right ml-2"></i></div>
         </div>
 
-        <div @click="activeTab = 'hki'" class="bg-slate-900/60 border border-slate-800 hover:border-cyan-500/40 rounded-2xl p-6 cursor-pointer transition-all group flex flex-col justify-between">
+        <div onclick="switchTab('hki')" class="bg-slate-900/60 border border-slate-800 hover:border-cyan-500/40 rounded-2xl p-6 cursor-pointer transition-all group flex flex-col justify-between">
           <div class="space-y-4">
             <div class="w-12 h-12 rounded-xl bg-cyan-500/10 text-cyan-400 flex items-center justify-center text-xl font-bold group-hover:scale-110 transition-transform">
               <i class="fa-solid fa-copyright"></i>
             </div>
-            <h3 class="text-xl font-bold text-white group-hover:text-cyan-400 transition-colors">3. HKI & Lisensi Koding</h3>
-            <p class="text-slate-400 text-sm leading-relaxed">
-              Materi baru perlindungan hak cipta source code, open-source, dan etika atribusi karya digital.
-            </p>
+            <h3 class="text-lg font-bold text-white group-hover:text-cyan-400 transition-colors">3. HKI & Lisensi</h3>
+            <p class="text-slate-400 text-xs leading-relaxed">Perlindungan hak cipta source code, open-source, dan etika atribusi karya digital.</p>
           </div>
-          <div class="mt-6 flex items-center text-cyan-400 font-semibold text-xs">
-            <span>Pelajari</span> <i class="fa-solid fa-chevron-right ml-2"></i>
+          <div class="mt-6 flex items-center text-cyan-400 font-semibold text-xs"><span>Pelajari</span> <i class="fa-solid fa-chevron-right ml-2"></i></div>
+        </div>
+
+        <div onclick="switchTab('ai')" class="bg-slate-900/60 border border-slate-800 hover:border-cyan-500/40 rounded-2xl p-6 cursor-pointer transition-all group flex flex-col justify-between">
+          <div class="space-y-4">
+            <div class="w-12 h-12 rounded-xl bg-cyan-500/10 text-cyan-400 flex items-center justify-center text-xl font-bold group-hover:scale-110 transition-transform">
+              <i class="fa-solid fa-microchip"></i>
+            </div>
+            <h3 class="text-lg font-bold text-white group-hover:text-cyan-400 transition-colors">4. Prinsip & Etika AI</h3>
+            <p class="text-slate-400 text-xs leading-relaxed">Prinsip kerja AI (CP 5.1), etika, halusinasi, bias, & keamanan data (CP 5.2).</p>
           </div>
+          <div class="mt-6 flex items-center text-cyan-400 font-semibold text-xs"><span>Pelajari</span> <i class="fa-solid fa-chevron-right ml-2"></i></div>
         </div>
       </div>
     </section>
 
     <!-- TAB 1: COMPUTATIONAL THINKING -->
-    <section x-show="activeTab === 'ct'" class="space-y-8 max-w-4xl mx-auto">
+    <section id="tab-ct" class="tab-content space-y-8 max-w-4xl mx-auto">
       <div class="space-y-3">
         <span class="text-cyan-400 font-semibold text-xs uppercase tracking-wider">Fondasi Awal Pembelajaran</span>
         <h2 class="text-3xl font-extrabold text-white">Mengapa Berpikir Komputasional Dulu, Baru Literasi Digital?</h2>
@@ -348,7 +142,7 @@
           <div class="space-y-2">
             <h3 class="text-xl font-bold text-white">1. Fondasi Pola Pikir Sistematis</h3>
             <p class="text-slate-300 text-sm leading-relaxed">
-              Berpikir komputasional (*Computational Thinking*) melatih otak memecahkan masalah kompleks melalui dekomposisi (memecah masalah), pengenalan pola, abstraksi, dan algoritma.
+              Berpikir komputasional (Computational Thinking) melatih otak memecahkan masalah kompleks melalui dekomposisi (memecah masalah), pengenalan pola, abstraksi, dan algoritma.
             </p>
           </div>
         </div>
@@ -376,7 +170,7 @@
     </section>
 
     <!-- TAB 2: UU ITE & UU PDP -->
-    <section x-show="activeTab === 'law'" class="space-y-8 max-w-4xl mx-auto">
+    <section id="tab-law" class="tab-content space-y-8 max-w-4xl mx-auto">
       <div class="space-y-3">
         <span class="text-cyan-400 font-semibold text-xs uppercase tracking-wider">Regulasi Resmi & Sanksi Pidana</span>
         <h2 class="text-3xl font-extrabold text-white">Undang-Undang ITE dan UU Pelindungan Data Pribadi</h2>
@@ -400,7 +194,7 @@
         <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4">
           <div class="text-cyan-400 text-xl font-bold"><i class="fa-solid fa-lock mr-2"></i> Apa itu UU PDP?</div>
           <p class="text-xs text-slate-300 leading-relaxed">
-            <b>Undang-Undang Pelindungan Data Pribadi (UU No. 27 Tahun 2022)</b> adalah regulasi khusus yang memberikan pelindungan penuh atas kerahasiaan data privasi warga negara dari pencurian dan penyalahgunaan (*doxing* / pinjol ilegal).
+            <b>Undang-Undang Pelindungan Data Pribadi (UU No. 27 Tahun 2022)</b> adalah regulasi khusus yang memberikan pelindungan penuh atas kerahasiaan data privasi warga negara dari pencurian dan penyalahgunaan (doxing / pinjol ilegal).
           </p>
           <div class="space-y-2 pt-2 border-t border-slate-800 text-xs">
             <p class="text-red-400 font-semibold">🚨 Sanksi Pencurian/Penyebaran Data Ilegal (Pasal 65):</p>
@@ -422,7 +216,7 @@
           <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
             <span class="text-cyan-400 font-bold">2. Kasus UU PDP & Doxing</span>
             <p class="text-slate-300 leading-relaxed">
-              Pelaku penyebaran foto KTP dan NIK orang lain (*doxing*) untuk teror pinjol ilegal dijerat UU ITE & UU PDP dengan ancaman penjara <b>hingga 5 tahun dan denda miliaran rupiah</b>.<br>
+              Pelaku penyebaran foto KTP dan NIK orang lain (doxing) untuk teror pinjol ilegal dijerat UU ITE & UU PDP dengan ancaman penjara <b>hingga 5 tahun dan denda miliaran rupiah</b>.<br>
               <i class="text-slate-500">Sumber: Tempo.co / Antaranews</i>
             </p>
           </div>
@@ -430,10 +224,10 @@
       </div>
     </section>
 
-    <!-- TAB 3: HKI & LISENSI KODING (NEW!) -->
-    <section x-show="activeTab === 'hki'" class="space-y-8 max-w-4xl mx-auto">
+    <!-- TAB 3: HKI & LISENSI KODING -->
+    <section id="tab-hki" class="tab-content space-y-8 max-w-4xl mx-auto">
       <div class="space-y-3">
-        <span class="text-cyan-400 font-semibold text-xs uppercase tracking-wider">Materi Baru Kurikulum Koding</span>
+        <span class="text-cyan-400 font-semibold text-xs uppercase tracking-wider">Materi Kurikulum Koding & Kreativitas</span>
         <h2 class="text-3xl font-extrabold text-white">Hak Kekayaan Intelektual (HKI) & Lisensi Perangkat Lunak</h2>
         <p class="text-slate-300 text-base">Sebagai siswa koding dan kreator digital, Anda wajib memahami perlindungan hukum atas karya cipta dan kode program.</p>
       </div>
@@ -445,14 +239,14 @@
             <span>Apa itu HKI (Hak Kekayaan Intelektual)?</span>
           </div>
           <p class="text-slate-300 text-sm leading-relaxed">
-            HKI adalah hak eksklusif yang diberikan oleh negara kepada pencipta atau pembuat atas karya intelektual yang mereka hasilkan, termasuk di dalamnya <b>kode sumber (*source code*) aplikasi, desain antarmuka (*UI/UX*), algoritma khusus, dan aset digital</b>.
+            HKI adalah hak eksklusif yang diberikan oleh negara kepada pencipta atau pembuat atas karya intelektual yang mereka hasilkan, termasuk di dalamnya <b>kode sumber (source code) aplikasi, desain antarmuka (UI/UX), algoritma khusus, dan aset digital</b>.
           </p>
           <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 text-xs text-slate-300 space-y-2">
             <p class="font-bold text-white">Mengapa HKI Penting dalam Koding?</p>
             <ul class="list-disc pl-5 space-y-1 text-slate-400">
               <li>Mencegah plagiasi dan pencurian kode program oleh pihak lain tanpa izin.</li>
               <li>Memberikan penghargaan ekonomi dan moral kepada pembuat perangkat lunak.</li>
-              <li>Menghindari sanksi perdata maupun pidana akibat pelanggaran hak cipta (*copyright infringement*).</li>
+              <li>Menghindari sanksi perdata maupun pidana akibat pelanggaran hak cipta (copyright infringement).</li>
             </ul>
           </div>
         </div>
@@ -473,9 +267,9 @@
               </p>
             </div>
             <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
-              <span class="font-bold text-white">Copyright Tertutup (*Proprietary*)</span>
+              <span class="font-bold text-white">Copyright Tertutup (Proprietary)</span>
               <p class="text-slate-400 leading-relaxed">
-                Kode dilindungi sepenuhnya. Dilarang keras menyalin, membongkar (*reverse engineering*), atau menyebarkan ulang tanpa izin tertulis dari perusahaan pemilik.
+                Kode dilindungi sepenuhnya. Dilarang keras menyalin, membongkar (reverse engineering), atau menyebarkan ulang tanpa izin tertulis dari perusahaan pemilik.
               </p>
             </div>
           </div>
@@ -484,7 +278,7 @@
     </section>
 
     <!-- TAB 4: PRINSIP & ETIKA AI (CP 5.1 & 5.2) -->
-    <section x-show="activeTab === 'ai'" class="space-y-8 max-w-4xl mx-auto">
+    <section id="tab-ai" class="tab-content space-y-8 max-w-4xl mx-auto">
       <div class="space-y-3">
         <span class="text-cyan-400 font-semibold text-xs uppercase tracking-wider">Capaian Pembelajaran 5.1 & 5.2 (Fase E)</span>
         <h2 class="text-3xl font-extrabold text-white">Prinsip Kerja AI, Etika, & Keamanan Data</h2>
@@ -517,15 +311,346 @@
     </section>
 
     <!-- TAB 5: SIMULATOR KASUS -->
-    <section x-show="activeTab === 'simulator'" class="space-y-8 max-w-4xl mx-auto" x-data="{ step: 1, option: null, feedback: '' }">
+    <section id="tab-simulator" class="tab-content space-y-8 max-w-4xl mx-auto">
       <div class="space-y-3 text-center">
         <span class="text-cyan-400 font-semibold text-xs uppercase tracking-wider">Uji Etika & Hukum</span>
-        <h2 class="text-3xl font-extrabold text-white">Simulator Dilema Etika Digital & HKI</h2>
+        <h2 class="text-3xl font-extrabold text-white">Simulator Dilema Etika Digital, HKI & AI</h2>
         <p class="text-slate-300 text-base">Pilih tindakan paling tepat dalam skenario nyata berikut:</p>
       </div>
 
       <div class="bg-slate-900 border border-slate-800 rounded-3xl p-8 space-y-6 shadow-xl">
-        <template x-if="step === 1">
+        <div id="sim-container">
+          <!-- Dynamic Simulator Content via JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 6: KUIS INTERAKTIF (15 SOAL) -->
+    <section id="tab-quiz" class="tab-content space-y-8 max-w-4xl mx-auto">
+      <div class="space-y-3 text-center">
+        <span class="text-cyan-400 font-semibold text-xs uppercase tracking-wider">Evaluasi Formatif & Sumatif</span>
+        <h2 class="text-3xl font-extrabold text-white">Kuis Interaktif Lengkap (15 Soal)</h2>
+        <p class="text-slate-300 text-sm">Uji pemahaman Anda mengenai Berpikir Komputasional, UU ITE, UU PDP, HKI, dan Etika AI.</p>
+      </div>
+
+      <div id="quiz-result-box" class="hidden bg-slate-900 border border-cyan-500/40 rounded-3xl p-8 text-center space-y-4 shadow-2xl">
+        <div class="w-20 h-20 bg-cyan-500/20 text-cyan-400 rounded-full flex items-center justify-center text-3xl mx-auto border border-cyan-500/40">
+          <i class="fa-solid fa-trophy"></i>
+        </div>
+        <h3 class="text-2xl font-bold text-white">Hasil Kuis Anda</h3>
+        <div id="quiz-score-display" class="text-4xl font-extrabold text-cyan-400">0 / 100</div>
+        <p id="quiz-feedback-text" class="text-slate-300 text-sm max-w-md mx-auto"></p>
+        <button onclick="resetQuiz()" class="bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold px-6 py-3 rounded-xl text-xs transition-all">
+          Ulangi Kuis
+        </button>
+      </div>
+
+      <form id="quiz-form" onsubmit="submitQuiz(event)" class="space-y-10">
+        <!-- BAGIAN A: PILIHAN GANDA (10 SOAL) -->
+        <div class="space-y-6">
+          <h3 class="text-xl font-bold text-white border-b border-slate-800 pb-3"><i class="fa-solid fa-list-check text-cyan-400 mr-2"></i> Bagian A: Pilihan Ganda (10 Soal)</h3>
+          <div id="mcq-container" class="space-y-6"></div>
+        </div>
+
+        <!-- BAGIAN B: BENAR / SALAH (5 SOAL) -->
+        <div class="space-y-6 pt-6">
+          <h3 class="text-xl font-bold text-white border-b border-slate-800 pb-3"><i class="fa-solid fa-check-double text-cyan-400 mr-2"></i> Bagian B: Benar atau Salah (5 Soal)</h3>
+          <div id="tf-container" class="space-y-6"></div>
+        </div>
+
+        <button type="submit" class="w-full bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-extrabold py-4 rounded-2xl shadow-lg shadow-cyan-500/20 transition-all text-sm cursor-pointer">
+          Kirim Jawaban & Lihat Hasil Kuis
+        </button>
+      </form>
+    </section>
+
+    <!-- TAB 7: REFLEKSI -->
+    <section id="tab-reflection" class="tab-content space-y-8 max-w-2xl mx-auto">
+      <div class="space-y-3 text-center">
+        <span class="text-cyan-400 font-semibold text-xs uppercase tracking-wider">Evaluasi Mandiri</span>
+        <h2 class="text-3xl font-extrabold text-white">Lembar Refleksi & Komitmen Digital</h2>
+        <p class="text-slate-300 text-sm">Tuliskan komitmen nyata Anda sebagai warga digital yang beretika, taat hukum, dan bijak ber-AI:</p>
+      </div>
+
+      <div class="bg-slate-900 border border-slate-800 rounded-3xl p-8 space-y-6 shadow-xl">
+        <div class="space-y-2">
+          <label class="block text-xs font-semibold text-slate-300">1. Hal baru apa yang paling berharga bagi Anda hari ini mengenai hukum siber, UU ITE, UU PDP, HKI, dan prinsip AI?</label>
+          <textarea rows="3" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-slate-100 text-xs focus:outline-none focus:border-cyan-500" placeholder="Tuliskan jawaban Anda..."></textarea>
+        </div>
+
+        <div class="space-y-2">
+          <label class="block text-xs font-semibold text-slate-300">2. Komitmen nyata apa yang akan Anda terapkan mulai hari ini saat menggunakan internet, media sosial, atau menulis kode program?</label>
+          <textarea id="reflection-input" rows="3" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-slate-100 text-xs focus:outline-none focus:border-cyan-500" placeholder="Contoh: Saya berkomitmen untuk selalu menghargai Hak Kekayaan Intelektual, menjaga data pribadi, dan menggunakan AI secara bertanggung jawab..."></textarea>
+        </div>
+
+        <button onclick="saveReflection()" class="w-full bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold py-3.5 rounded-xl shadow-lg shadow-cyan-500/20 transition-all text-xs cursor-pointer">
+          Simpan & Kirim Komitmen Digital
+        </button>
+
+        <div id="reflection-success" class="hidden bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 p-4 rounded-xl text-center text-xs font-medium">
+          <i class="fa-solid fa-circle-check mr-2"></i> Komitmen digital Anda berhasil disimpan. Terima kasih telah menjadi pelajar yang cerdas dan bertanggung jawab!
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="bg-slate-900 border-t border-slate-800 mt-20 py-8 text-center text-xs text-slate-500">
+    <p>Hub Pembelajaran Terpadu: Literasi Digital, Hukum Siber, UU ITE, UU PDP, HKI & AI • Fase E (Kelas X SMK)</p>
+  </footer>
+
+  <script>
+    // Tab switching logic
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.getElementById('tab-' + tabId).classList.add('active');
+
+      document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.className = "nav-btn px-3 py-2 rounded-lg text-xs font-semibold border border-transparent text-slate-400 hover:text-white hover:bg-slate-800/60 transition-all";
+      });
+      const activeNav = document.getElementById('nav-' + tabId);
+      if (activeNav) {
+        activeNav.className = "nav-btn px-3 py-2 rounded-lg text-xs font-semibold border border-cyan-500/40 bg-cyan-500/10 text-cyan-400 transition-all";
+      }
+
+      document.querySelectorAll('.mob-btn').forEach(btn => {
+        btn.className = "mob-btn px-3 py-1.5 rounded-lg text-xs whitespace-nowrap bg-slate-800 text-slate-300";
+      });
+      event && event.target && event.target.classList.contains('mob-btn') && (event.target.className = "mob-btn px-3 py-1.5 rounded-lg text-xs whitespace-nowrap bg-cyan-500 text-slate-950 font-bold");
+      
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Quiz Data
+    const mcqData = [
+      {
+        id: 1,
+        q: 'Mengapa berpikir komputasional (computational thinking) perlu dipelajari sebelum mendalami literasi digital dan etika hukum siber?',
+        options: [
+          'A. Agar siswa bisa meretas aplikasi dengan cepat',
+          'B. Melatih otak memecahkan masalah secara sistematis sebagai pisau analisis kritis sebelum menyaring informasi',
+          'C. Karena koding tidak ada hubungannya dengan etika bermedia',
+          'D. Sebagai syarat wajib membuat akun media sosial'
+        ],
+        correct: 1
+      },
+      {
+        id: 2,
+        q: 'Berdasarkan revisi UU ITE terbaru (UU No. 1 Tahun 2024), apa ancaman hukuman maksimal bagi penyebar berita bohong (hoaks) yang merugikan masyarakat?',
+        options: [
+          'A. Penjara 1 tahun dan denda 10 juta rupiah',
+          'B. Penjara 6 tahun dan/atau denda maksimal 1 Miliar Rupiah',
+          'C. Peringatan tertulis tanpa sanksi hukum',
+          'D. Pencabutan kuota internet seumur hidup'
+        ],
+        correct: 1
+      },
+      {
+        id: 3,
+        q: 'Manakah tindakan di bawah ini yang melanggar Undang-Undang Pelindungan Data Pribadi (UU No. 27 Tahun 2022)?',
+        options: [
+          'A. Menyimpan nomor HP sendiri di kontak gawai',
+          'B. Menyebarkan foto KTP dan NIK orang lain ke internet tanpa izin (doxing)',
+          'C. Menggunakan mode gelap pada aplikasi perpesanan',
+          'D. Mengunggah foto pemandangan alam ke Instagram'
+        ],
+        correct: 1
+      },
+      {
+        id: 4,
+        q: 'Apa yang dimaksud dengan Hak Kekayaan Intelektual (HKI / Copyright) dalam konteks pengembangan perangkat lunak dan koding?',
+        options: [
+          'A. Hak milik perangkat keras komputer seperti laptop dan mouse',
+          'B. Perlindungan hukum atas karya cipta kode program, algoritma asli, dan aset digital yang dibuat kreator',
+          'C. Aturan cara merakit komponen CPU',
+          'D. Hak untuk menggunakan Wi-Fi publik secara gratis'
+        ],
+        correct: 1
+      },
+      {
+        id: 5,
+        q: 'Apa fungsi utama dari lisensi Open Source seperti MIT License dalam dunia koding?',
+        options: [
+          'A. Melarang orang lain melihat baris kode program',
+          'B. Memperbolehkan penggunaan, modifikasi, dan distribusi kode dengan syarat tetap mencantumkan atribusi pembuat aslinya',
+          'C. Menjual lisensi kode seharga jutaan rupiah',
+          'D. Menghapus jejak digital pembuat kode'
+        ],
+        correct: 1
+      },
+      {
+        id: 6,
+        q: 'Bagaimana prinsip kerja dasar dari teknologi Kecerdasan Artifisial (AI) menurut Capaian Pembelajaran 5.1?',
+        options: [
+          'A. AI memiliki perasaan dan kesadaran murni seperti manusia',
+          'B. AI memproses miliaran data pelatihan (training data) menggunakan model statistik dan probabilitas untuk menebak kata/elemen berikutnya',
+          'C. AI bekerja secara magis tanpa butuh daya listrik',
+          'D. AI tidak memerlukan data sama sekali untuk berfungsi'
+        ],
+        correct: 1
+      },
+      {
+        id: 7,
+        q: 'Manakah yang termasuk ke dalam kategori "Data Spesifik / Sangat Rahasia" menurut UU PDP?',
+        options: [
+          'A. Nama lengkap dan jenis kelamin',
+          'B. Agama dan alamat domisili',
+          'C. Data biometrik (sidik jari/wajah), catatan keuangan, dan password',
+          'D. Tanggal lahir'
+        ],
+        correct: 2
+      },
+      {
+        id: 8,
+        q: 'Apa yang dimaksud dengan fenomena "Halusinasi AI" dalam konteks etika penggunaan kecerdasan artifisial?',
+        options: [
+          'A. Komputer mengalami kerusakan layar',
+          'B. Kondisi ketika AI memberikan informasi keliru atau fiktif namun disampaikan dengan sangat percaya diri sehingga manusia wajib melakukan verifikasi fakta',
+          'C. AI bisa bermimpi di malam hari',
+          'D. Jaringan internet mendadak lambat'
+        ],
+        correct: 1
+      },
+      {
+        id: 9,
+        q: 'Apa risiko terbesar jika seseorang mengabaikan aturan Hak Cipta dengan melakukan plagiasi kode program atau aset digital orang lain?',
+        options: [
+          'A. Komputer menjadi cepat panas',
+          'B. Terkena sanksi hukum perdata maupun pidana atas pelanggaran hak cipta',
+          'C. Jaringan internet otomatis terputus',
+          'D. Kapasitas harddisk bertambah'
+        ],
+        correct: 1
+      },
+      {
+        id: 10,
+        q: 'Mengapa kita tidak boleh mengunggah data rahasia seperti NIK KTP atau password ke platform AI publik?',
+        options: [
+          'A. Karena membuat kuota internet habis',
+          'B. Karena data tersebut dapat tersimpan dan digunakan untuk melatih model berikutnya, memicu kebocoran data yang melanggar UU PDP',
+          'C. Karena komputer akan restart sendiri',
+          'D. Karena dilarang oleh penyedia listrik'
+        ],
+        correct: 1
+      }
+    ];
+
+    const tfData = [
+      {
+        id: 1,
+        q: 'Semua gambar, video, dan artikel yang ditemukan di internet bebas diambil dan diakui sebagai milik sendiri tanpa mencantumkan sumber.',
+        correct: false
+      },
+      {
+        id: 2,
+        q: 'Mengunggah foto KTP orang lain ke media sosial (doxing) merupakan pelanggaran terhadap UU PDP dan UU ITE.',
+        correct: true
+      },
+      {
+        id: 3,
+        q: 'Berpikir komputasional tidak memiliki kaitan apa pun dengan kemampuan literasi digital seseorang.',
+        correct: false
+      },
+      {
+        id: 4,
+        q: 'Teknologi AI dapat berfungsi sebagai co-pilot yang hebat, namun manusia tetap bertindak sebagai penanggung jawab akhir (fact-checker).',
+        correct: true
+      },
+      {
+        id: 5,
+        q: 'Berdasarkan hukum di Indonesia, segala ketikan, komentar, dan unggahan di media sosial tercatat secara permanen dan dipantau oleh hukum.',
+        correct: true
+      }
+    ];
+
+    // Render Quiz
+    function renderQuiz() {
+      const mcqDiv = document.getElementById('mcq-container');
+      mcqDiv.innerHTML = mcqQuestionsHTML();
+
+      const tfDiv = document.getElementById('tf-container');
+      tfDiv.innerHTML = tfQuestionsHTML();
+    }
+
+    function mcqQuestionsHTML() {
+      return mcqData.map((item, idx) => `
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4">
+          <p class="font-semibold text-white text-sm">${idx + 1}. ${item.q}</p>
+          <div class="space-y-2">
+            ${item.options.map((opt, optIdx) => `
+              <label class="flex items-start space-x-3 p-3 rounded-xl border border-slate-800 bg-slate-950 hover:bg-slate-800/50 cursor-pointer transition-all text-xs text-slate-300">
+                <input type="radio" name="mcq_${item.id}" value="${optIdx}" class="mt-0.5 text-cyan-500 focus:ring-cyan-500 bg-slate-900 border-slate-700">
+                <span>${opt}</span>
+              </label>
+            `).join('')}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function tfQuestionsHTML() {
+      return tfData.map((item, idx) => `
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4">
+          <p class="font-semibold text-white text-sm">${idx + 1}. ${item.q}</p>
+          <div class="flex space-x-4">
+            <label class="flex items-center space-x-2 px-4 py-2.5 rounded-xl border border-slate-800 bg-slate-950 hover:bg-slate-800/50 cursor-pointer text-xs text-slate-300">
+              <input type="radio" name="tf_${item.id}" value="true" class="text-cyan-500 focus:ring-cyan-500 bg-slate-900 border-slate-700">
+              <span>Benar</span>
+            </label>
+            <label class="flex items-center space-x-2 px-4 py-2.5 rounded-xl border border-slate-800 bg-slate-950 hover:bg-slate-800/50 cursor-pointer text-xs text-slate-300">
+              <input type="radio" name="tf_${item.id}" value="false" class="text-cyan-500 focus:ring-cyan-500 bg-slate-900 border-slate-700">
+              <span>Salah</span>
+            </label>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function submitQuiz(e) {
+      e.preventDefault();
+      let score = 0;
+
+      mcqData.forEach(item => {
+        const selected = document.querySelector(`input[name="mcq_${item.id}"]:checked`);
+        if (selected && parseInt(selected.value) === item.correct) {
+          score += 7;
+        }
+      });
+
+      tfData.forEach(item => {
+        const selected = document.querySelector(`input[name="tf_${item.id}"]:checked`);
+        if (selected && (selected.value === 'true') === item.correct) {
+          score += 6;
+        }
+      });
+
+      document.getElementById('quiz-form').classList.add('hidden');
+      const resBox = document.getElementById('quiz-result-box');
+      resBox.classList.remove('hidden');
+      document.getElementById('quiz-score-display').innerText = score + ' / 100';
+      document.getElementById('quiz-feedback-text').innerText = score >= 75 
+        ? 'Luar biasa! Anda menguasai materi literasi digital, hukum siber, HKI, dan AI dengan sangat baik.' 
+        : 'Tetap semangat! Silakan pelajari kembali materi pada modul di atas untuk meningkatkan pemahaman Anda.';
+      
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function resetQuiz() {
+      document.getElementById('quiz-form').reset();
+      document.getElementById('quiz-form').classList.remove('hidden');
+      document.getElementById('quiz-result-box').classList.add('hidden');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Simulator Logic
+    let simStep = 1;
+    let simOption = null;
+    let simFeedback = '';
+
+    function renderSimulator() {
+      const container = document.getElementById('sim-container');
+      if (simStep === 1) {
+        container.innerHTML = `
           <div class="space-y-6">
             <div class="flex justify-between text-xs text-slate-400 font-semibold uppercase">
               <span>Skenario 1 dari 2</span>
@@ -535,186 +660,92 @@
               "Anda menemukan sebuah repositori kode program aplikasi open-source di GitHub buatan developer luar negeri. Anda ingin memakainya untuk tugas sekolah, namun Anda menghapus seluruh catatan hak cipta (license file) dan mengganti nama pembuatnya seolah-olah itu karya murni Anda. Tindakan Anda adalah:"
             </h3>
             <div class="space-y-3 text-xs">
-              <button @click="option = 1; feedback = 'Kurang tepat! Menghapus lisensi dan mengakui karya orang lain sebagai milik sendiri adalah pelanggaran Hak Kekayaan Intelektual (plagiasi).' " 
-                :class="option === 1 ? 'border-red-500 bg-red-500/10 text-white' : 'border-slate-800 bg-slate-950 text-slate-300 hover:border-slate-700'"
-                class="w-full text-left p-4 rounded-xl border transition-all font-medium">
+              <button onclick="setSimOption(1, 1)" class="w-full text-left p-4 rounded-xl border ${simOption === 1 ? 'border-red-500 bg-red-500/10 text-white' : 'border-slate-800 bg-slate-950 text-slate-300 hover:border-slate-700'} transition-all font-medium">
                 A. Sah-sah saja karena kodenya sudah disebar secara publik di internet.
               </button>
-              <button @click="option = 2; feedback = 'Benar sekali! Meskipun open-source, etika HKI mewajibkan kita mencantumkan atribusi dan mematuhi lisensi pembuat aslinya.'" 
-                :class="option === 2 ? 'border-emerald-500 bg-emerald-500/10 text-white' : 'border-slate-800 bg-slate-950 text-slate-300 hover:border-slate-700'"
-                class="w-full text-left p-4 rounded-xl border transition-all font-medium">
+              <button onclick="setSimOption(1, 2)" class="w-full text-left p-4 rounded-xl border ${simOption === 2 ? 'border-emerald-500 bg-emerald-500/10 text-white' : 'border-slate-800 bg-slate-950 text-slate-300 hover:border-slate-700'} transition-all font-medium">
                 B. Melanggar etika HKI. Seharusnya tetap mencantumkan atribusi dan lisensi asli pembuatnya sesuai ketentuan MIT License.
               </button>
             </div>
-            <template x-if="option !== null">
+            ${simOption !== null ? `
               <div class="space-y-4 pt-4">
-                <div :class="option === 2 ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300' : 'bg-red-500/10 border-red-500/30 text-red-300'" class="p-4 rounded-xl border text-xs" x-text="feedback"></div>
-                <button @click="step = 2; option = null; feedback = ''" class="bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold px-6 py-2.5 rounded-xl text-xs transition-all">
+                <div class="p-4 rounded-xl border text-xs ${simOption === 2 ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300' : 'bg-red-500/10 border-red-500/30 text-red-300'}">${simFeedback}</div>
+                <button onclick="simStep = 2; simOption = null; renderSimulator();" class="bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold px-6 py-2.5 rounded-xl text-xs transition-all cursor-pointer">
                   Lanjut Skenario 2 <i class="fa-solid fa-arrow-right ml-2"></i>
                 </button>
               </div>
-            </template>
+            ` : ''}
           </div>
-        </template>
-
-        <template x-if="step === 2">
+        `;
+      } else if (simStep === 2) {
+        container.innerHTML = `
           <div class="space-y-6">
             <div class="flex justify-between text-xs text-slate-400 font-semibold uppercase">
               <span>Skenario 2 dari 2</span>
-              <span>UU ITE & UU PDP</span>
+              <span>UU PDP & Etika AI</span>
             </div>
             <h3 class="text-lg font-bold text-white leading-snug">
-              "Teman sekelas Anda berselisih dengan orang lain di grup WhatsApp publik, lalu teman Anda menyebarkan nomor telepon dan alamat rumah pribadi pihak lawan tersebut ke media sosial. Sikap Anda sebagai warga digital yang paham hukum adalah:"
+              "Saat menggunakan platform AI publik untuk tugas sekolah, platform tersebut meminta Anda mengunggah data keuangan dan KTP pribadi. Sikap Anda yang benar adalah:"
             </h3>
             <div class="space-y-3 text-xs">
-              <button @click="option = 1; feedback = 'Benar! Menyebarkan data pribadi orang lain tanpa izin (*doxing*) melanggar UU PDP Pasal 65 dengan ancaman penjara hingga 5 tahun dan denda 5 Miliar Rupiah.'" 
-                :class="option === 1 ? 'border-emerald-500 bg-emerald-500/10 text-white' : 'border-slate-800 bg-slate-950 text-slate-300 hover:border-slate-700'"
-                class="w-full text-left p-4 rounded-xl border transition-all font-medium">
-                A. Menegur teman tersebut karena tindakan *doxing* melanggar UU PDP dan UU ITE serta berbahaya secara hukum.
+              <button onclick="setSimOption(2, 1)" class="w-full text-left p-4 rounded-xl border ${simOption === 1 ? 'border-emerald-500 bg-emerald-500/10 text-white' : 'border-slate-800 bg-slate-950 text-slate-300 hover:border-slate-700'} transition-all font-medium">
+                A. Menolak mengunggah data rahasia tersebut demi menjaga keamanan privasi sesuai UU PDP.
               </button>
-              <button @click="option = 2; feedback = 'Kurang tepat! Ikut menyebarkan atau mendiamkan tindakan doxing dapat membuat Anda terseret masalah hukum siber.'" 
-                :class="option === 2 ? 'border-red-500 bg-red-500/10 text-white' : 'border-slate-800 bg-slate-950 text-slate-300 hover:border-slate-700'"
-                class="w-full text-left p-4 rounded-xl border transition-all font-medium">
-                B. Ikut membagikan postingan tersebut agar masalahnya cepat selesai.
+              <button onclick="setSimOption(2, 2)" class="w-full text-left p-4 rounded-xl border ${simOption === 2 ? 'border-red-500 bg-red-500/10 text-white' : 'border-slate-800 bg-slate-950 text-slate-300 hover:border-slate-700'} transition-all font-medium">
+                B. Mengunggahnya langsung agar tugas cepat selesai.
               </button>
             </div>
-            <template x-if="option !== null">
+            ${simOption !== null ? `
               <div class="space-y-4 pt-4">
-                <div :class="option === 1 ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300' : 'bg-red-500/10 border-red-500/30 text-red-300'" class="p-4 rounded-xl border text-xs" x-text="feedback"></div>
-                <button @click="step = 3" class="bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold px-6 py-2.5 rounded-xl text-xs transition-all">
+                <div class="p-4 rounded-xl border text-xs ${simOption === 1 ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300' : 'bg-red-500/10 border-red-500/30 text-red-300'}">${simFeedback}</div>
+                <button onclick="simStep = 3; renderSimulator();" class="bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold px-6 py-2.5 rounded-xl text-xs transition-all cursor-pointer">
                   Lihat Hasil Simulasi <i class="fa-solid fa-flag-checkered ml-2"></i>
                 </button>
               </div>
-            </template>
+            ` : ''}
           </div>
-        </template>
-
-        <template x-if="step === 3">
+        `;
+      } else {
+        container.innerHTML = `
           <div class="text-center space-y-6 py-6">
             <div class="w-16 h-16 bg-emerald-500/20 text-emerald-400 rounded-full flex items-center justify-center text-2xl mx-auto border border-emerald-500/40">
               <i class="fa-solid fa-award"></i>
             </div>
             <h3 class="text-2xl font-bold text-white">Simulasi Etika Selesai!</h3>
             <p class="text-slate-300 text-sm max-w-md mx-auto">
-              Anda telah memahami pentingnya menjaga Hak Kekayaan Intelektual, mematuhi UU ITE, dan melindungi data pribadi sesuai koridor hukum yang berlaku.
+              Anda telah memahami pentingnya menjaga Hak Kekayaan Intelektual, mematuhi UU ITE, UU PDP, serta etika penggunaan kecerdasan artifisial.
             </p>
-            <button @click="step = 1; option = null" class="bg-slate-800 hover:bg-slate-700 text-white font-semibold px-6 py-2.5 rounded-xl text-xs border border-slate-700 transition-all">
+            <button onclick="simStep = 1; simOption = null; renderSimulator();" class="bg-slate-800 hover:bg-slate-700 text-white font-semibold px-6 py-2.5 rounded-xl text-xs border border-slate-700 transition-all cursor-pointer">
               Ulangi Simulator
             </button>
           </div>
-        </template>
-      </div>
-    </section>
+        `;
+      }
+    }
 
-    <!-- TAB 5: QUIZ INTERAKTIF (10 MCQ + 5 TF) -->
-    <section x-show="activeTab === 'quiz'" class="space-y-8 max-w-4xl mx-auto">
-      <div class="space-y-3 text-center">
-        <span class="text-cyan-400 font-semibold text-xs uppercase tracking-wider">Evaluasi Formatif & Sumatif</span>
-        <h2 class="text-3xl font-extrabold text-white">Kuis Interaktif (15 Soal)</h2>
-        <p class="text-slate-300 text-sm">Uji pemahaman Anda mengenai Berpikir Komputasional, UU ITE, UU PDP, dan HKI.</p>
-      </div>
+    function setSimOption(scenario, opt) {
+      simOption = opt;
+      if (scenario === 1) {
+        simFeedback = opt === 2 
+          ? 'Benar sekali! Meskipun open-source, etika HKI mewajibkan kita mencantumkan atribusi dan mematuhi lisensi pembuat aslinya.' 
+          : 'Kurang tepat! Menghapus lisensi dan mengakui karya orang lain sebagai milik sendiri adalah pelanggaran Hak Kekayaan Intelektual (plagiasi).';
+      } else {
+        simFeedback = opt === 1 
+          ? 'Benar! Mengunggah data sensitif pribadi ke platform AI publik melanggar UU PDP karena berisiko memicu kebocoran data (data breach).' 
+          : 'Kurang tepat! Hal ini sangat berbahaya karena data sensitif Anda dapat disimpan server publik tanpa jaminan kerahasiaan.';
+      }
+      renderSimulator();
+    }
 
-      <!-- RESULT BOX -->
-      <template x-if="quizSubmitted">
-        <div class="bg-slate-900 border border-cyan-500/40 rounded-3xl p-8 text-center space-y-4 shadow-2xl">
-          <div class="w-20 h-20 bg-cyan-500/20 text-cyan-400 rounded-full flex items-center justify-center text-3xl mx-auto border border-cyan-500/40">
-            <i class="fa-solid fa-trophy"></i>
-          </div>
-          <h3 class="text-2xl font-bold text-white">Hasil Kuis Anda</h3>
-          <div class="text-4xl font-extrabold text-cyan-400" x-text="score + ' / 100'"></div>
-          <p class="text-slate-300 text-sm max-w-md mx-auto" x-text="score >= 75 ? 'Luar biasa! Anda menguasai materi literasi digital, hukum siber, dan HKI dengan sangat baik.' : 'Tetap semangat! Silakan pelajari kembali materi pada modul di atas untuk meningkatkan pemahaman Anda.'"></p>
-          <button @click="resetQuiz()" class="bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold px-6 py-3 rounded-xl text-xs transition-all">
-            Ulangi Kuis
-          </button>
-        </div>
-      </template>
+    function saveReflection() {
+      document.getElementById('reflection-success').classList.remove('hidden');
+    }
 
-      <!-- QUIZ FORM -->
-      <div class="space-y-10" x-show="!quizSubmitted">
-        
-        <!-- BAGIAN A: PILIHAN GANDA (10 SOAL) -->
-        <div class="space-y-6">
-          <h3 class="text-xl font-bold text-white border-b border-slate-800 pb-3"><i class="fa-solid fa-list-check text-cyan-400 mr-2"></i> Bagian A: Pilihan Ganda (10 Soal)</h3>
-          
-          <template x-for="(item, index) in mcqQuestions" :key="item.id">
-            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4">
-              <p class="font-semibold text-white text-sm" x-text="(index + 1) + '. ' + item.q"></p>
-              <div class="space-y-2">
-                <template x-for="(opt, optIndex) in item.options" :key="optIndex">
-                  <label class="flex items-start space-x-3 p-3 rounded-xl border border-slate-800/80 bg-slate-950 hover:bg-slate-800/50 cursor-pointer transition-all text-xs text-slate-300">
-                    <input type="radio" :name="'mcq_' + item.id" :value="optIndex" x-model.number="mcqAnswers[item.id]" class="mt-0.5 text-cyan-500 focus:ring-cyan-500 bg-slate-900 border-slate-700">
-                    <span x-text="opt"></span>
-                  </label>
-                </template>
-              </div>
-            </div>
-          </template>
-        </div>
-
-        <!-- BAGIAN B: BENAR / SALAH (5 SOAL) -->
-        <div class="space-y-6 pt-6">
-          <h3 class="text-xl font-bold text-white border-b border-slate-800 pb-3"><i class="fa-solid fa-check-double text-cyan-400 mr-2"></i> Bagian B: Benar atau Salah (5 Soal)</h3>
-          
-          <template x-for="(item, index) in tfQuestions" :key="item.id">
-            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4">
-              <p class="font-semibold text-white text-sm" x-text="(index + 1) + '. ' + item.q"></p>
-              <div class="flex space-x-4">
-                <label class="flex items-center space-x-2 px-4 py-2.5 rounded-xl border border-slate-800 bg-slate-950 hover:bg-slate-800/50 cursor-pointer text-xs text-slate-300">
-                  <input type="radio" :name="'tf_' + item.id" :value="true" x-model.boolean="tfAnswers[item.id]" class="text-cyan-500 focus:ring-cyan-500 bg-slate-900 border-slate-700">
-                  <span>Benar</span>
-                </label>
-                <label class="flex items-center space-x-2 px-4 py-2.5 rounded-xl border border-slate-800 bg-slate-950 hover:bg-slate-800/50 cursor-pointer text-xs text-slate-300">
-                  <input type="radio" :name="'tf_' + item.id" :value="false" x-model.boolean="tfAnswers[item.id]" class="text-cyan-500 focus:ring-cyan-500 bg-slate-900 border-slate-700">
-                  <span>Salah</span>
-                </label>
-              </div>
-            </div>
-          </template>
-        </div>
-
-        <button @click="submitQuiz()" class="w-full bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-extrabold py-4 rounded-2xl shadow-lg shadow-cyan-500/20 transition-all text-sm">
-          Kirim Jawaban & Lihat Hasil Kuis
-        </button>
-
-      </div>
-    </section>
-
-    <!-- TAB 6: REFLEKSI -->
-    <section x-show="activeTab === 'reflection'" class="space-y-8 max-w-2xl mx-auto">
-      <div class="space-y-3 text-center">
-        <span class="text-cyan-400 font-semibold text-xs uppercase tracking-wider">Evaluasi Mandiri</span>
-        <h2 class="text-3xl font-extrabold text-white">Lembar Refleksi & Komitmen Digital</h2>
-        <p class="text-slate-300 text-sm">Tuliskan komitmen nyata Anda sebagai warga digital yang beretika dan taat hukum:</p>
-      </div>
-
-      <div class="bg-slate-900 border border-slate-800 rounded-3xl p-8 space-y-6 shadow-xl">
-        <div class="space-y-2">
-          <label class="block text-xs font-semibold text-slate-300">1. Hal baru apa yang paling berharga bagi Anda hari ini mengenai hukum siber, UU ITE, UU PDP, dan HKI?</label>
-          <textarea rows="3" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-slate-100 text-xs focus:outline-none focus:border-cyan-500" placeholder="Tuliskan jawaban Anda..."></textarea>
-        </div>
-
-        <div class="space-y-2">
-          <label class="block text-xs font-semibold text-slate-300">2. Komitmen nyata apa yang akan Anda terapkan mulai hari ini saat menggunakan internet, media sosial, atau menulis kode program?</label>
-          <textarea x-model="reflectionText" rows="3" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-slate-100 text-xs focus:outline-none focus:border-cyan-500" placeholder="Contoh: Saya berkomitmen untuk selalu menghargai Hak Kekayaan Intelektual dan menjaga data pribadi..."></textarea>
-        </div>
-
-        <button @click="saved = true" class="w-full bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold py-3.5 rounded-xl shadow-lg shadow-cyan-500/20 transition-all text-xs">
-          Simpan & Kirim Komitmen Digital
-        </button>
-
-        <template x-if="saved">
-          <div class="bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 p-4 rounded-xl text-center text-xs font-medium">
-            <i class="fa-solid fa-circle-check mr-2"></i> Komitmen digital Anda berhasil disimpan. Terima kasih telah menjadi pelajar yang cerdas dan bertanggung jawab!
-          </div>
-        </template>
-      </div>
-    </section>
-
-  </main>
-
-  <footer class="bg-slate-900 border-t border-slate-800 mt-20 py-8 text-center text-xs text-slate-500">
-    <p>Hub Pembelajaran Interaktif: Literasi Digital, Hukum Siber, UU ITE, UU PDP & HKI • Fase E (Kelas X SMK)</p>
-  </footer>
-
+    // Initialize on load
+    window.onload = function() {
+      renderQuiz();
+      renderSimulator();
+    };
+  </script>
 </body>
 </html>
