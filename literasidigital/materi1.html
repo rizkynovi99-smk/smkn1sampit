@@ -188,9 +188,12 @@
           });
           this.tfQuestions.forEach(item => {
             let val = this.tfAnswers[item.id];
-            let boolVal = (val === true || val === 'true');
-            if (boolVal === item.correct) {
-              currentScore += 6;
+            // Pastikan soal benar/salah benar-benar dijawab (tidak undefined/null)
+            if (val !== undefined && val !== null) {
+              let boolVal = (val === true || val === 'true');
+              if (boolVal === item.correct) {
+                currentScore += 6;
+              }
             }
           });
           this.score = currentScore;
