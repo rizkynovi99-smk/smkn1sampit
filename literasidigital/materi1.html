@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="id" class="scroll-smooth">
 <head>
@@ -735,18 +734,85 @@
         <p class="text-slate-600 text-sm">Uji pemahaman Anda mengenai Berpikir Komputasional, UU ITE, UU PDP, HKI, dan Etika AI.</p>
       </div>
 
-      <!-- RESULT BOX -->
+      <!-- RESULT BOX & PEMBAHASAN SOAL -->
       <template x-if="quizSubmitted">
-        <div class="bg-white border border-emerald-300 rounded-3xl p-8 text-center space-y-4 shadow-md">
-          <div class="w-20 h-20 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center text-3xl mx-auto border border-emerald-200">
-            <i class="fa-solid fa-trophy"></i>
+        <div class="space-y-8 max-w-3xl mx-auto">
+          <div class="bg-white border border-emerald-300 rounded-3xl p-8 text-center space-y-4 shadow-md">
+            <div class="w-20 h-20 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center text-3xl mx-auto border border-emerald-200">
+              <i class="fa-solid fa-trophy"></i>
+            </div>
+            <h3 class="text-2xl font-bold text-slate-900">Hasil Kuis Anda</h3>
+            <div class="text-4xl font-extrabold text-emerald-600" x-text="score + ' / 100'"></div>
+            <p class="text-slate-600 text-sm max-w-md mx-auto" x-text="score >= 75 ? 'Luar biasa! Anda menguasai materi literasi digital, hukum siber, HKI, dan AI dengan sangat baik.' : 'Tetap semangat! Silakan pelajari kembali materi pada modul di atas untuk meningkatkan pemahaman Anda.'"></p>
+            <button @click="resetQuiz()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-6 py-3 rounded-xl text-xs transition-all shadow">
+              Ulangi Kuis
+            </button>
           </div>
-          <h3 class="text-2xl font-bold text-slate-900">Hasil Kuis Anda</h3>
-          <div class="text-4xl font-extrabold text-emerald-600" x-text="score + ' / 100'"></div>
-          <p class="text-slate-600 text-sm max-w-md mx-auto" x-text="score >= 75 ? 'Luar biasa! Anda menguasai materi literasi digital, hukum siber, HKI, dan AI dengan sangat baik.' : 'Tetap semangat! Silakan pelajari kembali materi pada modul di atas untuk meningkatkan pemahaman Anda.'"></p>
-          <button @click="resetQuiz()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-6 py-3 rounded-xl text-xs transition-all shadow">
-            Ulangi Kuis
-          </button>
+
+          <!-- PEMBAHASAN & ANALISIS JAWABAN -->
+          <div class="bg-white border border-slate-200 rounded-3xl p-8 space-y-6 shadow-sm">
+            <h3 class="text-xl font-bold text-slate-900 border-b border-slate-200 pb-4">
+              <i class="fa-solid fa-clipboard-question text-emerald-600 mr-2"></i> Pembahasan & Analisis Jawaban (15 Soal)
+            </h3>
+
+            <!-- MCQ Review -->
+            <div class="space-y-6">
+              <h4 class="font-bold text-emerald-700 text-sm">Bagian A: Pilihan Ganda</h4>
+              <template x-for="(item, index) in mcqQuestions" :key="'rev_mcq_' + item.id">
+                <div class="p-5 rounded-2xl border" :class="parseInt(mcqAnswers[item.id]) === item.correct ? 'bg-emerald-50/50 border-emerald-200' : 'bg-rose-50/50 border-rose-200'">
+                  <p class="font-semibold text-slate-900 text-xs sm:text-sm mb-3" x-text="(index + 1) + '. ' + item.q"></p>
+                  
+                  <div class="space-y-1.5 text-xs mb-3">
+                    <p class="text-slate-700">
+                      <b>Jawaban Anda:</b> 
+                      <span :class="parseInt(mcqAnswers[item.id]) === item.correct ? 'text-emerald-700 font-bold' : 'text-rose-600 font-bold'" 
+                            x-text="mcqAnswers[item.id] !== undefined ? item.options[mcqAnswers[item.id]] : 'Tidak dijawab'">
+                      </span>
+                    </p>
+                    <template x-if="parseInt(mcqAnswers[item.id]) !== item.correct">
+                      <p class="text-slate-700">
+                        <b>Jawaban Benar:</b> <span class="text-emerald-700 font-bold" x-text="item.options[item.correct]"></span>
+                      </p>
+                    </template>
+                  </div>
+
+                  <div class="bg-white p-3.5 rounded-xl border border-slate-200 text-xs text-slate-600 space-y-1">
+                    <p class="font-bold text-slate-800"><i class="fa-solid fa-circle-info text-emerald-600 mr-1"></i> Pembahasan / Rationale:</p>
+                    <p x-text="item.rationale"></p>
+                  </div>
+                </div>
+              </template>
+            </div>
+
+            <!-- TF Review -->
+            <div class="space-y-6 pt-6 border-t border-slate-200">
+              <h4 class="font-bold text-emerald-700 text-sm">Bagian B: Benar atau Salah</h4>
+              <template x-for="(item, index) in tfQuestions" :key="'rev_tf_' + item.id">
+                <div class="p-5 rounded-2xl border" :class="((tfAnswers[item.id] === true || tfAnswers[item.id] === 'true') === item.correct) ? 'bg-emerald-50/50 border-emerald-200' : 'bg-rose-50/50 border-rose-200'">
+                  <p class="font-semibold text-slate-900 text-xs sm:text-sm mb-3" x-text="(index + 1) + '. ' + item.q"></p>
+                  
+                  <div class="space-y-1.5 text-xs mb-3">
+                    <p class="text-slate-700">
+                      <b>Jawaban Anda:</b> 
+                      <span :class="((tfAnswers[item.id] === true || tfAnswers[item.id] === 'true') === item.correct) ? 'text-emerald-700 font-bold' : 'text-rose-600 font-bold'" 
+                            x-text="tfAnswers[item.id] !== undefined ? ((tfAnswers[item.id] === true || tfAnswers[item.id] === 'true') ? 'Benar' : 'Salah') : 'Tidak dijawab'">
+                      </span>
+                    </p>
+                    <template x-if="!((tfAnswers[item.id] === true || tfAnswers[item.id] === 'true') === item.correct)">
+                      <p class="text-slate-700">
+                        <b>Jawaban Benar:</b> <span class="text-emerald-700 font-bold" x-text="item.correct ? 'Benar' : 'Salah'"></span>
+                      </p>
+                    </template>
+                  </div>
+
+                  <div class="bg-white p-3.5 rounded-xl border border-slate-200 text-xs text-slate-600 space-y-1">
+                    <p class="font-bold text-slate-800"><i class="fa-solid fa-circle-info text-emerald-600 mr-1"></i> Pembahasan / Rationale:</p>
+                    <p x-text="item.rationale"></p>
+                  </div>
+                </div>
+              </template>
+            </div>
+          </div>
         </div>
       </template>
 
