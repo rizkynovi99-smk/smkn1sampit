@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Modul Interaktif: Algoritma, Flowchart, Percabangan & Perulangan</title>
+    <title>Modul Interaktif: Algoritma, Flowchart, & Struktur Kontrol (Fase E)</title>
     <!-- Tailwind CSS Light Mode -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
@@ -38,29 +38,25 @@
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col selection:bg-brand-500 selection:text-white">
 
-    <!-- Welcome Mascot Animated Modal with Driving Question -->
+    <!-- Welcome Mascot & Pertanyaan Pemantik Modal -->
     <div id="welcome-mascot-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 transition-all duration-300">
         <div class="bg-white rounded-3xl max-w-xl w-full p-8 shadow-2xl border border-slate-200 text-center space-y-6 relative overflow-hidden animate-bounce-in max-h-[90vh] overflow-y-auto">
-            <!-- Decorative background blob -->
             <div class="absolute -top-12 -right-12 w-32 h-32 bg-emerald-100 rounded-full blur-2xl"></div>
             <div class="absolute -bottom-12 -left-12 w-32 h-32 bg-blue-100 rounded-full blur-2xl"></div>
             
-            <!-- Animated Robot SVG Avatar -->
             <div class="relative z-10 flex justify-center">
                 <div class="w-20 h-20 bg-gradient-to-tr from-emerald-500 to-teal-400 rounded-2xl flex items-center justify-center shadow-lg animate-pulse transform hover:scale-105 transition-transform">
-                    <svg class="w-12 h-12 text-white animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
-                    </svg>
+                    <i class="fa-solid fa-code text-white text-3xl"></i>
                 </div>
             </div>
 
             <div class="relative z-10 space-y-3">
                 <span class="bg-emerald-100 text-emerald-800 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Pertanyaan Pemantik & Studi Kasus</span>
-                <h3 class="text-xl font-bold text-slate-900">Selamat Datang di Modul Koding & AI! 👋</h3>
+                <h3 class="text-xl font-bold text-slate-900">Selamat Datang di Modul Pembelajaran (Fase E)! 👋</h3>
                 <div class="p-4 bg-emerald-50 border border-emerald-200 rounded-xl text-left">
                     <p class="text-xs md:text-sm text-slate-700 leading-relaxed font-medium">
                         <i class="fa-solid fa-quote-left text-brand-600 mr-1 text-base"></i>
-                        "Pernahkah kalian mengalami antrean yang sangat panjang dan lama saat membeli makanan di kantin sekolah saat jam istirahat? Mengapa proses pelayanan tersebut bisa tersendat? Menurut kalian, langkah-langkah atau alur kerja seperti apa yang dapat dirancang agar proses transaksi dan penyajian makanan menjadi jauh lebih cepat dan teratur?"
+                        Pernahkah kalian mengalami antrean yang sangat panjang dan lama saat membeli makanan di kantin sekolah saat jam istirahat? Mengapa proses pelayanan tersebut bisa tersendat? Menurut kalian, langkah-langkah atau alur kerja seperti apa yang dapat dirancang agar proses transaksi dan penyajian makanan menjadi jauh lebih cepat dan teratur?
                         <i class="fa-solid fa-quote-right text-brand-600 ml-1 text-base"></i>
                     </p>
                 </div>
@@ -68,13 +64,12 @@
 
             <div class="relative z-10 pt-2">
                 <button onclick="closeWelcomeModal()" class="w-full py-3.5 bg-brand-600 hover:bg-brand-700 text-white font-bold text-sm rounded-xl shadow-md transition-all flex items-center justify-center gap-2 transform hover:-translate-y-0.5">
-                    <i class="fa-solid fa-rocket"></i> Mulai Eksplorasi Modul!
+                    <i class="fa-solid fa-rocket"></i> Mulai Eksplorasi Materi Pembelajaran!
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- Header & Navigation -->
     <header class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm">
         <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col lg:flex-row justify-between items-center gap-4">
             <div class="flex items-center gap-3">
@@ -83,18 +78,16 @@
                 </div>
                 <div>
                     <h1 class="text-xl font-bold text-slate-900">Kurikulum Koding & AI: Algoritma & Pemrograman</h1>
-                    <p class="text-xs text-slate-500">Fase E (Kelas X SMA/MA) • Standar Kemendikdasmen 2025/2026</p>
+                    <p class="text-xs text-slate-500">Fase E (Kelas X SMA/MA) • Standar Kemendikdasmen</p>
                 </div>
             </div>
-            <!-- Navigasi Tab Utama -->
             <nav class="flex flex-wrap gap-1.5 justify-center" id="nav-tabs">
-                <button onclick="switchTab('pengantar')" class="nav-btn px-3 py-2 text-xs font-semibold rounded-lg bg-brand-600 text-white transition-all shadow-sm" data-target="pengantar">1. Pengantar & BK</button>
+                <button onclick="switchTab('pengantar')" class="nav-btn px-3 py-2 text-xs font-semibold rounded-lg bg-brand-600 text-white transition-all shadow-sm" data-target="pengantar">1. Pengantar Algoritma</button>
                 <button onclick="switchTab('flowchart')" class="nav-btn px-3 py-2 text-xs font-semibold rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all" data-target="flowchart">2. Logika & Flowchart</button>
-                <button onclick="switchTab('kontrol')" class="nav-btn px-3 py-2 text-xs font-semibold rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all" data-target="kontrol">3. Percabangan & Looping (Excel)</button>
-                <button onclick="switchTab('galeri')" class="nav-btn px-3 py-2 text-xs font-semibold rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all" data-target="galeri">4. Galeri Visual Flowchart</button>
-                <button onclick="switchTab('levels')" class="nav-btn px-3 py-2 text-xs font-semibold rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all" data-target="levels">5. 10 Level Studi Kasus</button>
-                <button onclick="switchTab('kuis')" class="nav-btn px-3 py-2 text-xs font-semibold rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all" data-target="kuis">6. Kuis Formatif</button>
-                <button onclick="switchTab('refleksi')" class="nav-btn px-3 py-2 text-xs font-semibold rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all" data-target="refleksi">7. Refleksi</button>
+                <button onclick="switchTab('kontrol')" class="nav-btn px-3 py-2 text-xs font-semibold rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all" data-target="kontrol">3. Percabangan & Looping</button>
+                <button onclick="switchTab('galeri')" class="nav-btn px-3 py-2 text-xs font-semibold rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all" data-target="galeri">4. Galeri Visual</button>
+                <button onclick="switchTab('kuis')" class="nav-btn px-3 py-2 text-xs font-semibold rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all" data-target="kuis">5. Kuis Formatif</button>
+                <button onclick="switchTab('refleksi')" class="nav-btn px-3 py-2 text-xs font-semibold rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all" data-target="refleksi">6. Refleksi</button>
             </nav>
         </div>
     </header>
@@ -105,45 +98,59 @@
         <section id="pengantar" class="tab-content space-y-6">
             <div class="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm space-y-6">
                 <div>
-                    <span class="bg-emerald-100 text-emerald-800 text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider">1. Pengantar Algoritma & Berpikir Komputasional</span>
+                    <span class="bg-emerald-100 text-emerald-800 text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider">1. Pengertian Algoritma & Berpikir Komputasional</span>
                     <h2 class="text-2xl font-bold text-slate-900 mt-3 mb-2">Fondasi Berpikir Sistematis & Terstruktur</h2>
                     <p class="text-slate-600 leading-relaxed text-sm">
                         Berpikir komputasional adalah kerangka berpikir sistematis yang menggabungkan dekomposisi, abstraksi, identifikasi pola, dan perancangan algoritma untuk merumuskan solusi permasalahan kompleks.
                     </p>
                 </div>
 
-                <div class="p-6 bg-slate-50 rounded-xl border border-slate-200 space-y-4">
-                    <h3 class="font-bold text-slate-900 text-base flex items-center gap-2 text-brand-700">
-                        <i class="fa-solid fa-circle-question"></i> Pertanyaan Pemantik & Refleksi Awal
-                    </h3>
-                    <div class="grid md:grid-cols-2 gap-4 text-xs text-slate-700">
-                        <div onclick="expandCard(this)" class="p-4 bg-white rounded-lg border border-slate-200 space-y-1 shadow-sm cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-md hover:border-brand-500">
-                            <strong class="text-slate-900 block text-sm"><i class="fa-solid fa-arrow-right text-brand-500 mr-1"></i> Perbandingan Algoritma:</strong>
-                            <p class="text-slate-600">Kemampuan apa yang perlu peserta didik tunjukkan ketika membandingkan dua atau lebih algoritma berdasarkan efisiensi?</p>
+                <div class="space-y-4 border-l-4 border-brand-500 pl-4 py-2 bg-slate-50 rounded-r-xl">
+                    <h3 class="font-bold text-slate-900 text-base"><i class="fa-solid fa-book-open text-brand-600 mr-2"></i> Pengertian Algoritma</h3>
+                    <ul class="space-y-2 text-xs md:text-sm text-slate-700">
+                        <li><strong>Definisi:</strong> Algoritma adalah urutan dari sejumlah langkah logis dan sistematis yang disusun untuk memecahkan suatu masalah tertentu, yang dapat dijalankan oleh manusia maupun oleh komputer.</li>
+                        <li><strong>Asal Usul:</strong> Istilah "algoritma" berasal dari nama seorang ahli matematika terkemuka yaitu <strong>Mohammad bin Musa al-Khwarizmi</strong> (780–850).</li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h3 class="font-bold text-slate-900 text-base mb-3">Cara Penyajian Algoritma:</h3>
+                    <p class="text-xs text-slate-600 mb-4">Dalam penerapannya, algoritma dapat disajikan dalam tiga bentuk utama:</p>
+                    <div class="grid md:grid-cols-3 gap-4">
+                        <div class="p-5 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
+                            <span class="text-xs font-bold text-brand-600">Bentuk 1</span>
+                            <h4 class="font-bold text-slate-900 text-sm">Narasi / Tulisan Biasa</h4>
+                            <p class="text-xs text-slate-600 leading-relaxed">Menggambarkan langkah-langkah menggunakan kalimat deskriptif sehari-hari.</p>
                         </div>
-                        <div onclick="expandCard(this)" class="p-4 bg-white rounded-lg border border-slate-200 space-y-1 shadow-sm cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-md hover:border-brand-500">
-                            <strong class="text-slate-900 block text-sm"><i class="fa-solid fa-arrow-right text-brand-500 mr-1"></i> Transisi Logika:</strong>
-                            <p class="text-slate-600">Tahap berpikir saat menerjemahkan logika dari <em>flowchart</em> ke kode pemrograman teks atau rumus spreadsheet?</p>
+                        <div class="p-5 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
+                            <span class="text-xs font-bold text-brand-600">Bentuk 2</span>
+                            <h4 class="font-bold text-slate-900 text-sm">Pseudocode</h4>
+                            <p class="text-xs text-slate-600 leading-relaxed">Format penulisan yang menyerupai kode pemrograman namun menggunakan bahasa informal.</p>
+                        </div>
+                        <div class="p-5 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
+                            <span class="text-xs font-bold text-brand-600">Bentuk 3</span>
+                            <h4 class="font-bold text-slate-900 text-sm">Flowchart (Diagram Alir)</h4>
+                            <p class="text-xs text-slate-600 leading-relaxed">Representasi visual atau grafis dari langkah-langkah penyelesaian masalah.</p>
                         </div>
                     </div>
                 </div>
 
-                <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <div class="p-5 bg-slate-50 border border-slate-200 rounded-xl">
-                        <div class="text-brand-600 font-bold mb-2"><i class="fa-solid fa-puzzle-piece mr-2"></i> Dekomposisi</div>
-                        <p class="text-xs text-slate-600 leading-relaxed">Memecah masalah besar menjadi bagian-bagian kecil yang lebih mudah dikelola.</p>
+                <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-4 pt-4">
+                    <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl">
+                        <div class="text-brand-600 font-bold mb-1 text-xs"><i class="fa-solid fa-puzzle-piece mr-1"></i> Dekomposisi</div>
+                        <p class="text-[11px] text-slate-600">Memecah masalah besar menjadi bagian kecil.</p>
                     </div>
-                    <div class="p-5 bg-slate-50 border border-slate-200 rounded-xl">
-                        <div class="text-brand-600 font-bold mb-2"><i class="fa-solid fa-fingerprint mr-2"></i> Pengenalan Pola</div>
-                        <p class="text-xs text-slate-600 leading-relaxed">Mencari tren, kesamaan, atau karakteristik berulang dari data.</p>
+                    <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl">
+                        <div class="text-brand-600 font-bold mb-1 text-xs"><i class="fa-solid fa-fingerprint mr-1"></i> Pengenalan Pola</div>
+                        <p class="text-[11px] text-slate-600">Mencari kesamaan atau tren berulang dari data.</p>
                     </div>
-                    <div class="p-5 bg-slate-50 border border-slate-200 rounded-xl">
-                        <div class="text-brand-600 font-bold mb-2"><i class="fa-solid fa-filter mr-2"></i> Abstraksi</div>
-                        <p class="text-xs text-slate-600 leading-relaxed">Mengabaikan detail tidak penting dan berfokus pada informasi inti.</p>
+                    <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl">
+                        <div class="text-brand-600 font-bold mb-1 text-xs"><i class="fa-solid fa-filter mr-1"></i> Abstraksi</div>
+                        <p class="text-[11px] text-slate-600">Mengabaikan detail tidak penting, fokus pada inti.</p>
                     </div>
-                    <div class="p-5 bg-slate-50 border border-slate-200 rounded-xl">
-                        <div class="text-brand-600 font-bold mb-2"><i class="fa-solid fa-list-ol mr-2"></i> Algoritma</div>
-                        <p class="text-xs text-slate-600 leading-relaxed">Menyusun urutan instruksi atau langkah logis bertahap.</p>
+                    <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl">
+                        <div class="text-brand-600 font-bold mb-1 text-xs"><i class="fa-solid fa-list-ol mr-1"></i> Algoritma</div>
+                        <p class="text-[11px] text-slate-600">Menyusun urutan instruksi logis bertahap.</p>
                     </div>
                 </div>
             </div>
@@ -156,30 +163,28 @@
                     <span class="bg-blue-100 text-blue-800 text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider">2. Implementasi Logika dalam Flowchart</span>
                     <h2 class="text-2xl font-bold text-slate-900 mt-3 mb-2">Visualisasi Alur Proses & Kamus Simbol</h2>
                     <p class="text-slate-600 text-sm">
-                        *Flowchart* (diagram alir) adalah representasi visual grafis menggunakan simbol standar internasional untuk menggambarkan alur instruksi.
+                        *Flowchart* (diagram alir) adalah representasi visual grafis menggunakan simbol standar internasional untuk menggambarkan alur instruksi program.
                     </p>
                 </div>
 
-                <!-- Gambar Resmi Bentuk Simbol Flowchart -->
                 <div class="bg-slate-50 p-5 rounded-xl border border-slate-200 space-y-3">
                     <h3 class="font-bold text-slate-900 text-sm"><i class="fa-solid fa-shapes text-brand-600 mr-2"></i> Referensi Resmi Bentuk Simbol Flowchart</h3>
                     <div class="rounded-lg overflow-hidden border bg-white p-2 flex justify-center">
                         <img src="https://www.softwareseni.co.id/cdn/5d8a2888296e91abbdcb65f0/683d098dd9c15be4710b54cb_AD_4nXf_3qrzFlbaGQK36RcbFkWzX1FcOZsxMhwH9CQ4OIDrFITxkimAbPDO4tWHcg-kHaIwDKgQkJPcjQt7FsPGgyqjB0vmfzV96E-GTpfGnmutLnB8hz6-5yJPaWyvraK8ZTQtVXhNig.png" 
                              onerror="this.src='https://placehold.co/600x400/e2e8f0/475569?text=Simbol+Flowchart';" 
-                             alt="Simbol Flowchart" class="max-h-60 object-contain rounded cursor-pointer hover:scale-105 transition-all"
+                             alt="Simbol Flowchart" class="max-h-64 object-contain rounded cursor-pointer hover:scale-105 transition-all"
                              onclick="openImageModal(this.src, 'Referensi Simbol Flowchart')">
                     </div>
                 </div>
 
-                <!-- Contoh Penggunaan Connector -->
                 <div class="bg-slate-50 p-5 rounded-xl border border-slate-200 space-y-3">
-                    <h3 class="font-bold text-slate-900 text-sm"><i class="fa-solid fa-link text-brand-600 mr-2"></i> Contoh Penggunaan Connector Symbol</h3>
-                    <p class="text-xs text-slate-600">Connector digunakan untuk menghubungkan alur flowchart yang terputus antar halaman atau bagian yang padat.</p>
+                    <h3 class="font-bold text-slate-900 text-sm"><i class="fa-solid fa-link text-brand-600 mr-2"></i> Contoh Penggunaan Konektor (Connector)</h3>
+                    <p class="text-xs text-slate-600">Simbol konektor digunakan untuk menghubungkan alur flowchart yang terputus antar halaman atau bagian agar diagram tetap rapi.</p>
                     <div class="rounded-lg overflow-hidden border bg-white p-2 flex justify-center">
                         <img src="https://awsimages.detik.net.id/community/media/visual/2023/09/17/contoh-flowchart_169.png?w=620" 
-                             onerror="this.src='https://placehold.co/600x400/e2e8f0/475569?text=Connector+Flowchart';" 
-                             alt="Connector Flowchart" class="max-h-48 object-contain rounded cursor-pointer hover:scale-105 transition-all"
-                             onclick="openImageModal(this.src, 'Contoh Flowchart dengan Connector')">
+                             onerror="this.src='https://placehold.co/600x400/e2e8f0/475569?text=Contoh+Connector';" 
+                             alt="Contoh Flowchart Connector" class="max-h-56 object-contain rounded cursor-pointer hover:scale-105 transition-all"
+                             onclick="openImageModal(this.src, 'Contoh Penggunaan Konektor Flowchart')">
                     </div>
                 </div>
 
@@ -205,133 +210,152 @@
             </div>
         </section>
 
-        <!-- TAB 3: STRUKTUR PERCABANGAN & PENGULANGAN (DENGAN ANALOGI EXCEL) -->
+        <!-- TAB 3: PERCABANGAN & LOOPING (EXCEL ANALOGY) -->
         <section id="kontrol" class="tab-content hidden space-y-6">
             <div class="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm space-y-6">
                 <div>
                     <span class="bg-purple-100 text-purple-800 text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider">3. Struktur Percabangan & Pengulangan + Analogi Excel</span>
                     <h2 class="text-2xl font-bold text-slate-900 mt-3 mb-2">Branching & Looping Dihubungkan dengan Microsoft Excel</h2>
                     <p class="text-slate-600 text-sm">
-                        Konsep pemrograman seperti <em>branching</em> (percabangan) dan <em>looping</em> (perulangan) memiliki padanan intuitif yang sering digunakan dalam kehidupan sehari-hari saat mengolah tabel di <strong>Microsoft Excel</strong> menggunakan rumus logika (`IF`, `IFS`) dan fitur <em>Fill Handle</em>.
+                        Konsep pemrograman seperti <em>branching</em> (percabangan) dan <em>looping</em> (perulangan) memiliki padanan intuitif saat mengolah tabel di <strong>Microsoft Excel</strong> menggunakan rumus logika (`IF`, `IFS`).
                     </p>
                 </div>
 
                 <div class="grid md:grid-cols-2 gap-8">
-                    <!-- Sisi Percabangan (Branching) & Analogi Excel -->
                     <div class="space-y-4 bg-slate-50 p-6 rounded-xl border border-slate-200">
                         <h3 class="font-bold text-slate-900 text-base flex items-center gap-2 text-brand-700">
                             <i class="fa-solid fa-code-branch"></i> A. Percabangan (*Branching / If-Else*)
                         </h3>
                         <p class="text-xs text-slate-600 leading-relaxed">
-                            Dalam koding, percabangan menguji suatu kondisi benar atau salah. Di <strong>Microsoft Excel</strong>, hal ini setara dengan penggunaan fungsi <strong>`=IF()`</strong> atau <strong>`=IFS()`</strong>.
+                            Di <strong>Microsoft Excel</strong>, percabangan setara dengan penggunaan fungsi <strong>`=IF()`</strong> atau <strong>`=IFS()`</strong>.
                         </p>
-                        <div class="space-y-2">
-                            <span class="text-xs font-bold text-slate-700 block">Python (Koding):</span>
-                            <div class="bg-slate-900 text-emerald-400 p-3 rounded-lg font-mono text-xs overflow-x-auto shadow-inner">
-                                <pre>nilai = 75
+                        <div class="bg-slate-900 text-emerald-400 p-3 rounded-lg font-mono text-xs overflow-x-auto shadow-inner">
+                            <pre>nilai = 75
 if nilai >= 80:
     print("Predikat A")
 elif nilai >= 70:
     print("Predikat B")
 else:
     print("Predikat C")</pre>
-                            </div>
                         </div>
-                        <div class="space-y-2 pt-2">
-                            <span class="text-xs font-bold text-slate-700 block">Analogi Microsoft Excel (Formula):</span>
-                            <div class="bg-emerald-900 text-emerald-200 p-3 rounded-lg font-mono text-xs overflow-x-auto shadow-inner">
-                                <pre>=IFS(A2>=80; "Predikat A"; A2>=70; "Predikat B"; TRUE; "Predikat C")</pre>
-                            </div>
-                            <p class="text-[11px] text-slate-500"><em>Penjelasan:</em> Excel memeriksa nilai di sel `A2`. Jika ≥ 80, bernilai "Predikat A"; jika ≥ 70, bernilai "Predikat B"; selain itu "Predikat C". Ini persis logika <code>if-elif-else</code>!</p>
+                        <div class="bg-emerald-900 text-emerald-200 p-3 rounded-lg font-mono text-xs overflow-x-auto shadow-inner">
+                            <pre>=IFS(A2>=80; "Predikat A"; A2>=70; "Predikat B"; TRUE; "Predikat C")</pre>
                         </div>
                     </div>
 
-                    <!-- Sisi Perulangan (Looping) & Analogi Excel -->
                     <div class="space-y-4 bg-slate-50 p-6 rounded-xl border border-slate-200">
                         <h3 class="font-bold text-slate-900 text-base flex items-center gap-2 text-brand-700">
                             <i class="fa-solid fa-rotate"></i> B. Perulangan (*Looping / For & While*)
                         </h3>
                         <p class="text-xs text-slate-600 leading-relaxed">
-                            Dalam koding, perulangan menjalankan instruksi berkali-kali tanpa menulis kode berulang. Di <strong>Microsoft Excel</strong>, analoginya adalah fitur <strong>Fill Handle (Tarik Rumus ke Bawah)</strong> dan <strong>Tabel Otomatis</strong> yang mengevaluasi ratusan baris data secara instan.
+                            Di <strong>Microsoft Excel</strong>, analoginya adalah fitur <strong>Fill Handle (Tarik Rumus ke Bawah)</strong>.
                         </p>
-                        <div class="space-y-2">
-                            <span class="text-xs font-bold text-slate-700 block">Python (Koding):</span>
-                            <div class="bg-slate-900 text-cyan-400 p-3 rounded-lg font-mono text-xs overflow-x-auto shadow-inner">
-                                <pre># Mengulang perhitungan pajak untuk 5 baris data
-for i in range(5):
+                        <div class="bg-slate-900 text-cyan-400 p-3 rounded-lg font-mono text-xs overflow-x-auto shadow-inner">
+                            <pre>for i in range(5):
     pajak = gaji[i] * 0.10
     print("Pajak ke-", i, "=", pajak)</pre>
-                            </div>
                         </div>
-                        <div class="space-y-2 pt-2">
-                            <span class="text-xs font-bold text-slate-700 block">Analogi Microsoft Excel (AutoFill):</span>
-                            <div class="bg-emerald-900 text-emerald-200 p-3 rounded-lg font-mono text-xs overflow-x-auto shadow-inner">
-                                <pre>=B2 * 0.10  (lalu ditarik ke bawah dari baris 2 sampai 100)</pre>
-                            </div>
-                            <p class="text-[11px] text-slate-500"><em>Penjelasan:</em> Alih-alih menulis rumus satu per satu untuk 100 karyawan, pengguna Excel menulis satu rumus lalu menarik ke bawah (iterasi baris otomatis), mirip konsep <code>for loop</code> pada array/tabel.</p>
+                        <div class="bg-emerald-900 text-emerald-200 p-3 rounded-lg font-mono text-xs overflow-x-auto shadow-inner">
+                            <pre>=B2 * 0.10  (lalu ditarik ke bawah dari baris 2 sampai 100)</pre>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- TAB 4: GALERI VISUAL FLOWCHART -->
+        <!-- TAB 4: GALERI VISUAL FLOWCHART (SEMUA GAMBAR) -->
         <section id="galeri" class="tab-content hidden space-y-6">
             <div class="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm space-y-6">
                 <div>
-                    <span class="bg-blue-100 text-blue-800 text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider">4. Galeri Visual Flowchart</span>
-                    <h2 class="text-2xl font-bold text-slate-900 mt-3 mb-2">Contoh Nyata Diagram Alir & Alur Kasus</h2>
-                    <p class="text-slate-600 text-sm">Galeri diagram alir terstruktur mencakup memasak nasi, menonton film, dan perbandingan loop.</p>
+                    <span class="bg-blue-100 text-blue-800 text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider">4. Galeri Visual Flowchart & Studi Kasus</span>
+                    <h2 class="text-2xl font-bold text-slate-900 mt-3 mb-2">Kumpulan Contoh Nyata Diagram Alir</h2>
+                    <p class="text-slate-600 text-sm">Berikut adalah seluruh galeri visual diagram alir yang mencakup proses kehidupan sehari-hari, percabangan film, pemecahan masalah kompas, serta kompleksitas waktu.</p>
                 </div>
-                <div class="grid md:grid-cols-2 gap-6">
-                    <div class="bg-slate-50 p-5 rounded-xl border border-slate-200 space-y-3">
-                        <h3 class="font-bold text-slate-900 text-sm"><i class="fa-solid fa-utensils text-brand-600 mr-2"></i> Algoritma Memasak Nasi</h3>
+
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Gambar 1: Memasak Nasi -->
+                    <div class="bg-slate-50 p-5 rounded-xl border border-slate-200 space-y-3 flex flex-col justify-between">
+                        <div>
+                            <h3 class="font-bold text-slate-900 text-sm mb-1"><i class="fa-solid fa-utensils text-brand-600 mr-2"></i> Algoritma Memasak Nasi</h3>
+                            <p class="text-xs text-slate-500 mb-2">Urutan linier mencuci beras hingga nasi matang.</p>
+                        </div>
                         <div class="rounded-lg overflow-hidden border bg-white p-2 flex justify-center">
                             <img src="https://course-net.com/wp-content/uploads/2023/12/gambar-flowchart-algortima-memasak-nasi-1024x1014.jpeg" 
                                  onerror="this.src='https://placehold.co/600x400/e2e8f0/475569?text=Flowchart';" 
-                                 alt="Memasak Nasi" class="max-h-48 object-contain rounded cursor-pointer"
-                                 onclick="openImageModal(this.src, 'Flowchart Memasak Nasi')">
+                                 alt="Memasak Nasi" class="h-44 object-contain rounded cursor-pointer hover:scale-105 transition-all"
+                                 onclick="openImageModal(this.src, 'Flowchart Algoritma Memasak Nasi')">
                         </div>
+                        <span class="text-[10px] text-slate-400 italic">Sumber: Course-Net Indonesia</span>
                     </div>
-                    <div class="bg-slate-50 p-5 rounded-xl border border-slate-200 space-y-3">
-                        <h3 class="font-bold text-slate-900 text-sm"><i class="fa-solid fa-film text-brand-600 mr-2"></i> Percabangan Menonton Film</h3>
+
+                    <!-- Gambar 2: Menonton Film -->
+                    <div class="bg-slate-50 p-5 rounded-xl border border-slate-200 space-y-3 flex flex-col justify-between">
+                        <div>
+                            <h3 class="font-bold text-slate-900 text-sm mb-1"><i class="fa-solid fa-film text-brand-600 mr-2"></i> Percabangan Menonton Film</h3>
+                            <p class="text-xs text-slate-500 mb-2">Penerapan struktur decision pemilihan genre.</p>
+                        </div>
                         <div class="rounded-lg overflow-hidden border bg-white p-2 flex justify-center">
                             <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEg2eey_ghTKPhCwL93lMTuBCwvtuXv-X3bbd_riWFX9hoaz-onMrqPUyvYgWO8vt7ZbOUJ13JGUl7za-12_3CivadqirBe2hT0sr7a9Pbh1Qi88yLMbkan9hAzafQstita6caGlPy8V8R8/s1600/algoritma-percabangan-menonton-film.gif" 
                                  onerror="this.src='https://placehold.co/600x400/e2e8f0/475569?text=Flowchart';" 
-                                 alt="Menonton Film" class="max-h-48 object-contain rounded cursor-pointer"
-                                 onclick="openImageModal(this.src, 'Flowchart Menonton Film')">
+                                 alt="Menonton Film" class="h-44 object-contain rounded cursor-pointer hover:scale-105 transition-all"
+                                 onclick="openImageModal(this.src, 'Flowchart Percabangan Menonton Film')">
                         </div>
+                        <span class="text-[10px] text-slate-400 italic">Sumber: Dokumentasi Pembelajaran</span>
+                    </div>
+
+                    <!-- Gambar 3: Perbandingan Loop -->
+                    <div class="bg-slate-50 p-5 rounded-xl border border-slate-200 space-y-3 flex flex-col justify-between">
+                        <div>
+                            <h3 class="font-bold text-slate-900 text-sm mb-1"><i class="fa-solid fa-rotate text-brand-600 mr-2"></i> Perbandingan For & While Loop</h3>
+                            <p class="text-xs text-slate-500 mb-2">Ilustrasi alur perulangan bersyarat & terhitung.</p>
+                        </div>
+                        <div class="rounded-lg overflow-hidden border bg-white p-2 flex justify-center">
+                            <img src="https://miro.medium.com/v2/resize:fit:1250/1*n4QFLyx_WkpQTMvVr9RkRA.png" 
+                                 onerror="this.src='https://placehold.co/600x400/e2e8f0/475569?text=Flowchart';" 
+                                 alt="Looping" class="h-44 object-contain rounded cursor-pointer hover:scale-105 transition-all"
+                                 onclick="openImageModal(this.src, 'Perbandingan For dan While Loop')">
+                        </div>
+                        <span class="text-[10px] text-slate-400 italic">Sumber: CodingEm / Medium</span>
+                    </div>
+
+                    <!-- Gambar 4: Pemecahan Masalah Kompas -->
+                    <div class="bg-slate-50 p-5 rounded-xl border border-slate-200 space-y-3 flex flex-col justify-between">
+                        <div>
+                            <h3 class="font-bold text-slate-900 text-sm mb-1"><i class="fa-solid fa-diagram-project text-brand-600 mr-2"></i> Alur Pemecahan Masalah Kompas</h3>
+                            <p class="text-xs text-slate-500 mb-2">Visualisasi gradasi kompetensi berpikir.</p>
+                        </div>
+                        <div class="rounded-lg overflow-hidden border bg-white p-2 flex justify-center">
+                            <img src="https://asset.kompas.com/crops/vJMXzLh8jOVxoj1wNtrzgPtKzTs=/56x8:726x454/750x500/data/photo/2021/06/23/60d30c4d6a664.jpg" 
+                                 onerror="this.src='https://placehold.co/600x400/e2e8f0/475569?text=Kompas';" 
+                                 alt="Kompas" class="h-44 object-contain rounded cursor-pointer hover:scale-105 transition-all"
+                                 onclick="openImageModal(this.src, 'Alur Pemecahan Masalah Kompas')">
+                        </div>
+                        <span class="text-[10px] text-slate-400 italic">Sumber: Kompas / Puskurjar</span>
+                    </div>
+
+                    <!-- Gambar 5: Sonora Analogi -->
+                    <div class="bg-slate-50 p-5 rounded-xl border border-slate-200 space-y-3 flex flex-col justify-between">
+                        <div>
+                            <h3 class="font-bold text-slate-900 text-sm mb-1"><i class="fa-solid fa-brain text-brand-600 mr-2"></i> Analogi Pemrosesan Logika</h3>
+                            <p class="text-xs text-slate-500 mb-2">Representasi data & pengambilan keputusan.</p>
+                        </div>
+                        <div class="rounded-lg overflow-hidden border bg-white p-2 flex justify-center">
+                            <img src="https://imgx.sonora.id/crop/0x0:0x0/x/photo/2023/02/24/6jpg-20230224010729.jpg" 
+                                 onerror="this.src='https://placehold.co/600x400/e2e8f0/475569?text=Sonora';" 
+                                 alt="Sonora" class="h-44 object-contain rounded cursor-pointer hover:scale-105 transition-all"
+                                 onclick="openImageModal(this.src, 'Analogi Pemrosesan Logika Sonora')">
+                        </div>
+                        <span class="text-[10px] text-slate-400 italic">Sumber: Sonora.id</span>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- TAB 5: 10 LEVEL STUDI KASUS -->
-        <section id="levels" class="tab-content hidden space-y-6">
-            <div class="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm space-y-6">
-                <div>
-                    <span class="bg-indigo-100 text-indigo-800 text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider">5. Eksplorasi 10 Level Studi Kasus</span>
-                    <h2 class="text-2xl font-bold text-slate-900 mt-3 mb-2">Simulasi Varian Level Algoritma Berjenjang</h2>
-                    <p class="text-slate-600 text-sm">Pilih salah satu dari 10 level di bawah ini untuk melihat skenario dan visual flowchart-nya.</p>
-                </div>
-                <div class="flex flex-wrap gap-1.5 border-b border-slate-200 pb-4" id="level-buttons">
-                    <button onclick="selectLevel(1)" class="lvl-btn px-3 py-2 text-xs font-bold rounded-lg bg-brand-600 text-white transition-all shadow-sm" data-lvl="1">Lvl 1</button>
-                    <button onclick="selectLevel(3)" class="lvl-btn px-3 py-2 text-xs font-bold rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all" data-lvl="3">Lvl 3</button>
-                    <button onclick="selectLevel(5)" class="lvl-btn px-3 py-2 text-xs font-bold rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all" data-lvl="5">Lvl 5</button>
-                    <button onclick="selectLevel(10)" class="lvl-btn px-3 py-2 text-xs font-bold rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all" data-lvl="10">Lvl 10</button>
-                </div>
-                <div id="level-display" class="grid md:grid-cols-2 gap-8 items-center bg-slate-50 p-6 rounded-xl border border-slate-200">
-                    <div id="level-text" class="space-y-4"></div>
-                    <div id="level-visual" class="flex flex-col items-center justify-center p-4 bg-white rounded-xl border border-slate-200 shadow-inner min-h-[380px]"></div>
-                </div>
-            </div>
-        </section>
-
-        <!-- TAB 6: KUIS FORMATIF -->
+        <!-- TAB 5: KUIS FORMATIF -->
         <section id="kuis" class="tab-content hidden space-y-6">
             <div class="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm space-y-6">
                 <div>
-                    <span class="bg-purple-100 text-purple-800 text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider">6. Evaluasi Formatif</span>
+                    <span class="bg-purple-100 text-purple-800 text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider">5. Evaluasi Formatif</span>
                     <h2 class="text-2xl font-bold text-slate-900 mt-3 mb-2">Kuis Pemahaman Algoritma & Flowchart</h2>
                 </div>
                 <div class="space-y-6">
@@ -359,11 +383,11 @@ for i in range(5):
             </div>
         </section>
 
-        <!-- TAB 7: REFLEKSI -->
+        <!-- TAB 6: REFLEKSI -->
         <section id="refleksi" class="tab-content hidden space-y-6">
             <div class="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm space-y-6">
                 <div>
-                    <span class="bg-rose-100 text-rose-800 text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider">7. Refleksi Pembelajaran</span>
+                    <span class="bg-rose-100 text-rose-800 text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider">6. Refleksi Pembelajaran</span>
                     <h2 class="text-2xl font-bold text-slate-900 mt-3 mb-2">Catatan Refleksi & Evaluasi Diri</h2>
                 </div>
                 <div class="space-y-4">
@@ -380,7 +404,7 @@ for i in range(5):
 
     </main>
 
-    <!-- Modals -->
+    <!-- Custom Modal -->
     <div id="custom-modal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
         <div class="bg-white p-6 rounded-2xl max-w-md w-full shadow-xl border border-slate-200 text-center space-y-4">
             <div class="w-12 h-12 bg-brand-100 text-brand-600 rounded-full flex items-center justify-center mx-auto text-xl font-bold">
@@ -405,58 +429,11 @@ for i in range(5):
         </div>
     </div>
 
-    <!-- Card Zoom Modal for Driving Questions -->
-    <div id="card-zoom-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4" onclick="closeCardModal()">
-        <div class="bg-white p-8 rounded-3xl max-w-lg w-full shadow-2xl border border-slate-200 space-y-4 transform transition-all" onclick="event.stopPropagation()">
-            <div class="flex justify-between items-center border-b pb-3">
-                <span class="bg-brand-100 text-brand-800 text-xs font-bold px-3 py-1 rounded-full uppercase">Refleksi Pemantik</span>
-                <button onclick="closeCardModal()" class="text-slate-400 hover:text-slate-700 font-bold"><i class="fa-solid fa-xmark text-xl"></i></button>
-            </div>
-            <div id="card-zoom-content" class="text-base text-slate-800 font-medium leading-relaxed">
-                <!-- Content injected dynamically -->
-            </div>
-            <div class="pt-2">
-                <button onclick="closeCardModal()" class="w-full py-3 bg-brand-600 hover:bg-brand-700 text-white font-bold text-sm rounded-xl">Paham / Tutup</button>
-            </div>
-        </div>
-    </div>
-
     <footer class="bg-white border-t border-slate-200 mt-12 py-6 text-center text-xs text-slate-500">
-        <p>Kurikulum Koding & Kecerdasan Artifisial • Modul Interaktif Sesuai Standar Kemendikdasmen 2025/2026</p>
+        <p>Kurikulum Koding & Kecerdasan Artifisial • Modul Interaktif Sesuai Standar Kemendikdasmen</p>
     </footer>
 
     <script>
-        const levelsData = {
-            1: {
-                title: "Level 1: Runtunan Dasar (Sequence)",
-                desc: "Rangkaian instruksi linier sederhana.",
-                case: "Contoh: Menyikat Gigi",
-                steps: ["1. Ambil sikat", "2. Beri pasta", "3. Sikat gigi"],
-                visualHTML: `<div class="text-xs font-semibold text-center p-4">Alur Linier Berurutan</div>`
-            },
-            3: {
-                title: "Level 3: Percabangan (If-Else)",
-                desc: "Keputusan bersyarat.",
-                case: "Contoh: Nilai Ujian",
-                steps: ["Cek Nilai >= 75"],
-                visualHTML: `<div class="text-xs font-semibold text-center p-4">Decision (Belah Ketupat)</div>`
-            },
-            5: {
-                title: "Level 5: Perulangan (Looping)",
-                desc: "Eksekusi berulang.",
-                case: "Contoh: Deret Angka",
-                steps: ["Ulangi selama i <= 5"],
-                visualHTML: `<div class="text-xs font-semibold text-center p-4">Loop Iteration</div>`
-            },
-            10: {
-                title: "Level 10: Klasifikasi AI",
-                desc: "Decision Tree sederhana.",
-                case: "Contoh: Spam Email",
-                steps: ["Cek Kata Diskon"],
-                visualHTML: `<div class="text-xs font-semibold text-center p-4">AI Model Decision</div>`
-            }
-        };
-
         function switchTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
             document.querySelectorAll('.nav-btn').forEach(b => {
@@ -469,29 +446,6 @@ for i in range(5):
                 activeBtn.classList.remove('bg-slate-100', 'text-slate-600', 'hover:bg-slate-200');
                 activeBtn.classList.add('bg-brand-600', 'text-white', 'shadow-sm');
             }
-        }
-
-        function selectLevel(lvlNum) {
-            document.querySelectorAll('.lvl-btn').forEach(b => {
-                b.classList.remove('bg-brand-600', 'text-white', 'shadow-sm');
-                b.classList.add('bg-slate-100', 'text-slate-600', 'hover:bg-slate-200');
-            });
-            const btn = document.querySelector(`[data-lvl="${lvlNum}"]`);
-            if(btn) {
-                btn.classList.remove('bg-slate-100', 'text-slate-600', 'hover:bg-slate-200');
-                btn.classList.add('bg-brand-600', 'text-white', 'shadow-sm');
-            }
-            const data = levelsData[lvlNum] || levelsData[1];
-            document.getElementById('level-text').innerHTML = `
-                <span class="bg-brand-100 text-brand-800 text-xs font-semibold px-3 py-1 rounded-full uppercase">Level ${lvlNum}</span>
-                <h3 class="text-xl font-bold text-slate-900">${data.title}</h3>
-                <p class="text-sm text-slate-600">${data.desc}</p>
-                <div class="p-3 bg-white rounded-lg border border-slate-200">
-                    <strong>${data.case}</strong>
-                    <ul class="list-disc pl-4 mt-2 text-xs">${data.steps.map(s => `<li>${s}</li>`).join('')}</ul>
-                </div>
-            `;
-            document.getElementById('level-visual').innerHTML = data.visualHTML;
         }
 
         function hitungKuis() {
@@ -529,23 +483,8 @@ for i in range(5):
             setTimeout(() => modal.remove(), 300);
         }
 
-        function expandCard(cardElement) {
-            const contentHTML = cardElement.innerHTML;
-            document.getElementById('card-zoom-content').innerHTML = contentHTML;
-            const modal = document.getElementById('card-zoom-modal');
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-        }
-
-        function closeCardModal() {
-            const modal = document.getElementById('card-zoom-modal');
-            modal.classList.remove('flex');
-            modal.classList.add('hidden');
-        }
-
         window.onload = function() {
             switchTab('pengantar');
-            selectLevel(1);
         };
     </script>
 </body>
