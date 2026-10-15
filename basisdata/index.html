@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analisis Data Basis Data: Kontekstual SMK (DKV, Bisnis Digital & Bisnis Ritel)</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- FontAwesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                            800: '#166534',
+                            900: '#14532d',
+                        },
+                        dkv: {
+                            50: '#faf5ff',
+                            500: '#a855f7',
+                            600: '#9333ea',
+                            700: '#7e22ce',
+                        },
+                        bisdig: {
+                            50: '#f0f9ff',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                        },
+                        ritel: {
+                            50: '#fff7ed',
+                            500: '#f97316',
+                            600: '#ea580c',
+                            700: '#c2410c',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+        }
+        .glass-dark {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased selection:bg-brand-500 selection:text-white">
+
+    <!-- Navigation Bar -->
+    <nav class="sticky top-0 z-50 bg-slate-900/95 backdrop-blur-md border-b border-slate-800 text-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-dkv-500 via-bisdig-500 to-ritel-500 flex items-center justify-center text-white shadow-lg">
+                        <i class="fa-solid fa-database text-lg"></i>
+                    </div>
+                    <div>
+                        <span class="font-bold text-base sm:text-lg tracking-tight bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">Basis Data Analisis Tren (SMK)</span>
+                        <span class="block text-xs text-brand-400 font-medium">DKV • Bisnis Digital • Bisnis Ritel (Fase E)</span>
+                    </div>
+                </div>
+                <div class="hidden lg:flex space-x-1 text-xs font-medium">
+                    <a href="#konsep" class="px-3 py-2 rounded-lg hover:bg-slate-800 transition">Konsep Basis Data</a>
+                    <a href="#dikw" class="px-3 py-2 rounded-lg hover:bg-slate-800 transition">Piramida DIKW</a>
+                    <a href="#jurusan" class="px-3 py-2 rounded-lg hover:bg-slate-800 transition">Penerapan Jurusan</a>
+                    <a href="#pipeline" class="px-3 py-2 rounded-lg hover:bg-slate-800 transition">Alur Data & KA</a>
+                    <a href="#simulator" class="px-3 py-2 rounded-lg hover:bg-slate-800 transition">Simulator Query</a>
+                    <a href="#video" class="px-3 py-2 rounded-lg hover:bg-slate-800 transition">Video Pembelajaran</a>
+                    <a href="#kuis" class="px-3 py-2 rounded-lg bg-brand-600 hover:bg-brand-500 text-white transition ml-2">Kuis Interaktif</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="gradient-bg text-white py-14 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+        <div class="max-w-5xl mx-auto text-center relative z-10 space-y-4">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-brand-500/20 text-brand-400 border border-brand-500/30">
+                <i class="fa-solid fa-graduation-cap"></i> Modul Pembelajaran Pertemuan 1 - Koding & Kecerdasan Artifisial
+            </div>
+            <h1 class="text-3xl sm:text-5xl font-extrabold tracking-tight leading-tight">
+                Memahami Konsep Dasar Basis Data & <br>
+                <span class="bg-gradient-to-r from-dkv-500 via-bisdig-500 to-ritel-500 bg-clip-text text-transparent">
+                    Analisis Tren Pasar, Produk & Jasa SMK
+                </span>
+            </h1>
+            <p class="text-slate-300 text-sm sm:text-base max-w-3xl mx-auto">
+                Implementasi pengolahan data terstruktur untuk pendukung keputusan pada keahlian <strong>Desain Komunikasi Visual (DKV)</strong>, <strong>Bisnis Digital</strong>, dan <strong>Bisnis Ritel</strong>.
+            </p>
+            <div class="flex flex-wrap justify-center gap-3 pt-2">
+                <a href="#jurusan" class="px-5 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-white text-xs font-semibold shadow-lg shadow-brand-600/30 transition flex items-center gap-2">
+                    <i class="fa-solid fa-shapes"></i> Studi Kasus Jurusan
+                </a>
+                <a href="#simulator" class="px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 transition flex items-center gap-2">
+                    <i class="fa-solid fa-terminal"></i> Coba Simulator Query SQL
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-16">
+
+        <!-- SECTION 1: KONSEP DASAR DATA - INFORMASI - BASIS DATA -->
+        <section id="konsep" class="scroll-mt-20">
+            <div class="text-center max-w-3xl mx-auto mb-8">
+                <h2 class="text-2xl font-bold text-slate-900">1. Konsep Dasar Data, Informasi & Basis Data</h2>
+                <p class="text-slate-600 text-sm mt-1">Sesuai Kurikulum Koding & KA Elemen Analisis Data (Fase E/X SMK)</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Data -->
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
+                    <div class="w-10 h-10 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center text-lg mb-3">
+                        <i class="fa-solid fa-cubes"></i>
+                    </div>
+                    <h3 class="text-base font-bold text-slate-900 mb-2">1. Data (Mentah)</h3>
+                    <p class="text-slate-600 text-xs mb-3">
+                        Catatan mentah, simbol, atau fakta yang belum memiliki makna kontekstual.
+                    </p>
+                    <div class="bg-amber-50 rounded-lg p-3 text-[11px] text-amber-900 font-mono">
+                        <code>"Logo_V2.png", 150000, "2026-10-15", "SKU-992"</code>
+                    </div>
+                </div>
+
+                <!-- Informasi -->
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
+                    <div class="w-10 h-10 rounded-xl bg-bisdig-50 text-bisdig-600 flex items-center justify-center text-lg mb-3">
+                        <i class="fa-solid fa-chart-pie"></i>
+                    </div>
+                    <h3 class="text-base font-bold text-slate-900 mb-2">2. Informasi (Diolah)</h3>
+                    <p class="text-slate-600 text-xs mb-3">
+                        Data mentah yang diproses sehingga memberikan arti dan menjawab pertanyaan 4W (What, Where, When, Who).
+                    </p>
+                    <div class="bg-bisdig-50 rounded-lg p-3 text-[11px] text-bisdig-900">
+                        "Produk SKU-992 (Kemeja Oversize) terjual 150 unit pada promo Payday 15 Okt 2026."
+                    </div>
+                </div>
+
+                <!-- Basis Data -->
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
+                    <div class="w-10 h-10 rounded-xl bg-brand-50 text-brand-600 flex items-center justify-center text-lg mb-3">
+                        <i class="fa-solid fa-server"></i>
+                    </div>
+                    <h3 class="text-base font-bold text-slate-900 mb-2">3. Basis Data (DBMS)</h3>
+                    <p class="text-slate-600 text-xs mb-3">
+                        Sistem terpusat & terstruktur untuk menyimpan kumpulan data terhubung tanpa redundansi berlebih.
+                    </p>
+                    <div class="bg-brand-50 rounded-lg p-3 text-[11px] text-brand-900">
+                        Sistem DBMS: MySQL, PostgreSQL, phpMyAdmin, Firebase, MongoDB.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 2: PIRAMIDA DIKW BERDASARKAN KONTEKS KERJA -->
+        <section id="dikw" class="scroll-mt-20">
+            <div class="bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-slate-200">
+                <div class="text-center max-w-3xl mx-auto mb-8">
+                    <span class="text-xs font-semibold text-brand-600 uppercase tracking-wider">Ackoff Framework (1989)</span>
+                    <h2 class="text-2xl font-bold text-slate-900 mt-1">Piramida DIKW dalam Pengambilan Keputusan</h2>
+                    <p class="text-slate-600 text-xs mt-1">Transformasi dari Fakta Mentah hingga Kebijaksanaan Bisnis Berbasis Data</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-5 gap-3 text-center text-xs">
+                    <div class="bg-slate-100 p-4 rounded-xl border border-slate-200 flex flex-col justify-between">
+                        <div>
+                            <span class="font-bold text-slate-500 uppercase">Data</span>
+                            <p class="text-[11px] text-slate-600 mt-1">Fakta & Simbol mentah.</p>
+                        </div>
+                        <div class="mt-2 py-1 bg-slate-200 rounded font-mono text-[10px]">`SKU-101`, `19.00`</div>
+                    </div>
+                    <div class="bg-blue-50 p-4 rounded-xl border border-blue-200 flex flex-col justify-between">
+                        <div>
+                            <span class="font-bold text-blue-600 uppercase">Information</span>
+                            <p class="text-[11px] text-blue-700 mt-1">Data dengan konteks (4W).</p>
+                        </div>
+                        <div class="mt-2 py-1 bg-blue-100 rounded text-[10px] text-blue-900">Penjualan produk SKU-101 melonjak jam 19.00</div>
+                    </div>
+                    <div class="bg-amber-50 p-4 rounded-xl border border-amber-200 flex flex-col justify-between">
+                        <div>
+                            <span class="font-bold text-amber-600 uppercase">Knowledge</span>
+                            <p class="text-[11px] text-amber-700 mt-1">Memahami pola "Mengapa".</p>
+                        </div>
+                        <div class="mt-2 py-1 bg-amber-100 rounded text-[10px] text-amber-900">Konsumen belanja setelah jam kerja via ShopeePay</div>
+                    </div>
+                    <div class="bg-purple-50 p-4 rounded-xl border border-purple-200 flex flex-col justify-between">
+                        <div>
+                            <span class="font-bold text-purple-600 uppercase">Insight</span>
+                            <p class="text-[11px] text-purple-700 mt-1">Pemahaman mendalam baru.</p>
+                        </div>
+                        <div class="mt-2 py-1 bg-purple-100 rounded text-[10px] text-purple-900">Gaya visual feed ungu meningkatkan CTR 35%</div>
+                    </div>
+                    <div class="bg-emerald-50 p-4 rounded-xl border border-emerald-200 flex flex-col justify-between">
+                        <div>
+                            <span class="font-bold text-emerald-600 uppercase">Wisdom</span>
+                            <p class="text-[11px] text-emerald-700 mt-1">Keputusan etis & strategis.</p>
+                        </div>
+                        <div class="mt-2 py-1 bg-emerald-100 rounded font-bold text-[10px] text-emerald-900">Jalankan Flash Sale jam 19.00 + stok barang!</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 3: PENERAPAN SPESIFIK TIGA JURUSAN (DKV, BISNIS DIGITAL, BISNIS RITEL) -->
+        <section id="jurusan" class="scroll-mt-20">
+            <div class="text-center max-w-3xl mx-auto mb-10">
+                <span class="text-xs font-semibold text-brand-600 uppercase tracking-wider">Integrasi Keahlian Kejuruan</span>
+                <h2 class="text-2xl sm:text-3xl font-bold text-slate-900 mt-1">Penerapan Basis Data pada Jurusan SMK</h2>
+                <p class="text-slate-600 text-xs sm:text-sm mt-1">Bagaimana basis data & analisis tren digunakan langsung dalam praktik dunia kerja keahlian masing-masing.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- DKV -->
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-dkv-500/30 hover:shadow-md transition">
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="p-2.5 rounded-xl bg-dkv-50 text-dkv-600 font-bold text-lg">
+                            <i class="fa-solid fa-palette"></i>
+                        </span>
+                        <span class="text-[10px] font-extrabold uppercase px-2.5 py-1 bg-dkv-50 text-dkv-700 rounded-full border border-dkv-500/20">DKV</span>
+                    </div>
+                    <h3 class="font-bold text-lg text-slate-900 mb-2">Desain Komunikasi Visual</h3>
+                    <p class="text-slate-600 text-xs mb-4">
+                        Pengelolaan aset digital, metadata karya, portofolio, serta analisis tren desain & preferensi gaya visual konsumen.
+                    </p>
+                    <ul class="text-xs space-y-2 text-slate-700 bg-slate-50 p-3 rounded-xl border border-slate-200">
+                        <li class="flex items-start gap-1.5">
+                            <i class="fa-solid fa-check text-dkv-600 mt-0.5"></i>
+                            <span><strong>Metadata Aset:</strong> Format file (vector/bitmap), lisensi, palet warna RGB/CMYK.</span>
+                        </li>
+                        <li class="flex items-start gap-1.5">
+                            <i class="fa-solid fa-check text-dkv-600 mt-0.5"></i>
+                            <span><strong>Tren Desain:</strong> Menganalisis style ilustrasi & font terpopuler berdasarkan data respon audiens.</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Bisnis Digital -->
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-bisdig-500/30 hover:shadow-md transition">
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="p-2.5 rounded-xl bg-bisdig-50 text-bisdig-600 font-bold text-lg">
+                            <i class="fa-solid fa-chart-line"></i>
+                        </span>
+                        <span class="text-[10px] font-extrabold uppercase px-2.5 py-1 bg-bisdig-50 text-bisdig-700 rounded-full border border-bisdig-500/20">Bisnis Digital</span>
+                    </div>
+                    <h3 class="font-bold text-lg text-slate-900 mb-2">Bisnis Digital</h3>
+                    <p class="text-slate-600 text-xs mb-4">
+                        Pengelolaan transaksi e-commerce, digital consumer behavior, analisis corong AIDA, & efektivitas iklan digital.
+                    </p>
+                    <ul class="text-xs space-y-2 text-slate-700 bg-slate-50 p-3 rounded-xl border border-slate-200">
+                        <li class="flex items-start gap-1.5">
+                            <i class="fa-solid fa-check text-bisdig-600 mt-0.5"></i>
+                            <span><strong>Consumer Behavior:</strong> Riwayat klik, jam checkout e-wallet (ShopeePay/GoPay), CTR iklan.</span>
+                        </li>
+                        <li class="flex items-start gap-1.5">
+                            <i class="fa-solid fa-check text-bisdig-600 mt-0.5"></i>
+                            <span><strong>Tren Pasar:</strong> Memprediksi produk viral & kata kunci pencarian terbanyak di e-commerce.</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Bisnis Ritel -->
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-ritel-500/30 hover:shadow-md transition">
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="p-2.5 rounded-xl bg-ritel-50 text-ritel-600 font-bold text-lg">
+                            <i class="fa-solid fa-store"></i>
+                        </span>
+                        <span class="text-[10px] font-extrabold uppercase px-2.5 py-1 bg-ritel-50 text-ritel-700 rounded-full border border-ritel-500/20">Bisnis Ritel</span>
+                    </div>
+                    <h3 class="font-bold text-lg text-slate-900 mb-2">Bisnis Ritel</h3>
+                    <p class="text-slate-600 text-xs mb-4">
+                        Pencatatan Point of Sales (POS), manajemen stok opname, layout merchandising, & analisis barang fast/slow-moving.
+                    </p>
+                    <ul class="text-xs space-y-2 text-slate-700 bg-slate-50 p-3 rounded-xl border border-slate-200">
+                        <li class="flex items-start gap-1.5">
+                            <i class="fa-solid fa-check text-ritel-600 mt-0.5"></i>
+                            <span><strong>Manajemen Inventaris:</strong> Monitoring stok barang minim untuk re-order otomatis ke supplier.</span>
+                        </li>
+                        <li class="flex items-start gap-1.5">
+                            <i class="fa-solid fa-check text-ritel-600 mt-0.5"></i>
+                            <span><strong>Tren Produk:</strong> Memisahkan barang terlaris (*Fast-Moving*) dari barang yang mengendap.</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 4: SIMULASI PIPELINE TREN -->
+        <section id="pipeline" class="scroll-mt-20 gradient-bg rounded-3xl p-6 sm:p-8 text-white shadow-xl">
+            <div class="max-w-3xl mx-auto text-center mb-8">
+                <span class="text-xs font-semibold text-brand-400 uppercase tracking-wider">Simulasi Alur Kerja Data</span>
+                <h2 class="text-2xl font-bold mt-1">Bagaimana Data Menjadi Prediksi Tren Bisnis & KA?</h2>
+                <p class="text-slate-300 text-xs mt-1">Sistem menyimulasikan konversi transaksi POS/E-Commerce menjadi Insight Keputusan</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div id="pipe-step-1" class="glass-dark p-4 rounded-xl border-slate-700 transition">
+                    <span class="text-[10px] font-bold px-2 py-0.5 bg-slate-800 rounded text-slate-300">Tahap 1</span>
+                    <h4 class="font-bold text-xs mt-2">Input Transaksi</h4>
+                    <p class="text-[11px] text-slate-400 mt-1">Pelanggan checkout barang di POS / E-Commerce.</p>
+                </div>
+                <div id="pipe-step-2" class="glass-dark p-4 rounded-xl border-slate-700 transition">
+                    <span class="text-[10px] font-bold px-2 py-0.5 bg-slate-800 rounded text-slate-300">Tahap 2</span>
+                    <h4 class="font-bold text-xs mt-2">Simpan di DBMS</h4>
+                    <p class="text-[11px] text-slate-400 mt-1">Data tersimpan di tabel `tbl_penjualan` via SQL.</p>
+                </div>
+                <div id="pipe-step-3" class="glass-dark p-4 rounded-xl border-slate-700 transition">
+                    <span class="text-[10px] font-bold px-2 py-0.5 bg-slate-800 rounded text-slate-300">Tahap 3</span>
+                    <h4 class="font-bold text-xs mt-2">Agregasi SQL</h4>
+                    <p class="text-[11px] text-slate-400 mt-1">Perhitungan total stok & kuantitas terjual.</p>
+                </div>
+                <div id="pipe-step-4" class="glass-dark p-4 rounded-xl border-slate-700 transition">
+                    <span class="text-[10px] font-bold px-2 py-0.5 bg-slate-800 rounded text-slate-300">Tahap 4</span>
+                    <h4 class="font-bold text-xs mt-2">Wawasan Tren KA</h4>
+                    <p class="text-[11px] text-slate-400 mt-1">Prediksi produk terlaris & rekomendasi stok.</p>
+                </div>
+            </div>
+
+            <div class="mt-6 bg-slate-950/80 rounded-xl p-3 border border-slate-800">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-xs font-mono text-slate-400"><i class="fa-solid fa-code text-brand-400 mr-1"></i> Console Execution Log</span>
+                    <button onclick="runPipelineSimulation()" class="px-3 py-1 rounded bg-brand-600 hover:bg-brand-500 text-white text-xs font-semibold transition">
+                        <i class="fa-solid fa-play mr-1"></i> Jalankan Simulasi
+                    </button>
+                </div>
+                <div id="pipeline-log" class="font-mono text-xs text-emerald-400 h-16 overflow-y-auto p-2 bg-slate-900 rounded">
+                    > Klik "Jalankan Simulasi" untuk memulai simulasi pengolahan data...
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 5: SIMULATOR QUERY SQL SMK -->
+        <section id="simulator" class="scroll-mt-20">
+            <div class="bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-slate-200">
+                <div class="flex flex-col md:flex-row md:items-center justify-between pb-4 border-b border-slate-200 gap-4">
+                    <div>
+                        <span class="text-xs font-semibold text-brand-600 uppercase tracking-wider">Praktik Hands-On SQL</span>
+                        <h2 class="text-xl font-bold text-slate-900">Simulator Query Basis Data Transaksi SMK</h2>
+                        <p class="text-xs text-slate-600">Simulasikan pencarian data produk berdasarkan kategori DKV, Bisnis Digital, dan Bisnis Ritel.</p>
+                    </div>
+                    <div class="flex flex-wrap gap-2">
+                        <button onclick="filterCategory('ALL')" class="px-3 py-1 rounded text-xs font-semibold bg-slate-900 text-white hover:bg-slate-800">Semua Data</button>
+                        <button onclick="filterCategory('DKV')" class="px-3 py-1 rounded text-xs font-semibold bg-dkv-50 text-dkv-700 hover:bg-dkv-100 border border-dkv-200">Kategori DKV</button>
+                        <button onclick="filterCategory('Bisnis Digital')" class="px-3 py-1 rounded text-xs font-semibold bg-bisdig-50 text-bisdig-700 hover:bg-bisdig-100 border border-bisdig-200">Bisnis Digital</button>
+                        <button onclick="filterCategory('Bisnis Ritel')" class="px-3 py-1 rounded text-xs font-semibold bg-ritel-50 text-ritel-700 hover:bg-ritel-100 border border-ritel-200">Bisnis Ritel</button>
+                    </div>
+                </div>
+
+                <div class="mt-4 bg-slate-900 text-slate-200 rounded-xl p-3 font-mono text-xs flex flex-col sm:flex-row items-center justify-between gap-2">
+                    <div class="flex items-center gap-2">
+                        <span class="text-brand-400 font-bold">SQL Query:</span>
+                        <code id="sql-display" class="text-slate-300 bg-slate-800 px-2.5 py-1 rounded">SELECT * FROM tbl_produk_smk;</code>
+                    </div>
+                    <div class="text-slate-400 text-xs">
+                        Total Items: <span id="record-count" class="text-white font-bold">6</span>
+                    </div>
+                </div>
+
+                <div class="mt-4 overflow-x-auto">
+                    <table class="w-full text-left text-xs text-slate-600 border-collapse">
+                        <thead class="bg-slate-100 text-slate-800 font-semibold uppercase text-[10px] tracking-wider">
+                            <tr>
+                                <th class="p-2.5 border-b">SKU / ID (PK)</th>
+                                <th class="p-2.5 border-b">Nama Produk / Aset</th>
+                                <th class="p-2.5 border-b">Keahlian Jurusan</th>
+                                <th class="p-2.5 border-b">Harga Satuan</th>
+                                <th class="p-2.5 border-b">Terjual / Diunduh</th>
+                                <th class="p-2.5 border-b">Status Stok / Aset</th>
+                            </tr>
+                        </thead>
+                        <tbody id="db-table-body" class="divide-y divide-slate-100">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 6: VIDEO PEMBELAJARAN EMBED -->
+        <section id="video" class="scroll-mt-20">
+            <div class="text-center max-w-3xl mx-auto mb-8">
+                <span class="text-xs font-semibold text-red-600 uppercase tracking-wider">Video Pembelajaran Terkait</span>
+                <h2 class="text-2xl font-bold text-slate-900">Media Pembelajaran Konsep Basis Data & Analisis Data</h2>
+                <p class="text-slate-600 text-xs mt-1">Saksikan dua video pembelajaran penguat konsep basis data dan analisis data berikut.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Video 1 -->
+                <div class="bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-200 flex flex-col">
+                    <div class="relative w-full pb-[56.25%] bg-slate-900">
+                        <iframe 
+                            class="absolute top-0 left-0 w-full h-full"
+                            src="https://www.youtube-nocookie.com/embed/vSJQHJzIpbw" 
+                            title="Konsep Dasar Basis Data"
+                            frameborder="0" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                            allowfullscreen>
+                        </iframe>
+                    </div>
+                    <div class="p-4 flex-1 flex flex-col justify-between">
+                        <div>
+                            <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-blue-100 text-blue-800 uppercase">Video 1</span>
+                            <h3 class="font-bold text-slate-900 text-sm mt-1">Konsep Dasar Basis Data & Sistem Informasi</h3>
+                            <p class="text-slate-600 text-xs mt-1">Membahas struktur penyimpanan terstruktur, tabel relasional, dan peran penting DBMS.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Video 2 -->
+                <div class="bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-200 flex flex-col">
+                    <div class="relative w-full pb-[56.25%] bg-slate-900">
+                        <iframe 
+                            class="absolute top-0 left-0 w-full h-full"
+                            src="https://www.youtube-nocookie.com/embed/3RkNY3j9pvg" 
+                            title="Pengolahan Data & Analisis Tren"
+                            frameborder="0" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                            allowfullscreen>
+                        </iframe>
+                    </div>
+                    <div class="p-4 flex-1 flex flex-col justify-between">
+                        <div>
+                            <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-100 text-amber-800 uppercase">Video 2</span>
+                            <h3 class="font-bold text-slate-900 text-sm mt-1">Pengolahan Data & Penerapan Analisis Tren</h3>
+                            <p class="text-slate-600 text-xs mt-1">Menjelaskan transformasi fakta mentah menjadi informasi serta analisis tren produk & pasar.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 7: KUIS EVALUASI MANDIRI -->
+        <section id="kuis" class="scroll-mt-20">
+            <div class="bg-gradient-to-br from-slate-900 to-slate-800 rounded-3xl p-6 sm:p-8 text-white">
+                <div class="max-w-2xl mx-auto text-center mb-6">
+                    <span class="text-xs font-semibold text-brand-400 uppercase tracking-wider">Uji Pemahaman</span>
+                    <h2 class="text-2xl font-bold mt-1">Kuis Konsep Basis Data & Analisis Tren SMK</h2>
+                    <p class="text-slate-300 text-xs mt-1">Evaluasi mandiri mengenai materi basis data kontekstual DKV, Bisnis Digital, dan Bisnis Ritel.</p>
+                </div>
+
+                <div id="quiz-container" class="max-w-xl mx-auto bg-slate-800/80 rounded-2xl p-5 border border-slate-700">
+                    <div id="quiz-card">
+                        <div class="flex items-center justify-between text-xs text-slate-400 mb-3">
+                            <span id="quiz-number">Pertanyaan 1 dari 4</span>
+                            <span id="quiz-score" class="text-brand-400 font-bold">Skor: 0</span>
+                        </div>
+                        <h3 id="quiz-question" class="text-sm font-semibold mb-4 text-white"></h3>
+                        <div id="quiz-options" class="space-y-2.5"></div>
+                        <div id="quiz-feedback" class="mt-3 p-3 rounded-xl text-xs font-medium hidden"></div>
+                        <div class="mt-4 flex justify-end">
+                            <button id="next-btn" onclick="nextQuestion()" class="hidden px-4 py-1.5 bg-brand-600 hover:bg-brand-500 text-white rounded-lg text-xs font-semibold transition">
+                                Selanjutnya <i class="fa-solid fa-arrow-right ml-1"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-slate-900 text-slate-400 text-xs py-6 border-t border-slate-800 mt-12">
+        <div class="max-w-7xl mx-auto px-4 text-center space-y-1">
+            <p class="font-medium text-slate-300">Modul Pembelajaran Koding dan Kecerdasan Artifisial (Elemen Analisis Data)</p>
+            <p>Khusus Konsentrasi Keahlian: Desain Komunikasi Visual (DKV), Bisnis Digital, & Bisnis Ritel • Fase E (Kelas X SMK)</p>
+            <p class="text-slate-500 pt-2">© 2026 Kurikulum Koding & KA. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        const smkDatabase = [
+            { id: 'SKU-DKV01', produk: 'Template Mockup 3D Packaging', jurusan: 'DKV', harga: 75000, qty: 140, status: 'Digital Asset (Tersedia)' },
+            { id: 'SKU-DKV02', produk: 'Font Modern Display License', jurusan: 'DKV', harga: 120000, qty: 85, status: 'Digital Asset (Tersedia)' },
+            { id: 'SKU-BD001', produk: 'Kemeja Oversize Cotton L', jurusan: 'Bisnis Digital', harga: 135000, qty: 210, status: 'Fast-Moving (Best Seller)' },
+            { id: 'SKU-BD002', produk: 'TWS Wireless Earphone V5', jurusan: 'Bisnis Digital', harga: 250000, qty: 175, status: 'Fast-Moving (Best Seller)' },
+            { id: 'SKU-RT001', produk: 'Minyak Goreng Pouch 2L', jurusan: 'Bisnis Ritel', harga: 34000, qty: 450, status: 'Stok Kritis (Perlu Reorder)' },
+            { id: 'SKU-RT002', produk: 'Deterjen Bubuk Bag 800g', jurusan: 'Bisnis Ritel', harga: 22000, qty: 310, status: 'Stok Aman' }
+        ];
+
+        function renderDatabaseTable(data) {
+            const tbody = document.getElementById('db-table-body');
+            tbody.innerHTML = '';
+            data.forEach((row, index) => {
+                const tr = document.createElement('tr');
+                tr.className = index % 2 === 0 ? 'bg-white hover:bg-slate-50' : 'bg-slate-50/50 hover:bg-slate-50';
+                tr.innerHTML = `
+                    <td class="p-2.5 font-mono font-bold text-slate-800">${row.id}</td>
+                    <td class="p-2.5 font-medium text-slate-900">${row.produk}</td>
+                    <td class="p-2.5">
+                        <span class="px-2 py-0.5 rounded text-[10px] font-semibold ${
+                            row.jurusan === 'DKV' ? 'bg-purple-100 text-purple-800' :
+                            row.jurusan === 'Bisnis Digital' ? 'bg-sky-100 text-sky-800' : 'bg-orange-100 text-orange-800'
+                        }">
+                            ${row.jurusan}
+                        </span>
+                    </td>
+                    <td class="p-2.5">Rp ${row.harga.toLocaleString('id-ID')}</td>
+                    <td class="p-2.5 font-bold text-slate-800">${row.qty} unit</td>
+                    <td class="p-2.5 text-slate-600 font-medium">${row.status}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+            document.getElementById('record-count').innerText = data.length;
+        }
+
+        function filterCategory(cat) {
+            const sqlDisplay = document.getElementById('sql-display');
+            if (cat === 'ALL') {
+                sqlDisplay.innerText = "SELECT * FROM tbl_produk_smk;";
+                renderDatabaseTable(smkDatabase);
+            } else {
+                sqlDisplay.innerText = `SELECT * FROM tbl_produk_smk WHERE Keahlian = '${cat}';`;
+                const filtered = smkDatabase.filter(item => item.jurusan === cat);
+                renderDatabaseTable(filtered);
+            }
+        }
+
+        function runPipelineSimulation() {
+            const log = document.getElementById('pipeline-log');
+            const steps = [
+                { id: 'pipe-step-1', msg: '> [11:40:01] INPUT: Kasir POS / Checkout E-Commerce mencatat transaksi barang...' },
+                { id: 'pipe-step-2', msg: '> [11:40:02] DBMS: INSERT INTO tbl_penjualan VALUES ("SKU-BD001", 1, "Payday");' },
+                { id: 'pipe-step-3', msg: '> [11:40:03] SQL AGGREGATE: SELECT SKU, SUM(qty) GROUP BY SKU ORDER BY SUM(qty) DESC;' },
+                { id: 'pipe-step-4', msg: '> [11:40:04] INSIGHT KA: Tren Terdeteksi! Kemeja Oversize terlaris, jalankan auto-reorder stok!' }
+            ];
+            log.innerHTML = '';
+            steps.forEach((step, idx) => {
+                setTimeout(() => {
+                    const p = document.createElement('div');
+                    p.innerText = step.msg;
+                    log.appendChild(p);
+                    log.scrollTop = log.scrollHeight;
+                }, idx * 800);
+            });
+        }
+
+        const quizData = [
+            {
+                question: "Dalam konteks jurusan Desain Komunikasi Visual (DKV), apakah contoh penerapan dari Basis Data?",
+                options: [
+                    "Menghapus seluruh file desain pelanggan secara otomatis",
+                    "Penyimpanan terstruktur metadata aset gambar (vektor/bitmap, resolusi, lisensi, dan palet warna)",
+                    "Mencetak baliho secara manual tanpa perangkat lunak",
+                    "Mengubah sinyal Wi-Fi laboratorium komputer"
+                ],
+                answer: 1,
+                explanation: "Siswa DKV menggunakan basis data untuk mengelola metadata aset digital seperti lisensi, tipe format vector/bitmap, dan palet warna."
+            },
+            {
+                question: "Siswa jurusan Bisnis Digital menganalisis log transaksi e-commerce dan menemukan bahwa pembeli banyak melakukan checkout produk jam 19.00 menggunakan ShopeePay. Menurut Piramida DIKW, temuan ini merupakan...?",
+                options: ["Data Mentah", "Primary Key", "Information & Insight", "Hardware"],
+                answer: 2,
+                explanation: "Temuan pola transaksi beserta konteks waktu dan metode pembayaran adalah bentuk Information yang menghasilkan Insight untuk tindakan bisnis."
+            },
+            {
+                question: "Di jurusan Bisnis Ritel, apa fungsi utama menghubungkan tabel 'Stok_Barang' dan tabel 'Penjualan_POS' menggunakan Primary Key & Foreign Key?",
+                options: [
+                    "Mengetahui barang mana yang laris (Fast-Moving) dan mengurangi stok secara otomatis saat kasir memindai barcode",
+                    "Menambah harga barang secara acak setiap jam",
+                    "Menghapus nama kasir yang sedang bertugas",
+                    "Mempercepat putaran mesin pendingin toko"
+                ],
+                answer: 0,
+                explanation: "Relasi PK-FK antara POS dan Stok memungkinkan pembaruan jumlah stok secara otomatis saat terjadi transaksi pembelian barang."
+            },
+            {
+                question: "Manakah contoh instruksi SQL yang tepat untuk menampilkan seluruh data produk kategori 'Bisnis Digital'?",
+                options: [
+                    "DELETE FROM tbl_produk WHERE Keahlian = 'Bisnis Digital';",
+                    "SELECT * FROM tbl_produk WHERE Keahlian = 'Bisnis Digital';",
+                    "UPDATE tbl_produk SET Keahlian = 'Bisnis Digital';",
+                    "CREATE TABLE Bisnis Digital;"
+                ],
+                answer: 1,
+                explanation: "Perintah 'SELECT * FROM tbl_produk WHERE Keahlian = 'Bisnis Digital';' digunakan untuk mengambil/menampilkan data sesuai kriteria."
+            }
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+
+        function loadQuestion() {
+            const q = quizData[currentQuestion];
+            document.getElementById('quiz-number').innerText = `Pertanyaan ${currentQuestion + 1} dari ${quizData.length}`;
+            document.getElementById('quiz-question').innerText = q.question;
+            const optionsContainer = document.getElementById('quiz-options');
+            optionsContainer.innerHTML = '';
+            document.getElementById('quiz-feedback').classList.add('hidden');
+            document.getElementById('next-btn').classList.add('hidden');
+
+            q.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = "w-full text-left p-3 rounded-xl bg-slate-700/60 hover:bg-slate-700 text-slate-200 text-xs border border-slate-600/50 transition flex items-center justify-between";
+                btn.innerHTML = `<span>${opt}</span> <i class="fa-regular fa-circle text-slate-400"></i>`;
+                btn.onclick = () => checkAnswer(idx);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(selectedIdx) {
+            const q = quizData[currentQuestion];
+            const feedback = document.getElementById('quiz-feedback');
+            const options = document.getElementById('quiz-options').children;
+
+            for (let btn of options) { btn.disabled = true; }
+
+            if (selectedIdx === q.answer) {
+                score += 25;
+                document.getElementById('quiz-score').innerText = `Skor: ${score}`;
+                options[selectedIdx].className = "w-full text-left p-3 rounded-xl bg-emerald-600/30 text-emerald-300 text-xs border border-emerald-500 font-semibold";
+                feedback.className = "mt-3 p-3 rounded-xl text-xs bg-emerald-950/60 text-emerald-300 border border-emerald-800";
+                feedback.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-400 mr-1"></i> <strong>Benar!</strong> ${q.explanation}`;
+            } else {
+                options[selectedIdx].className = "w-full text-left p-3 rounded-xl bg-red-600/30 text-red-300 text-xs border border-red-500 font-semibold";
+                options[q.answer].className = "w-full text-left p-3 rounded-xl bg-emerald-600/30 text-emerald-300 text-xs border border-emerald-500 font-semibold";
+                feedback.className = "mt-3 p-3 rounded-xl text-xs bg-red-950/60 text-red-300 border border-red-800";
+                feedback.innerHTML = `<i class="fa-solid fa-circle-xmark text-red-400 mr-1"></i> <strong>Salah.</strong> ${q.explanation}`;
+            }
+
+            feedback.classList.remove('hidden');
+            document.getElementById('next-btn').classList.remove('hidden');
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion < quizData.length) {
+                loadQuestion();
+            } else {
+                showQuizResult();
+            }
+        }
+
+        function showQuizResult() {
+            const card = document.getElementById('quiz-card');
+            card.innerHTML = `
+                <div class="text-center py-6 space-y-3">
+                    <div class="w-12 h-12 bg-brand-500/20 text-brand-400 rounded-full flex items-center justify-center text-2xl mx-auto border border-brand-500/30">
+                        <i class="fa-solid fa-trophy"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-white">Selesai! Skor Akhir Anda</h3>
+                    <p class="text-3xl font-extrabold text-brand-400">${score} / 100</p>
+                    <p class="text-xs text-slate-300">
+                        ${score >= 75 ? 'Sangat Baik! Anda telah memahami konsep basis data & analisis tren sesuai konsentrasi keahlian SMK.' : 'Bagus! Silakan tinjau kembali materi di atas untuk memantapkan pemahaman Anda.'}
+                    </p>
+                    <button onclick="resetQuiz()" class="mt-3 px-4 py-2 bg-brand-600 hover:bg-brand-500 text-white rounded-xl text-xs font-semibold transition">
+                        Coba Lagi <i class="fa-solid fa-rotate-right ml-1"></i>
+                    </button>
+                </div>
+            `;
+        }
+
+        function resetQuiz() {
+            currentQuestion = 0; score = 0;
+            document.getElementById('quiz-card').innerHTML = `
+                <div class="flex items-center justify-between text-xs text-slate-400 mb-3">
+                    <span id="quiz-number">Pertanyaan 1 dari 4</span>
+                    <span id="quiz-score" class="text-brand-400 font-bold">Skor: 0</span>
+                </div>
+                <h3 id="quiz-question" class="text-sm font-semibold mb-4 text-white"></h3>
+                <div id="quiz-options" class="space-y-2.5"></div>
+                <div id="quiz-feedback" class="mt-3 p-3 rounded-xl text-xs font-medium hidden"></div>
+                <div class="mt-4 flex justify-end">
+                    <button id="next-btn" onclick="nextQuestion()" class="hidden px-4 py-1.5 bg-brand-600 hover:bg-brand-500 text-white rounded-xl text-xs font-semibold transition">
+                        Selanjutnya <i class="fa-solid fa-arrow-right ml-1"></i>
+                    </button>
+                </div>
+            `;
+            loadQuestion();
+        }
+
+        window.onload = function() {
+            renderDatabaseTable(smkDatabase);
+            loadQuestion();
+        };
+    </script>
+</body>
+</html>
