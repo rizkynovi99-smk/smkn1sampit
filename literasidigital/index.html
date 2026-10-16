@@ -1,4 +1,19 @@
 <!DOCTYPE html>
+
+<script>
+    // Memastikan fungsi pemantik mendengarkan kesiapan DOM secara aman
+    document.addEventListener("DOMContentLoaded", function() {
+        window.closePemantikModal = function() {
+            const modal = document.getElementById('pemantikModal');
+            if (modal) {
+                modal.classList.add('hidden');
+            }
+        };
+    });
+
+    // Sisa fungsi chart, kuis, dan generator kelompok tetap berjalan seperti semula...
+</script>
+
 <html lang="id" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
@@ -1240,19 +1255,7 @@
     <!-- Script Chart.js & Interaksi -->
     <script>
        
-    // Memastikan fungsi pemantik mendengarkan kesiapan DOM secara aman
-    document.addEventListener("DOMContentLoaded", function() {
-        window.closePemantikModal = function() {
-            const modal = document.getElementById('pemantikModal');
-            if (modal) {
-                modal.classList.add('hidden');
-            }
-        };
-    });
-
-    // Sisa fungsi chart, kuis, dan generator kelompok tetap berjalan seperti semula...
-
-
+    
 
         const ctx1 = document.getElementById('chartAdopsiAI').getContext('2d');
         new Chart(ctx1, {
