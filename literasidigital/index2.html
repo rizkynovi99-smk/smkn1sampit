@@ -1,0 +1,1058 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hub Pembelajaran Terpadu - Literasi Digital, Hukum Siber & Etika AI (Fase E)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @keyframes floatSlow {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        @keyframes pulseGlow {
+            0%, 100% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.05); opacity: 1; }
+        }
+        .animate-float { animation: floatSlow 4s ease-in-out infinite; }
+        .animate-glow { animation: pulseGlow 3s ease-in-out infinite; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased">
+
+    <!-- Pop-up Pertanyaan Pemantik -->
+    <div id="pemantikModal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-sm px-4">
+        <div class="bg-white max-w-xl w-full p-8 rounded-3xl shadow-2xl border-4 border-indigo-600 text-center relative overflow-hidden">
+            <div class="absolute -top-10 -right-10 w-32 h-32 bg-indigo-100 rounded-full opacity-50 z-0"></div>
+            <div class="relative z-10">
+                <div class="bg-indigo-100 text-indigo-600 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto text-3xl mb-4 shadow-inner animate-bounce">
+                    <i class="fa-solid fa-circle-question"></i>
+                </div>
+                <span class="bg-indigo-100 text-indigo-700 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Pertanyaan Pemantik Utama</span>
+                <h3 class="text-2xl font-extrabold text-slate-900 mt-3 mb-4 leading-snug">
+                    "Apakah internet benar-benar ruang tanpa hukum, dan seberapa besar tanggung jawab kita atas setiap ketikan jari serta data yang dibagikan?"
+                </h3>
+                <p class="text-slate-600 text-sm mb-6 leading-relaxed">
+                    Sebelum menjelajahi modul ini, renungkan sejenak: setiap unggahan, komentar, dan baris kode meninggalkan jejak abadi yang diatur ketat oleh hukum positif di Indonesia.
+                </p>
+                <button onclick="closePemantikModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-8 py-3 rounded-xl shadow-lg transition transform hover:scale-105">
+                    Mulai Belajar & Eksplorasi Materi
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="bg-indigo-900 text-white shadow-lg sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center">
+            <div class="flex items-center space-x-3 mb-2 md:mb-0">
+                <div class="bg-indigo-600 p-3 rounded-xl text-2xl shadow animate-glow">
+                    <i class="fa-solid fa-shield-halved"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold tracking-wide">Hub Pembelajaran Terpadu</h1>
+                    <p class="text-xs text-indigo-200">SMKN 1 Sampit • Fase E / Kelas X (Kurikulum Merdeka)</p>
+                </div>
+            </div>
+            <nav class="flex flex-wrap gap-3 text-sm font-medium">
+                <a href="#pengantar" class="hover:text-indigo-300 transition">Berpikir Komputasional</a>
+                <a href="#galeri-animasi" class="hover:text-indigo-300 transition">Visual Animasi</a>
+                <a href="#statistik" class="hover:text-indigo-300 transition">Grafik Tren AI</a>
+                <a href="#pegangan" class="hover:text-indigo-300 transition">4 Pegangan</a>
+                <a href="#cp-ai" class="hover:text-indigo-300 transition">Prinsip & Etika</a>
+                <a href="#tabel-sanksi" class="hover:text-indigo-300 transition">Tabel Sanksi</a>
+                <a href="#lkpd1" class="hover:text-indigo-300 transition">LKPD 1</a>
+                <a href="#lkpd2" class="hover:text-indigo-300 transition">LKPD 2</a>
+                <a href="#kuis" class="hover:text-indigo-300 transition">Kuis</a>
+                <a href="#fokus-jurusan" class="hover:text-indigo-300 transition">Fokus Jurusan</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="bg-gradient-to-br from-indigo-900 via-slate-900 to-blue-950 text-white py-20 px-4 relative overflow-hidden">
+        <div class="absolute -right-20 -top-20 w-96 h-96 bg-indigo-600/20 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="max-w-5xl mx-auto text-center relative z-10">
+            <div class="inline-flex items-center space-x-2 bg-indigo-500/30 text-indigo-300 border border-indigo-400/30 text-xs px-4 py-1.5 rounded-full uppercase tracking-wider font-semibold mb-4 animate-float">
+                <i class="fa-solid fa-sparkles"></i> <span>Modul Interaktif V6.0 Dilengkapi LKPD 1 & LKPD 2</span>
+            </div>
+            <h2 class="text-3xl md:text-5xl font-extrabold mt-2 mb-6 leading-tight">
+                Literasi Digital, Hukum Siber, HKI & Etika AI untuk Murid SMK
+            </h2>
+            <p class="text-slate-300 text-base md:text-lg max-w-3xl mx-auto mb-8 leading-relaxed">
+                Membekali murid dengan investigasi kasus mendalam (LKPD 1), proyek kampanye kreatif poster digital beserta refleksi (LKPD 2), hingga pengaplikasian khusus untuk bidang DKV, Bisnis Digital, dan Bisnis Retail.
+            </p>
+        </div>
+    </section>
+
+    <!-- Section 1: Berpikir Komputasional vs Literasi Digital -->
+    <section id="pengantar" class="py-16 px-4 max-w-6xl mx-auto">
+        <div class="bg-white p-8 md:p-12 rounded-3xl shadow-lg border border-slate-200">
+            <div class="flex items-center space-x-3 mb-4">
+                <div class="w-12 h-12 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center text-xl font-bold">
+                    <i class="fa-solid fa-compass"></i>
+                </div>
+                <div>
+                    <span class="text-indigo-600 font-bold text-sm uppercase tracking-wider">Fondasi Awal Pembelajaran</span>
+                    <h3 class="text-2xl md:text-3xl font-bold text-slate-900">Mengapa Berpikir Komputasional Dulu, Baru Literasi Digital?</h3>
+                </div>
+            </div>
+            <p class="text-slate-700 mb-8 leading-relaxed">
+                Sebelum memahami aturan hukum di internet, murid harus memiliki kerangka berpikir yang logis dan terstruktur.
+            </p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                <div class="bg-gradient-to-br from-indigo-50 to-blue-50 p-6 rounded-2xl border border-indigo-100 transition hover:shadow-md">
+                    <div class="text-indigo-600 text-3xl mb-3"><i class="fa-solid fa-brain animate-float"></i></div>
+                    <h4 class="text-xl font-bold text-slate-900 mb-2">1. Fondasi Pola Pikir Sistematis</h4>
+                    <p class="text-slate-700 text-sm leading-relaxed">
+                        Berpikir komputasional (Computational Thinking) melatih otak memecahkan masalah kompleks melalui dekomposisi, pengenalan pola, abstraksi, dan algoritma.
+                    </p>
+                </div>
+                <div class="bg-gradient-to-br from-emerald-50 to-teal-50 p-6 rounded-2xl border border-emerald-100 transition hover:shadow-md">
+                    <div class="text-emerald-600 text-3xl mb-3"><i class="fa-solid fa-magnifying-glass-chart animate-float"></i></div>
+                    <h4 class="text-xl font-bold text-slate-900 mb-2">2. Sebagai Pisau Analisis Kritis</h4>
+                    <p class="text-slate-700 text-sm leading-relaxed">
+                        Sebelum mampu menyaring hoaks atau menilai kasus hukum digital secara objektif, diperlukan kerangka logika terstruktur agar tidak mudah terkecoh informasi provokatif.
+                    </p>
+                </div>
+            </div>
+
+            <div class="bg-slate-900 text-white p-6 rounded-2xl shadow-md border-l-4 border-indigo-500">
+                <h4 class="text-lg font-bold text-indigo-300 mb-3"><i class="fa-solid fa-lightbulb mr-2"></i>Analogi Sederhana untuk Murid:</h4>
+                <ul class="space-y-2 text-sm text-slate-300">
+                    <li>• <b>Berpikir Komputasional</b> adalah cara kerja sistem pengolah masalah di dalam otak kita.</li>
+                    <li>• <b>Literasi Digital & Etika</b> adalah rambu lalu lintas dan aturan main saat kita berkendara di ruang digital.</li>
+                    <li>• Karena <b>murid wajib paham logika berkendara sebelum mempelajari aturan hukum lalu lintasnya</b>.</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 2: Grafik Tren AI & Manipulasi Digital -->
+    <section id="statistik" class="py-16 px-4 bg-white border-y border-slate-200">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center mb-12">
+                <span class="text-indigo-600 font-bold text-sm uppercase tracking-wider">Data & Statistik Global</span>
+                <h3 class="text-3xl font-bold text-slate-900 mt-1">Grafik Peningkatan & Manipulasi AI (3 Tahun Terakhir)</h3>
+                <p class="text-slate-600 max-w-2xl mx-auto mt-2">Visualisasi lonjakan adopsi kecerdasan artifisial dan tren penyalahgunaan konten sintetis.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="bg-slate-50 p-6 rounded-3xl shadow-md border border-slate-200">
+                    <h4 class="text-lg font-bold text-slate-900 mb-2 text-center">Tren Peningkatan Penggunaan AI Global</h4>
+                    <p class="text-xs text-slate-500 text-center mb-4">Skala adopsi di sektor pendidikan & produktivitas (2024–2026)</p>
+                    <div class="relative h-64">
+                        <canvas id="chartAdopsiAI"></canvas>
+                    </div>
+                </div>
+
+                <div class="bg-slate-50 p-6 rounded-3xl shadow-md border border-slate-200">
+                    <h4 class="text-lg font-bold text-slate-900 mb-2 text-center">Tren Manipulasi Gambar/Video/Audio (Deepfake)</h4>
+                    <p class="text-xs text-slate-500 text-center mb-4">Lonjakan insiden konten sintetis berbahaya (2024–2026)</p>
+                    <div class="relative h-64">
+                        <canvas id="chartManipulasiAI"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 3: Empat Pegangan Utama + Video Studi Kasus -->
+    <section id="pegangan" class="py-16 px-4 max-w-7xl mx-auto">
+        <div class="text-center mb-12">
+            <span class="text-indigo-600 font-bold text-sm uppercase tracking-wider">Fondasi Hukum & Etika</span>
+            <h3 class="text-3xl font-bold text-slate-900 mt-1">Empat Pegangan Utama Warga Digital</h3>
+            <p class="text-slate-600 max-w-2xl mx-auto mt-2">Kajian mendalam regulasi resmi dan etika ber-AI.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+            <div class="bg-white p-6 rounded-2xl shadow-md border-t-4 border-indigo-600 flex flex-col justify-between transition hover:-translate-y-1">
+                <div>
+                    <div class="text-indigo-600 text-3xl mb-4"><i class="fa-solid fa-gavel"></i></div>
+                    <h4 class="text-xl font-bold text-slate-900 mb-2">1. UU ITE Manipulasi</h4>
+                    <p class="text-slate-600 text-sm">Mengatur hoaks, pencemaran nama baik, hingga Pasal 35 tentang pemalsuan dokumen elektronik.</p>
+                </div>
+                <div class="mt-4 pt-4 border-t border-slate-100 text-xs font-semibold text-indigo-600">UU No. 1 Tahun 2024</div>
+            </div>
+
+            <div class="bg-white p-6 rounded-2xl shadow-md border-t-4 border-emerald-600 flex flex-col justify-between transition hover:-translate-y-1">
+                <div>
+                    <div class="text-emerald-600 text-3xl mb-4"><i class="fa-solid fa-user-shield"></i></div>
+                    <h4 class="text-xl font-bold text-slate-900 mb-2">2. UU Pelindungan Data</h4>
+                    <p class="text-slate-600 text-sm">Perlindungan data umum & spesifik rahasia (biometrik, kesehatan, keuangan).</p>
+                </div>
+                <div class="mt-4 pt-4 border-t border-slate-100 text-xs font-semibold text-emerald-600">UU No. 27 Tahun 2022</div>
+            </div>
+
+            <div class="bg-white p-6 rounded-2xl shadow-md border-t-4 border-amber-600 flex flex-col justify-between transition hover:-translate-y-1">
+                <div>
+                    <div class="text-amber-600 text-3xl mb-4"><i class="fa-solid fa-code"></i></div>
+                    <h4 class="text-xl font-bold text-slate-900 mb-2">3. UU Hak Cipta</h4>
+                    <p class="text-slate-600 text-sm">Perlindungan source code, algoritma program komputer, dan lisensi (MIT vs Proprietary).</p>
+                </div>
+                <div class="mt-4 pt-4 border-t border-slate-100 text-xs font-semibold text-amber-600">UU No. 28 Tahun 2014</div>
+            </div>
+
+            <div class="bg-white p-6 rounded-2xl shadow-md border-t-4 border-purple-600 flex flex-col justify-between transition hover:-translate-y-1">
+                <div>
+                    <div class="text-purple-600 text-3xl mb-4"><i class="fa-solid fa-robot"></i></div>
+                    <h4 class="text-xl font-bold text-slate-900 mb-2">4. Etika Penggunaan AI</h4>
+                    <p class="text-slate-600 text-sm">Mitigasi AI Hallucination, bias, dan larangan keras mengunggah data sensitif.</p>
+                </div>
+                <div class="mt-4 pt-4 border-t border-slate-100 text-xs font-semibold text-purple-600">Etika & Keamanan</div>
+            </div>
+        </div>
+
+        <div class="bg-white p-8 rounded-3xl shadow-lg border border-slate-200">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+                <div>
+                    <span class="bg-red-100 text-red-700 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Studi Kasus Video Autentik</span>
+                    <h4 class="text-2xl font-bold text-slate-900 mt-2 mb-4">Analisis Deepfake: Pidato Jokowi Berbahasa Mandarin</h4>
+                    <p class="text-slate-700 text-sm leading-relaxed mb-4">
+                        Video di bawah ini adalah contoh nyata manipulasi AI (deepfake) di mana figur publik disinkronkan dengan bahasa asing yang tidak pernah diucapkannya. Murid diajak menganalisis bahaya disinformasi visual ini.
+                    </p>
+                    <ul class="space-y-2 text-xs text-slate-600 font-medium">
+                        <li><i class="fa-solid fa-check text-indigo-600 mr-2"></i>Tonton video untuk melihat betapa meyakinkannya manipulasi sintetis.</li>
+                        <li><i class="fa-solid fa-check text-indigo-600 mr-2"></i>Gunakan logika berpikir komputasional untuk memverifikasi keaslian.</li>
+                    </ul>
+                </div>
+                <div class="w-full aspect-video overflow-hidden rounded-2xl shadow-md bg-black">
+                    <iframe class="w-full h-full" src="https://www.youtube.com/embed/jYQwxQ4JssI" title="[HOAX] PIDATO JOKOWI BERBAHASA MANDARIN" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section Tengah: Prinsip Kerja & Etika AI (CP 5.1 & CP 5.2) -->
+    <section id="cp-ai" class="py-16 px-4 max-w-7xl mx-auto">
+        <div class="text-center mb-12">
+            <span class="text-indigo-600 font-bold text-sm uppercase tracking-wider">Capaian Pembelajaran AI</span>
+            <h3 class="text-3xl font-bold text-slate-900 mt-1">Prinsip Kerja, Penerapan, & Etika Keamanan AI (CP 5.1 & CP 5.2)</h3>
+            <p class="text-slate-600 max-w-2xl mx-auto mt-2">Memahami batasan teknologi kecerdasan artifisial dan penerapan bijak secara bertanggung jawab.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div class="bg-white p-8 rounded-3xl shadow-md border-t-4 border-indigo-600 flex flex-col justify-between">
+                <div>
+                    <div class="text-indigo-600 text-3xl mb-4"><i class="fa-solid fa-microchip animate-float"></i></div>
+                    <h4 class="text-2xl font-bold text-slate-900 mb-3">1. Prinsip Kerja & Penerapan Tepat Guna (CP 5.1)</h4>
+                    <p class="text-slate-700 text-sm leading-relaxed mb-4">
+                        AI bukanlah makhluk hidup atau manusia pintar di dalam komputer; AI adalah sistem matematika dan statistik canggih yang bekerja melalui data pelatihan (training data) dan model probabilitas untuk menebak kata atau elemen visual berikutnya.
+                    </p>
+                </div>
+                <div class="bg-indigo-50 p-4 rounded-xl border border-indigo-100 mt-4">
+                    <h5 class="font-bold text-indigo-900 text-xs uppercase tracking-wider mb-1"><i class="fa-solid fa-hands-holding-child mr-1"></i> Penerapan Bertanggung Jawab</h5>
+                    <p class="text-xs text-indigo-800 leading-relaxed">
+                        AI berperan sebagai co-pilot (pendamping kreatif) lintas disiplin ilmu—baik dalam menyusun referensi sastra, eksplorasi desain, maupun analisis data sains—bukan sebagai pengganti mutlak nalar dan empati manusia.
+                    </p>
+                </div>
+            </div>
+
+            <div class="bg-white p-8 rounded-3xl shadow-md border-t-4 border-purple-600 flex flex-col justify-between">
+                <div>
+                    <div class="text-purple-600 text-3xl mb-4"><i class="fa-solid fa-shield-halved animate-float"></i></div>
+                    <h4 class="text-2xl font-bold text-slate-900 mb-3">2. Etika, Keamanan Data, & Dampak Sosial (CP 5.2)</h4>
+                    <p class="text-slate-700 text-sm leading-relaxed mb-4">
+                        Analisis aspek etika menuntut kita mewaspadai halusinasi AI (informasi keliru yang disampaikan dengan sangat percaya diri) dan bias algoritma dari data masa lalu.
+                    </p>
+                </div>
+                <div class="bg-purple-50 p-4 rounded-xl border border-purple-100 mt-4">
+                    <h5 class="font-bold text-purple-900 text-xs uppercase tracking-wider mb-1"><i class="fa-solid fa-lock mr-1"></i> Keamanan Data & UU PDP</h5>
+                    <p class="text-xs text-purple-800 leading-relaxed">
+                        Jangan pernah mengunggah data rahasia (NIK KTP, password, rekening bank) ke platform AI publik agar terhindar dari kebocoran data. Waspadai pula dampak sosial manipulasi media seperti deepfake.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 4: Tabel Ringkasan Pasal & Sanksi -->
+    <section id="tabel-sanksi" class="py-16 px-4 bg-slate-100 border-y border-slate-200">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-12">
+                <span class="text-indigo-600 font-bold text-sm uppercase tracking-wider">Tabel Referensi Hukum</span>
+                <h3 class="text-3xl font-bold text-slate-900 mt-1">Ringkasan Pasal Sering Dilanggar & Sanksi Hukum</h3>
+                <p class="text-slate-600 max-w-2xl mx-auto mt-2">Daftar pelanggaran siber utama beserta ancaman pidana dan denda berdasarkan hukum positif di Indonesia.</p>
+            </div>
+
+            <div class="bg-white rounded-3xl shadow-lg overflow-hidden border border-slate-200">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-indigo-900 text-white text-xs uppercase tracking-wider">
+                                <th class="p-4">No</th>
+                                <th class="p-4">Hukum / Regulasi Resmi</th>
+                                <th class="p-4">Perbuatan / Pasal yang Sering Dilanggar</th>
+                                <th class="p-4">Ancaman Sanksi Hukum & Denda</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-200 text-sm text-slate-700">
+                            <tr class="hover:bg-slate-50">
+                                <td class="p-4 font-bold">1</td>
+                                <td class="p-4 font-semibold text-indigo-900"><a href="https://jdih.komdigi.go.id/produk_hukum/view/id/884/t/undangundang+nomor+1+tahun+2024" target="_blank" class="underline hover:text-indigo-600">UU ITE (Pasal 28 ayat 1)</a></td>
+                                <td class="p-4">Menyebarkan berita bohong (hoaks) menyesatkan yang merugikan konsumen secara elektronik.</td>
+                                <td class="p-4 font-bold text-red-600">Pidana penjara maksimal 6 tahun dan/atau denda hingga Rp1 Miliar.</td>
+                            </tr>
+                            <tr class="hover:bg-slate-50">
+                                <td class="p-4 font-bold">2</td>
+                                <td class="p-4 font-semibold text-indigo-900"><a href="https://jdih.komdigi.go.id/produk_hukum/view/id/884/t/undangundang+nomor+1+tahun+2024" target="_blank" class="underline hover:text-indigo-600">UU ITE (Pasal 35)</a></td>
+                                <td class="p-4">Memanipulasi, menciptakan, atau memalsukan dokumen elektronik agar seolah otentik (Pembuatan deepfake penipuan).</td>
+                                <td class="p-4 font-bold text-red-600">Pidana penjara maksimal 12 tahun dan/atau denda hingga Rp12 Miliar.</td>
+                            </tr>
+                            <tr class="hover:bg-slate-50">
+                                <td class="p-4 font-bold">3</td>
+                                <td class="p-4 font-semibold text-emerald-800"><a href="https://peraturan.bpk.go.id/Details/229798/uu-no-27-tahun-2022" target="_blank" class="underline hover:text-emerald-600">UU PDP (Pasal 65 & 67)</a></td>
+                                <td class="p-4">Memperoleh atau mengumpulkan data pribadi orang lain secara melawan hukum (kebocoran/pencurian data).</td>
+                                <td class="p-4 font-bold text-red-600">Pidana penjara maksimal 5 tahun dan/atau denda hingga Rp5 Miliar (Denda korporasi 2%).</td>
+                            </tr>
+                            <tr class="hover:bg-slate-50">
+                                <td class="p-4 font-bold">4</td>
+                                <td class="p-4 font-semibold text-amber-800"><a href="https://peraturan.bpk.go.id/Details/38690/uu-no-28-tahun-2014" target="_blank" class="underline hover:text-amber-600">UU Hak Cipta (Pasal 113)</a></td>
+                                <td class="p-4">Menggandakan atau menggunakan secara komersial source code / karya seni tanpa izin pencipta (plagiasi).</td>
+                                <td class="p-4 font-bold text-red-600">Pidana penjara maksimal 4 tahun dan/atau denda hingga Rp1 Miliar.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section: Berita & Analisis Kasus Deepfake -->
+    <section id="berita-deepfake" class="py-16 px-4 max-w-7xl mx-auto">
+        <div class="bg-white p-8 md:p-12 rounded-3xl shadow-xl border border-slate-200">
+            <div class="flex items-center space-x-3 mb-6">
+                <div class="w-12 h-12 rounded-xl bg-red-100 text-red-600 flex items-center justify-center text-xl font-bold">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                </div>
+                <div>
+                    <span class="bg-red-100 text-red-700 font-bold text-xs px-3 py-1 rounded-full uppercase tracking-wider">Kajian Kasus Nyata di Indonesia</span>
+                    <h3 class="text-2xl md:text-3xl font-bold text-slate-900">Analisis Berita: Video Deepfake Pidato Presiden Jokowi Berbahasa Mandarin</h3>
+                </div>
+            </div>
+
+            <p class="text-slate-700 mb-8 leading-relaxed">
+                Beredar luas di media sosial sebuah video yang menampilkan Presiden Joko Widodo sedang berpidato menggunakan bahasa Mandarin dengan sangat fasih. Setelah ditelusuri oleh Kementerian Komunikasi dan Informatika (Kominfo), video tersebut dipastikan merupakan hasil rekayasa teknologi kecerdasan artifisial (*deepfake*) menggunakan suntingan dari video asli saat presiden berpidato dalam bahasa Inggris di US-ASEAN Business Council.
+            </p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200">
+                    <h4 class="text-lg font-bold text-slate-900 mb-3 flex items-center">
+                        <i class="fa-solid fa-gavel text-red-600 mr-2"></i> Pasal & Ancaman Sanksi Hukum
+                    </h4>
+                    <ul class="space-y-4 text-sm text-slate-700">
+                        <li class="border-b border-slate-200 pb-3">
+                            • <b>Penyebar Hoaks / Disinformasi:</b><br>
+                            Melanggar <b>UU ITE (Pasal 28 ayat 1)</b>.<br>
+                            <span class="text-red-600 font-bold mt-1 block">Ancaman Sanksi: Pidana penjara maksimal 6 tahun dan/atau denda hingga Rp1 Miliar.</span>
+                        </li>
+                        <li>
+                            • <b>Pembuat / Produsen Deepfake:</b><br>
+                            Melanggar <b>UU ITE (Pasal 35)</b>.<br>
+                            <span class="text-red-600 font-bold mt-1 block">Ancaman Sanksi: Pidana penjara maksimal 12 tahun dan/atau denda hingga Rp12 Miliar.</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200 flex flex-col justify-between">
+                    <div>
+                        <h4 class="text-lg font-bold text-slate-900 mb-3 flex items-center">
+                            <i class="fa-solid fa-users-slash text-amber-600 mr-2"></i> Pihak Dirugikan & Dampaknya
+                        </h4>
+                        <p class="text-slate-700 text-sm leading-relaxed mb-3">
+                            Pihak yang dirugikan secara langsung adalah kepala negara (pencemaran nama baik dan manipulasi citra) serta masyarakat luas yang mengalami disinformasi politik.
+                        </p>
+                    </div>
+                    <div class="text-xs font-semibold text-red-600 bg-red-50 p-3 rounded-xl border border-red-100 mt-4">
+                        <i class="fa-solid fa-circle-exclamation mr-1"></i> Berpotensi memicu kepanikan sosial, polarisasi opini publik, dan hilangnya kepercayaan terhadap informasi digital.
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-gradient-to-br from-indigo-900 to-slate-900 text-white p-8 rounded-3xl shadow-md">
+                <h4 class="text-xl font-bold text-indigo-300 mb-4 flex items-center">
+                    <i class="fa-solid fa-brain mr-3"></i> Cara Menggunakan Logika Berpikir Komputasional untuk Memverifikasi Keaslian
+                </h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 text-sm">
+                    <div class="bg-indigo-950/80 p-5 rounded-2xl border border-indigo-800">
+                        <span class="text-xs font-bold text-indigo-400 uppercase">Langkah 1</span>
+                        <h5 class="font-bold text-white text-base mt-1 mb-2">Dekomposisi</h5>
+                        <p class="text-xs text-slate-300 leading-relaxed">Memecah elemen video menjadi bagian terpisah: amati gerak bibir (visual) secara mandiri dibandingkan dengan suara audio yang didengar.</p>
+                    </div>
+                    <div class="bg-indigo-950/80 p-5 rounded-2xl border border-indigo-800">
+                        <span class="text-xs font-bold text-indigo-400 uppercase">Langkah 2</span>
+                        <h5 class="font-bold text-white text-base mt-1 mb-2">Pengenalan Pola</h5>
+                        <p class="text-xs text-slate-300 leading-relaxed">Mengenali anomali: apakah postur, intonasi, dan artikulasi wajah tokoh publik tersebut konsisten dengan kebiasaan aslinya?</p>
+                    </div>
+                    <div class="bg-indigo-950/80 p-5 rounded-2xl border border-indigo-800">
+                        <span class="text-xs font-bold text-indigo-400 uppercase">Langkah 3</span>
+                        <h5 class="font-bold text-white text-base mt-1 mb-2">Abstraksi</h5>
+                        <p class="text-xs text-slate-300 leading-relaxed">Mengabaikan gangguan visual di permukaan dan fokus pada substansi: apakah bukti digital ini autentik?</p>
+                    </div>
+                    <div class="bg-indigo-950/80 p-5 rounded-2xl border border-indigo-800">
+                        <span class="text-xs font-bold text-indigo-400 uppercase">Langkah 4</span>
+                        <h5 class="font-bold text-white text-base mt-1 mb-2">Algoritma Verifikasi</h5>
+                        <p class="text-xs text-slate-300 leading-relaxed">Melacak sumber arsip asli di internet (*cross-check*) dan menolak menyebarkan konten sebelum dipastikan kebenarannya.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section: Generator Pembagi 3 Kelompok Otomatis -->
+    <section id="pembagi-kelompok" class="py-16 px-4 max-w-7xl mx-auto">
+        <div class="bg-white p-8 md:p-12 rounded-3xl shadow-xl border border-slate-200">
+            <div class="text-center mb-8">
+                <span class="bg-indigo-100 text-indigo-700 font-bold text-xs px-3 py-1 rounded-full uppercase tracking-wider">Alat Bantu Guru</span>
+                <h3 class="text-2xl md:text-3xl font-extrabold text-slate-900 mt-2">Generator Pembagi 3 Kelompok Otomatis (LKPD 1)</h3>
+                <p class="text-slate-600 text-sm max-w-2xl mx-auto mt-1">Masukkan daftar nama murid di bawah ini. Sistem akan mengacak dan membaginya secara merata ke dalam 3 kelompok investigasi (Kelompok A, B, dan C).</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200 flex flex-col justify-between">
+                    <div>
+                        <label for="inputDaftarMurid" class="block font-bold text-slate-900 text-sm mb-2">
+                            <i class="fa-solid fa-users-line text-indigo-600 mr-2"></i> Daftar Nama Murid (Satu nama per baris):
+                        </label>
+                        <p class="text-xs text-slate-500 mb-3">Copy-paste daftar absen atau nama murid kelas Anda langsung di sini.</p>
+                        <textarea id="inputDaftarMurid" rows="8" class="w-full p-4 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:outline-none text-sm text-slate-800 font-mono" placeholder="Contoh:&#10;Andi Saputra&#10;Bunga Lestari&#10;Citra Kirana&#10;Dedi Kurniawan&#10;Eka Pratama&#10;Fajar Hidayat"></textarea>
+                    </div>
+                    <button type="button" onclick="acakKelompokOtomatis()" class="mt-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-xl shadow-lg transition transform hover:scale-[1.02] text-sm">
+                        <i class="fa-solid fa-shuffle mr-2"></i> Acak dan Bagi ke 3 Kelompok
+                    </button>
+                </div>
+
+                <div class="bg-indigo-900 text-white p-6 rounded-2xl shadow-md flex flex-col justify-between">
+                    <div>
+                        <h4 class="font-bold text-indigo-200 text-base mb-4 flex items-center">
+                            <i class="fa-solid fa-clipboard-list mr-2"></i> Hasil Pembagian Kelompok Otomatis:
+                        </h4>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+                            <div class="bg-indigo-950 p-4 rounded-xl border border-indigo-800">
+                                <h5 class="font-bold text-indigo-300 mb-2 border-b border-indigo-800 pb-1">Kelompok A (Deepfake)</h5>
+                                <ul id="listKelompokA" class="space-y-1 text-indigo-100 list-disc list-inside">
+                                    <li class="italic text-indigo-400">Belum diacak...</li>
+                                </ul>
+                            </div>
+                            <div class="bg-indigo-950 p-4 rounded-xl border border-indigo-800">
+                                <h5 class="font-bold text-amber-300 mb-2 border-b border-indigo-800 pb-1">Kelompok B (Hak Cipta)</h5>
+                                <ul id="listKelompokB" class="space-y-1 text-indigo-100 list-disc list-inside">
+                                    <li class="italic text-indigo-400">Belum diacak...</li>
+                                </ul>
+                            </div>
+                            <div class="bg-indigo-950 p-4 rounded-xl border border-indigo-800">
+                                <h5 class="font-bold text-emerald-300 mb-2 border-b border-indigo-800 pb-1">Kelompok C (UU PDP)</h5>
+                                <ul id="listKelompokC" class="space-y-1 text-indigo-100 list-disc list-inside">
+                                    <li class="italic text-indigo-400">Belum diacak...</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-4 pt-3 border-t border-indigo-800 text-[11px] text-indigo-300 text-center">
+                        <i class="fa-solid fa-circle-info mr-1"></i> Anggota kelompok terdistribusi secara acak dan merata otomatis.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 5: LKPD 1 — Investigasi Kasus (Pertemuan 1) -->
+    <section id="lkpd1" class="py-16 px-4 max-w-7xl mx-auto">
+        <div class="text-center mb-12">
+            <span class="bg-indigo-100 text-indigo-700 font-bold text-xs px-3 py-1 rounded-full uppercase tracking-wider">Lembar Kerja Peserta Didik 1</span>
+            <h3 class="text-3xl font-bold text-slate-900 mt-2">LKPD 1 — Investigasi Kasus (Pertemuan 1)</h3>
+            <p class="text-slate-600 max-w-2xl mx-auto mt-2">Analisis mendalam mengenai penyalahgunaan kecerdasan artifisial, hoaks, atau pelanggaran hak cipta di Indonesia.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="bg-white p-6 rounded-3xl shadow-md border-t-4 border-indigo-600">
+                <div class="text-indigo-600 text-2xl mb-3"><i class="fa-solid fa-file-invoice"></i></div>
+                <h4 class="text-lg font-bold text-slate-900 mb-2">1. Ringkasan & Sumber Kasus</h4>
+                <p class="text-slate-600 text-sm leading-relaxed">
+                    Tuliskan ringkasan satu kasus penyalahgunaan AI (deepfake, hoaks, atau hak cipta) yang pernah terjadi di Indonesia beserta tautan atau referensi sumbernya secara jelas.
+                </p>
+            </div>
+
+            <div class="bg-white p-6 rounded-3xl shadow-md border-t-4 border-amber-600">
+                <div class="text-amber-600 text-2xl mb-3"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                <h4 class="text-lg font-bold text-slate-900 mb-2">2. Pihak Dirugikan & Kerugian</h4>
+                <p class="text-slate-600 text-sm leading-relaxed">
+                    Identifikasi siapa saja pihak yang dirugikan (individu, institusi, atau masyarakat luas) serta jabarkan bentuk kerugian moral maupun materiil yang dialami.
+                </p>
+            </div>
+
+            <div class="bg-white p-6 rounded-3xl shadow-md border-t-4 border-emerald-600">
+                <div class="text-emerald-600 text-2xl mb-3"><i class="fa-solid fa-clipboard-question"></i></div>
+                <h4 class="text-lg font-bold text-slate-900 mb-2">3. Pertanyaan Investigasi</h4>
+                <p class="text-slate-600 text-sm leading-relaxed">
+                    Tuliskan satu pertanyaan investigasi kelompok dengan format: <b>“Bagaimana jika …?”</b> untuk menguji skenario terburuk dari kasus tersebut.
+                </p>
+            </div>
+        </div>
+
+        <div class="bg-white p-8 rounded-3xl shadow-lg border border-slate-200">
+            <h4 class="text-2xl font-bold text-slate-900 mb-6 flex items-center">
+                <i class="fa-solid fa-table-cells text-indigo-600 mr-3"></i> Matriks Analisis Kasus Kelompok
+            </h4>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200">
+                    <span class="text-xs font-bold text-indigo-600 uppercase">Poin 1</span>
+                    <h5 class="font-bold text-slate-900 text-base mb-2">Fakta Kasus</h5>
+                    <p class="text-xs text-slate-600 leading-relaxed">Uraikan kronologi kejadian secara objektif berdasarkan data dan pemberitaan yang valid di lapangan.</p>
+                </div>
+                <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200">
+                    <span class="text-xs font-bold text-indigo-600 uppercase">Poin 2</span>
+                    <h5 class="font-bold text-slate-900 text-base mb-2">Norma yang Dilanggar</h5>
+                    <p class="text-xs text-slate-600 leading-relaxed">Analisis pelanggaran UU ITE, UU PDP, UU Hak Cipta, atau prinsip etika beserta argumen alasannya.</p>
+                </div>
+                <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200">
+                    <span class="text-xs font-bold text-indigo-600 uppercase">Poin 3</span>
+                    <h5 class="font-bold text-slate-900 text-base mb-2">Dampak Korban & Masyarakat</h5>
+                    <p class="text-xs text-slate-600 leading-relaxed">Evaluasi dampak psikologis, sosial, ekonomi, dan tingkat kepanikan yang ditimbulkan di publik.</p>
+                </div>
+                <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200">
+                    <span class="text-xs font-bold text-indigo-600 uppercase">Poin 4</span>
+                    <h5 class="font-bold text-slate-900 text-base mb-2">Rekomendasi Solusi</h5>
+                    <p class="text-xs text-slate-600 leading-relaxed">Berikan saran pencegahan yang ditujukan khusus bagi pembuat konten, platform digital, dan pengguna.</p>
+                </div>
+                <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200 md:col-span-2 lg:col-span-2">
+                    <span class="text-xs font-bold text-indigo-600 uppercase">Poin 5</span>
+                    <h5 class="font-bold text-slate-900 text-base mb-2">Langkah Verifikasi</h5>
+                    <p class="text-xs text-slate-600 leading-relaxed">Tentukan langkah nyata verifikasi (Computational Thinking / Cross-check) yang seharusnya dilakukan sebelum konten disebarluaskan.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section: Urgensi 4 Pegangan Utama Warga Digital -->
+    <section id="urgensi-pegangan" class="py-16 px-4 max-w-6xl mx-auto">
+        <div class="bg-white p-8 md:p-12 rounded-3xl shadow-xl border border-slate-200">
+            <div class="flex items-center space-x-4 mb-6">
+                <div class="bg-indigo-600 p-3 rounded-2xl text-2xl text-white shadow">
+                    <i class="fa-solid fa-compass"></i>
+                </div>
+                <div>
+                    <span class="bg-indigo-100 text-indigo-700 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Refleksi & Urgensi</span>
+                    <h3 class="text-2xl md:text-3xl font-bold text-slate-900 mt-1">Untuk Apa Kita Mengetahui 4 Pegangan Utama Warga Digital?</h3>
+                </div>
+            </div>
+
+            <p class="text-slate-700 text-base leading-relaxed mb-8">
+                Ruang digital ibarat lalu lintas raya tanpa batas fisik. Tanpa rambu dan pemahaman hukum yang jelas, setiap pengguna gawai berisiko menabrak aturan atau merugikan orang lain tanpa disadari. Mengetahui <b>Empat Pegangan Utama</b> (UU ITE, UU PDP, UU Hak Cipta, dan Etika AI) bukan sekadar menghafal pasal, melainkan fondasi penting bagi kehidupan kita.
+            </p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200 flex flex-col justify-between transition hover:shadow-md">
+                    <div>
+                        <div class="text-indigo-600 font-bold text-base mb-2 flex items-center">
+                            <i class="fa-solid fa-shield-halved mr-2"></i> 1. Membentengi Diri dari Jeratan Hukum Siber
+                        </div>
+                        <p class="text-xs text-slate-600 leading-relaxed">
+                            Dengan memahami batasan Pasal UU ITE dan UU PDP, kita tahu persis mana tindakan digital yang sah secara hukum dan mana yang berisiko menyeret kita ke dalam ancaman pidana penjara serta denda miliaran rupiah.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200 flex flex-col justify-between transition hover:shadow-md">
+                    <div>
+                        <div class="text-emerald-600 font-bold text-base mb-2 flex items-center">
+                            <i class="fa-solid fa-user-lock mr-2"></i> 2. Melindungi Kedaulatan Data Pribadi
+                        </div>
+                        <p class="text-xs text-slate-600 leading-relaxed">
+                            Pemahaman ini menyadarkan kita agar tidak sembarangan membagikan data sensitif (seperti NIK KTP, riwayat kesehatan, atau sandi akun) ke platform publik atau chatbot AI yang rentan mengalami kebocoran.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200 flex flex-col justify-between transition hover:shadow-md">
+                    <div>
+                        <div class="text-amber-600 font-bold text-base mb-2 flex items-center">
+                            <i class="fa-solid fa-code mr-2"></i> 3. Menjunjung Tinggi Integritas & Hak Cipta
+                        </div>
+                        <p class="text-xs text-slate-600 leading-relaxed">
+                            Bagi murid SMK (khususnya DKV, Bisnis Digital, dan Retail), pemahaman HKI dan lisensi melatih kita untuk menghargai karya cipta orang lain, menghindari plagiasi, dan bijak memposisikan AI sebagai co-pilot.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200 flex flex-col justify-between transition hover:shadow-md">
+                    <div>
+                        <div class="text-purple-600 font-bold text-base mb-2 flex items-center">
+                            <i class="fa-solid fa-brain mr-2"></i> 4. Menumbuhkan Nalar Kritis di Era AI
+                        </div>
+                        <p class="text-xs text-slate-600 leading-relaxed">
+                            Membantu kita waspada terhadap fenomena halusinasi AI, bahaya deepfake, serta melatih kemampuan berpikir komputasional dalam memverifikasi kebenaran informasi sebelum membagikannya (*sharing*).
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-indigo-900 text-white p-6 rounded-2xl shadow-md border-l-4 border-indigo-400">
+                <h4 class="text-base font-bold text-indigo-200 mb-2"><i class="fa-solid fa-lightbulb mr-2"></i>Kesimpulan Esensial:</h4>
+                <p class="text-xs text-indigo-100 leading-relaxed">
+                    Mengetahui 4 pegangan utama mengubah posisi kita dari sekadar <b>"pengguna pasif"</b> yang mudah disetir oleh algoritma dan hoaks, menjadi <b>"warga digital cerdas dan profesional"</b> yang siap menghadapi dunia kerja modern dengan penuh tanggung jawab.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section: Eksplorasi Pesan Kampanye LKPD 2 -->
+    <section id="pengantar-lkpd2" class="py-16 px-4 max-w-6xl mx-auto">
+        <div class="bg-white p-8 md:p-12 rounded-3xl shadow-lg border border-slate-200">
+            <div class="flex items-center space-x-4 mb-6">
+                <div class="bg-purple-600 p-3 rounded-2xl text-2xl text-white shadow">
+                    <i class="fa-solid fa-bullhorn"></i>
+                </div>
+                <div>
+                    <span class="bg-purple-100 text-purple-700 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Persiapan Proyek Kampanye</span>
+                    <h3 class="text-2xl md:text-3xl font-bold text-slate-900 mt-1">Menentukan Pesan Utama Kampanye Digital</h3>
+                </div>
+            </div>
+
+            <p class="text-slate-700 text-base leading-relaxed mb-8">
+                Sebelum merancang poster digital di LKPD 2, setiap kelompok perlu merumuskan esensi komunikasi yang kuat dan berdampak bagi lingkungan sekitar. Mari bedah makna dan arah dari pertanyaan inti kampanye berikut:
+            </p>
+
+            <div class="bg-gradient-to-br from-indigo-900 to-purple-950 text-white p-8 rounded-3xl shadow-xl mb-8 border border-indigo-800">
+                <span class="bg-purple-500/40 text-purple-200 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Pertanyaan Utama</span>
+                <blockquote class="text-xl md:text-2xl font-extrabold mt-4 mb-4 leading-snug text-indigo-100">
+                    "Pesan apa yang ingin kamu sampaikan kepada teman sebayamu tentang AI?"
+                </blockquote>
+                <p class="text-slate-300 text-sm leading-relaxed">
+                    Pertanyaan ini menuntut murid untuk memposisikan diri bukan sekadar sebagai pengguna teknologi, melainkan sebagai agen perubahan (*change maker*) yang peduli terhadap keselamatan dan etika digital teman-temannya.
+                </p>
+            </div>
+
+            <h4 class="text-xl font-bold text-slate-900 mb-4"><i class="fa-solid fa-compass text-purple-600 mr-2"></i>Maksud dan Tujuan dari Pertanyaan Tersebut:</h4>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200 flex flex-col justify-between">
+                    <div>
+                        <div class="text-purple-600 font-bold text-base mb-2 flex items-center">
+                            <i class="fa-solid fa-shield-halved mr-2"></i> 1. Edukasi Teman Sebaya (Peer Education)
+                        </div>
+                        <p class="text-xs text-slate-600 leading-relaxed">
+                            Mendorong murid menyampaikan informasi keselamatan digital dengan bahasa yang dekat, relevan, dan mudah dipahami oleh sesama remaja, sehingga pesan pencegahan hoaks dan deepfake lebih cepat diterima.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200 flex flex-col justify-between">
+                    <div>
+                        <div class="text-purple-600 font-bold text-base mb-2 flex items-center">
+                            <i class="fa-solid fa-brain mr-2"></i> 2. Membangun Kesadaran Etis Ber-AI
+                        </div>
+                        <p class="text-xs text-slate-600 leading-relaxed">
+                            Melatih murid agar sadar bahwa penggunaan AI memiliki batasan etika—seperti menghindari plagiasi murni, tidak melanggar hak cipta seniman, serta mewaspadai bahaya halusinasi dan manipulasi data.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 6: LKPD 2 — Proyek Kampanye (Poster Digital) dan Refleksi (Pertemuan 2) -->
+    <section id="lkpd2" class="py-16 px-4 max-w-7xl mx-auto bg-indigo-950 text-white rounded-3xl my-8 shadow-2xl border border-indigo-900">
+        <div class="text-center mb-12">
+            <span class="bg-purple-600 text-white font-bold text-xs px-3 py-1 rounded-full uppercase tracking-wider">Lembar Kerja Peserta Didik 2</span>
+            <h3 class="text-3xl font-extrabold mt-2">LKPD 2 — Proyek Kampanye (Poster Digital) & Refleksi (Pertemuan 2)</h3>
+            <p class="text-purple-200 max-w-2xl mx-auto mt-2">Aksi nyata pembuatan kampanye kreatif dan refleksi pembelajaran digital.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+            <div class="bg-indigo-900/80 p-8 rounded-3xl border border-indigo-800 flex flex-col justify-between">
+                <div>
+                    <div class="text-purple-400 text-2xl mb-3"><i class="fa-solid fa-bullhorn"></i></div>
+                    <h4 class="text-xl font-bold mb-4">1. Pesan Utama & Sasaran Audiens</h4>
+                    <p class="text-sm text-indigo-200 leading-relaxed mb-4">
+                        Tuliskan rumusan pesan utama kampanye (misal: <i>"Bijak Berkarya dengan AI & Jaga Data Pribadi"</i>) serta tentukan spesifikasi sasaran audiens poster digital Anda.
+                    </p>
+                </div>
+                <div class="bg-indigo-950 p-4 rounded-xl border border-indigo-800/60 text-xs text-indigo-300">
+                    <b>Target:</b> Teman sebaya di sekolah & komunitas digital luar sekolah.
+                </div>
+            </div>
+
+            <div class="bg-indigo-900/80 p-8 rounded-3xl border border-indigo-800 flex flex-col justify-between">
+                <div>
+                    <div class="text-purple-400 text-2xl mb-3"><i class="fa-solid fa-terminal"></i></div>
+                    <h4 class="text-xl font-bold mb-4">2. Alat AI & Log Prompt Utama</h4>
+                    <p class="text-sm text-indigo-200 leading-relaxed mb-4">
+                        Sebutkan platform alat AI yang digunakan (contoh: Canva AI, Midjourney, dll.) dan tempelkan log prompt utama yang dieksekusi saat menghasilkan aset visual.
+                    </p>
+                </div>
+                <div class="bg-indigo-950 p-4 rounded-xl border border-indigo-800/60 text-xs text-indigo-300">
+                    <b>Catatan Log:</b> Simpan riwayat prompt untuk transparansi orisinalitas karya.
+                </div>
+            </div>
+
+            <div class="bg-indigo-900/80 p-8 rounded-3xl border border-indigo-800 flex flex-col justify-between">
+                <div>
+                    <div class="text-purple-400 text-2xl mb-3"><i class="fa-solid fa-laptop-code"></i></div>
+                    <h4 class="text-xl font-bold mb-4">3. Batas Kontribusi Manusia & AI</h4>
+                    <p class="text-sm text-indigo-200 leading-relaxed mb-4">
+                        Uraikan secara transparan: bagian mana yang dibuat murni oleh kreativitas manusia dan bagian mana yang dibantu oleh AI? Cantumkan juga sumber referensi serta izin lisensi yang dipakai.
+                    </p>
+                </div>
+                <div class="bg-indigo-950 p-4 rounded-xl border border-indigo-800/60 text-xs text-indigo-300">
+                    <b>Prinsip:</b> AI sebagai co-pilot, manusia sebagai konseptor utama.
+                </div>
+            </div>
+
+            <div class="bg-indigo-900/80 p-8 rounded-3xl border border-indigo-800 flex flex-col justify-between">
+                <div>
+                    <div class="text-purple-400 text-2xl mb-3"><i class="fa-solid fa-seedling"></i></div>
+                    <h4 class="text-xl font-bold mb-4">4. Refleksi Pribadi Murid</h4>
+                    <ul class="space-y-3 text-sm text-indigo-200">
+                        <li>• <b>Dulu aku mengira</b> internet adalah ruang bebas tanpa aturan hukum...</li>
+                        <li>• <b>Kini aku paham</b> pentingnya menjaga etika, UU ITE, dan pelindungan data pribadi...</li>
+                        <li>• <b>Nanti aku akan</b> lebih kritis menyaring informasi dan bijak memanfaatkan AI...</li>
+                    </ul>
+                </div>
+                <div class="mt-4 pt-3 border-t border-indigo-800 text-xs text-purple-300">
+                    <i class="fa-solid fa-heart mr-1"></i> Refleksi bermakna membentuk profil pelajar Pancasila.
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section: Kuis & Asesmen Formatif (15 Soal) -->
+    <section id="kuis" class="py-16 px-4 bg-slate-100 border-y border-slate-200">
+        <div class="max-w-4xl mx-auto">
+            <div class="text-center mb-10">
+                <span class="bg-red-100 text-red-700 font-bold text-xs px-3 py-1 rounded-full uppercase tracking-wider">Evaluasi Formatif V6.0</span>
+                <h3 class="text-3xl font-bold text-slate-900 mt-2">Kuis Interaktif: Uji Nalar Kritis Murid (15 Soal)</h3>
+                <p class="text-slate-600 mt-1">10 Soal Pilihan Ganda & 5 Soal Benar/Salah. Dapatkan analisis dan pembahasan detail setelah pengiriman.</p>
+            </div>
+
+            <form id="quizForm" class="space-y-8">
+                <!-- SOAL 1 - 10 -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200" data-qid="1">
+                    <p class="font-bold text-slate-900 mb-3">1. Budi mengubah metadata struk pembayaran digital temannya agar nominal terlihat lebih besar lalu mengunggahnya untuk pamer. Tindakan Budi melanggar:</p>
+                    <div class="space-y-2 text-sm">
+                        <label class="block p-3 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer"><input type="radio" name="q1" value="a" class="mr-2"> A. Hanya pelanggaran etika pertemanan biasa.</label>
+                        <label class="block p-3 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer"><input type="radio" name="q1" value="b" class="mr-2"> B. Pasal 28 ayat (1) dan Pasal 35 UU ITE tentang manipulasi dokumen elektronik agar otentik.</label>
+                        <label class="block p-3 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer"><input type="radio" name="q1" value="c" class="mr-2"> C. UU Pelindungan Data Pribadi.</label>
+                        <label class="block p-3 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer"><input type="radio" name="q1" value="d" class="mr-2"> D. UU Hak Cipta aplikasi edit foto.</label>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200" data-qid="2">
+                    <p class="font-bold text-slate-900 mb-3">2. Seorang operator sekolah tidak sengaja menyebarkan spreadsheet berisi NIK dan riwayat kesehatan murid ke grup publik. Konsekuensi hukum berdasarkan UU PDP adalah:</p>
+                    <div class="space-y-2 text-sm">
+                        <label class="block p-3 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer"><input type="radio" name="q2" value="a" class="mr-2"> A. Operator bebas hukuman karena tujuannya koordinasi internal.</label>
+                        <label class="block p-3 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer"><input type="radio" name="q2" value="b" class="mr-2"> B. NIK dan riwayat kesehatan adalah data spesifik rahasia; kelalaian ini dapat dikenakan sanksi administratif atau pidana.</label>
+                        <label class="block p-3 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer"><input type="radio" name="q2" value="c" class="mr-2"> C. Hanya pihak pengunduh data yang dipidana.</label>
+                        <label class="block p-3 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer"><input type="radio" name="q2" value="d" class="mr-2"> D. UU PDP hanya berlaku untuk korporasi swasta.</label>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200" data-qid="3">
+                    <p class="font-bold text-slate-900 mb-3">3. Siti memasukkan dokumen rahasia perusahaan tempat ia magang (termasuk password server) ke chatbot AI gratis di internet. Risiko utama yang dilakukan Siti adalah:</p>
+                    <div class="space-y-2 text-sm">
+                        <label class="block p-3 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer"><input type="radio" name="q3" value="a" class="mr-2"> A. Tidak ada pelanggaran karena AI gratis menjamin privasi.</label>
+                        <label class="block p-3 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer"><input type="radio" name="q3" value="b" class="mr-2"> B. Siti melanggar kerahasiaan data dan UU PDP karena data sensitif dapat terekam ke server publik (training data).</label>
+                        <label class="block p-3 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer"><input type="radio" name="q3" value="c" class="mr-2"> C. Siti melanggar UU Hak Cipta.</label>
+                        <label class="block p-3 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer"><input type="radio" name="q3" value="d" class="mr-2"> D. Siti melanggar Pasal 28 UU ITE.</label>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200" data-qid="4">
+                    <p class="font-bold text-slate-900 mb-3">4. Seorang siswa SMK mengambil foto hasil karya desain digital milik ilustrator profesional dari internet, lalu mencetaknya dan menjualnya untuk kepentingan komersial tanpa izin pembuatnya. Berdasarkan UU Hak Cipta No. 28 Tahun 2014, analisis hukumnya adalah:</p>
+                    <div class="space-y-2 text-sm">
+                        <label class="block p-3 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer"><input type="radio" name="q4" value="a" class="mr-2"> A. Sah dilakukan karena gambar sudah diunggah secara bebas di internet.</label>
+                        <label class="block p-3 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer"><input type="radio" name="q4" value="b" class="mr-2"> B. Melanggar ketentuan UU Hak Cipta Pasal 113 mengenai penggunaan komersial ciptaan tanpa izin pencipta (pembajakan/plagiasi).</label>
+                        <label class="block p-3 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer"><input type="radio" name="q4" value="c" class="mr-2"> C. Hanya melanggar etika pertemanan biasa.</label>
+                        <label class="block p-3 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer"><input type="radio" name="q4" value="d" class="mr-2"> D. Melanggar UU PDP karena menyangkut data pribadi ilustrator.</label>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200" data-qid="5">
+                    <p class="font-bold text-slate-900 mb-3">5. Berdasarkan analisis studi kasus video deepfake (pidato tokoh publik berbahasa asing), langkah Computational Thinking yang PALING tepat adalah:</p>
+                    <div class="space-y-2 text-sm">
+                        <label class="block p-3 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer"><input type="radio" name="q5" value="a" class="mr-2"> A. Langsung menyebarkan video ke media sosial.</label>
+                        <label class="block p-3 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer"><input type="radio" name="q5" value="b" class="mr-2"> B. Dekomposisi masalah, analisis sinkronisasi visual/audio, verifikasi silang ke sumber kredibel, dan menolak menyebarkan.</label>
+                        <label class="block p-3 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer"><input type="radio" name="q5" value="c" class="mr-2"> C. Melaporkan pembuat video tanpa analisis.</label>
+                        <label class="block p-3 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer"><input type="radio" name="q5" value="d" class="mr-2"> D. Menganggap seluruh video di internet adalah fakta.</label>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200" data-qid="6">
+                    <p class="font-bold text-slate-900 mb-3">6. Dalam revisi UU ITE terbaru (UU No. 1 Tahun 2024), aturan pencemaran nama baik (Pasal 27A) mengalami pembaruan penting yaitu:</p>
+                    <div class="space-y-2 text-sm">
+                        <label class="block p-3 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer"><input type="radio" name="q6" value="a" class="mr-2"> A. Hukuman diperberat menjadi minimal 10 tahun.</label>
+                        <label class="block p-3 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer"><input type="radio" name="q6" value="b" class="mr-2"> B. Ditegaskan sebagai murni delik aduan dan mengedepankan pendekatan keadilan restoratif (restorative justice).</label>
+                        <label class="block p-3 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer"><input type="radio" name="q6" value="c" class="mr-2"> C. Pasal tersebut dihapus total.</label>
+                        <label class="block p-3 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer"><input type="radio" name="q6" value="d" class="mr-2"> D. Pasal hanya berlaku untuk perusahaan.</label>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200" data-qid="7">
+                    <p class="font-bold text-slate-900 mb-3">7. Manakah yang dikategorikan sebagai Data Pribadi Bersifat Spesifik (Sangat Rahasia) menurut UU PDP?</p>
+                    <div class="space-y-2 text-sm">
+                        <label class="block p-3 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer"><input type="radio" name="q7" value="a" class="mr-2"> A. Nama lengkap dan jenis kelamin.</label>
+                        <label class="block p-3 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer"><input type="radio" name="q7" value="b" class="mr-2"> B. Alamat domisili dan nomor telepon.</label>
+                        <label class="block p-3 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer"><input type="radio" name="q7" value="c" class="mr-2"> C. Data kesehatan, biometrik (sidik jari/wajah), dan catatan keuangan pribadi.</label>
+                        <label class="block p-3 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer"><input type="radio" name="q7" value="d" class="mr-2"> D. Agama dan kewarganegaraan.</label>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200" data-qid="8">
+                    <p class="font-bold text-slate-900 mb-3">8. AI memberikan jawaban rumus matematika dengan angka spesifik dan penjelasan meyakinkan, namun setelah dihitung manual ternyata salah total. Fenomena ini disebut:</p>
+                    <div class="space-y-2 text-sm">
+                        <label class="block p-3 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer"><input type="radio" name="q8" value="a" class="mr-2"> A. System Crash server total.</label>
+                        <label class="block p-3 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer"><input type="radio" name="q8" value="b" class="mr-2"> B. AI Hallucination (Halusinasi AI), di mana model menghasilkan informasi keliru dengan tingkat keyakinan tinggi.</label>
+                        <label class="block p-3 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer"><input type="radio" name="q8" value="c" class="mr-2"> C. Serangan hacker siber.</label>
+                        <label class="block p-3 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer"><input type="radio" name="q8" value="d" class="mr-2"> D. Pelanggaran Hak Cipta software.</label>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200" data-qid="9">
+                    <p class="font-bold text-slate-900 mb-3">9. E-commerce mengalami kebocoran jutaan data pengguna akibat kelalaian enkripsi server. Sanksi berdasarkan UU PDP bagi korporasi adalah:</p>
+                    <div class="space-y-2 text-sm">
+                        <label class="block p-3 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer"><input type="radio" name="q9" value="a" class="mr-2"> A. Teguran lisan dari netizen.</label>
+                        <label class="block p-3 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer"><input type="radio" name="q9" value="b" class="mr-2"> B. Sanksi administratif, denda hingga 2% dari pendapatan tahunan, atau pidana pengurusnya.</label>
+                        <label class="block p-3 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer"><input type="radio" name="q9" value="c" class="mr-2"> C. Perusahaan otomatis dibubarkan menteri.</label>
+                        <label class="block p-3 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer"><input type="radio" name="q9" value="d" class="mr-2"> D. Permintaan maaf di koran.</label>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200" data-qid="10">
+                    <p class="font-bold text-slate-900 mb-3">10. Kreator mencuri desain UI/UX startup lain, memodifikasinya sedikit, lalu menggunakan AI membuat suara CEO startup tersebut seolah mengaku bangkrut untuk menjatuhkan saham. Pelanggaran hukumnya:</p>
+                    <div class="space-y-2 text-sm">
+                        <label class="block p-3 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer"><input type="radio" name="q10" value="a" class="mr-2"> A. Hanya melanggar UU Hak Cipta.</label>
+                        <label class="block p-3 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer"><input type="radio" name="q10" value="b" class="mr-2"> B. Melanggar UU Hak Cipta (desain), UU ITE Pasal 28 & 35 (manipulasi informasi & hoaks ekonomi), serta etika deepfake.</label>
+                        <label class="block p-3 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer"><input type="radio" name="q10" value="c" class="mr-2"> C. Tidak ada pelanggaran.</label>
+                        <label class="block p-3 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer"><input type="radio" name="q10" value="d" class="mr-2"> D. Hanya melanggar UU PDP.</label>
+                    </div>
+                </div>
+
+                <!-- SOAL BENAR / SALAH (11 - 15) -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200" data-qid="11">
+                    <p class="font-bold text-slate-900 mb-3">11. (Benar / Salah) Karya seni atau ilustrasi digital yang dihasilkan 100% oleh kecerdasan buatan (AI) secara otomatis mendapatkan pelindungan penuh Hak Cipta di Indonesia.</p>
+                    <div class="space-y-2 text-sm">
+                        <label class="block p-3 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer"><input type="radio" name="q11" value="benar" class="mr-2"> Benar</label>
+                        <label class="block p-3 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer"><input type="radio" name="q11" value="salah" class="mr-2"> Salah</label>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200" data-qid="12">
+                    <p class="font-bold text-slate-900 mb-3">12. (Benar / Salah) Jika anak di bawah umur melakukan pelanggaran siber (seperti menyebarkan hoaks), hukum di Indonesia langsung menjatuhkan vonis penjara orang dewasa tanpa proses peradilan anak.</p>
+                    <div class="space-y-2 text-sm">
+                        <label class="block p-3 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer"><input type="radio" name="q12" value="benar" class="mr-2"> Benar</label>
+                        <label class="block p-3 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer"><input type="radio" name="q12" value="salah" class="mr-2"> Salah</label>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200" data-qid="13">
+                    <p class="font-bold text-slate-900 mb-3">13. (Benar / Salah) Pendekatan Restorative Justice mengutamakan pemulihan keadaan dan kerugian korban serta dialog, bukan semata-mata pembalasan atau hukuman penjara bagi pelaku.</p>
+                    <div class="space-y-2 text-sm">
+                        <label class="block p-3 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer"><input type="radio" name="q13" value="benar" class="mr-2"> Benar</label>
+                        <label class="block p-3 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer"><input type="radio" name="q13" value="salah" class="mr-2"> Salah</label>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200" data-qid="14">
+                    <p class="font-bold text-slate-900 mb-3">14. (Benar / Salah) Berpikir komputasional tidak berguna dalam literasi digital karena literasi digital murni hanya soal kemampuan mengetik cepat di gawai.</p>
+                    <div class="space-y-2 text-sm">
+                        <label class="block p-3 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer"><input type="radio" name="q14" value="benar" class="mr-2"> Benar</label>
+                        <label class="block p-3 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer"><input type="radio" name="q14" value="salah" class="mr-2"> Salah</label>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200" data-qid="15">
+                    <p class="font-bold text-slate-900 mb-3">15. (Benar / Salah) Menggunakan elemen template atau mere-create desain AI secara manual di Canva dengan modifikasi kreatif sendiri mengubah statusnya bukan lagi 100% buatan AI murni.</p>
+                    <div class="space-y-2 text-sm">
+                        <label class="block p-3 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer"><input type="radio" name="q15" value="benar" class="mr-2"> Benar</label>
+                        <label class="block p-3 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer"><input type="radio" name="q15" value="salah" class="mr-2"> Salah</label>
+                    </div>
+                </div>
+
+                <div class="text-center pt-4">
+                    <button type="button" onclick="evaluateQuiz()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-8 py-3 rounded-xl shadow-lg transition">
+                        Periksa Hasil Kuis & Lihat Pembahasan (15 Soal)
+                    </button>
+                </div>
+            </form>
+
+            <div id="quizResult" class="hidden mt-8 p-6 bg-white rounded-2xl shadow-lg text-center border-2 border-indigo-500">
+                <h4 class="text-2xl font-bold text-slate-900 mb-2">Hasil Evaluasi Kuis Anda</h4>
+                <p id="scoreText" class="text-lg font-semibold text-indigo-600 mb-4"></p>
+                <div id="feedbackText" class="text-slate-600 text-sm mb-6"></div>
+                <div id="detailedReview" class="text-left space-y-4 border-t pt-6">
+                    <h5 class="font-bold text-slate-900 text-lg">Pembahasan Detail Per Soal:</h5>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-slate-400 py-8 text-center text-xs">
+        <p>Hub Pembelajaran Terpadu V6.0 • SMKN 1 Sampit • Literasi Digital, UU ITE, UU PDP, HKI & AI (Fase E)</p>
+    </footer>
+
+    <!-- Script Chart.js & Interaksi -->
+    <script>
+        function closePemantikModal() {
+            document.getElementById('pemantikModal').classList.add('hidden');
+        }
+
+        const ctx1 = document.getElementById('chartAdopsiAI').getContext('2d');
+        new Chart(ctx1, {
+            type: 'line',
+            data: {
+                labels: ['2024', '2025', '2026'],
+                datasets: [{
+                    label: 'Tingkat Adopsi AI (%)',
+                    data: [45, 72, 88],
+                    borderColor: '#4f46e5',
+                    backgroundColor: 'rgba(79, 70, 229, 0.1)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.3
+                }]
+            },
+            options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, max: 100 } } }
+        });
+
+        const ctx2 = document.getElementById('chartManipulasiAI').getContext('2d');
+        new Chart(ctx2, {
+            type: 'bar',
+            data: {
+                labels: ['2024', '2025', '2026'],
+                datasets: [{
+                    label: 'Kasus Deepfake & Sintetis (Ribuan)',
+                    data: [120, 250, 410],
+                    backgroundColor: ['#f87171', '#fb923c', '#ef4444'],
+                    borderWidth: 1
+                }]
+            },
+            options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } } }
+        });
+
+        const quizData = {
+            q1: { correct: 'b', explanation: 'Manipulasi dokumen elektronik atau metadata struk agar seolah-olah otentik diatur secara tegas dalam Pasal 35 UU ITE dengan ancaman pidana berat.' },
+            q2: { correct: 'b', explanation: 'NIK dan riwayat kesehatan diklasifikasikan sebagai data spesifik rahasia dalam UU PDP; kelalaian institusi/operator dalam penyebarannya dapat dikenakan sanksi administratif dan pidana.' },
+            q3: { correct: 'b', explanation: 'Mengunggah data rahasia perusahaan atau password server ke AI publik melanggar kerahasiaan karena input tersebut dapat tersimpan dan terekam dalam database pelatihan sistem.' },
+            q4: { correct: 'b', explanation: 'Mengambil dan memperjualbelikan karya cipta orang lain secara komersial tanpa izin melanggar ketentuan UU Hak Cipta No. 28 Tahun 2014 (Pasal 113) dengan ancaman pidana penjara dan denda.' },
+            q5: { correct: 'b', explanation: 'Penerapan berpikir komputasional mengharuskan dekomposisi masalah, pengecekan sinkronisasi visual/audio, serta verifikasi silang sebelum menyebarkan konten.' },
+            q6: { correct: 'b', explanation: 'Revisi UU ITE terbaru (UU No. 1 Tahun 2024) menegaskan pencemaran nama baik (Pasal 27A) sebagai murni delik aduan serta mengedepankan prinsip keadilan restoratif.' },
+            q7: { correct: 'c', explanation: 'Data kesehatan, biometrik (sidik jari/wajah), dan catatan keuangan pribadi adalah data spesifik yang memerlukan proteksi ekstra berdasarkan UU PDP.' },
+            q8: { correct: 'b', explanation: 'Halusinasi AI (AI Hallucination) terjadi ketika model memberikan informasi keliru dengan tingkat keyakinan yang sangat tinggi karena cara kerja berbasis probabilitas statistik.' },
+            q9: { correct: 'b', explanation: 'Berdasarkan UU PDP, korporasi yang lalai menjaga keamanan data pengguna dapat dikenakan sanksi administratif berupa denda hingga 2% dari pendapatan tahunan.' },
+            q10: { correct: 'b', explanation: 'Kasus tersebut mencakup pelanggaran multi-pilar: UU Hak Cipta (pencurian desain UI/UX), UU ITE Pasal 28 & 35 (manipulasi informasi & hoaks ekonomi), serta etika deepfake.' },
+            q11: { correct: 'salah', explanation: 'Salah. Berdasarkan ketentuan hukum di Indonesia dan aturan umum HKI, karya yang 100% dihasilkan oleh kecerdasan buatan (AI) tanpa sentuhan kreativitas manusia tidak mendapatkan pelindungan Hak Cipta.' },
+            q12: { correct: 'salah', explanation: 'Salah. Anak di bawah umur yang berkonflik dengan hukum dilindungi oleh UU Sistem Peradilan Pidana Anak (SPPA) yang mewajibkan upaya diversi dan pendekatan restoratif, bukan langsung dipenjara layaknya orang dewasa.' },
+            q13: { correct: 'benar', explanation: 'Benar. Restorative Justice berfokus pada dialog, pemulihan kerugian korban, dan tanggung jawab pelaku, bukan sekadar memenjarakan.' },
+            q14: { correct: 'salah', explanation: 'Salah. Berpikir komputasional sangat penting dalam literasi digital untuk melatih nalar kritis, dekomposisi masalah, dan verifikasi silang terhadap hoaks atau disinformasi.' },
+            q15: { correct: 'benar', explanation: 'Benar. Menggunakan elemen template atau mere-create desain AI secara manual di Canva dengan modifikasi kreatif melibatkan peran manusia (human-in-the-loop), sehingga bukan 100% buatan AI murni.' }
+        };
+
+        function evaluateQuiz() {
+            let score = 0;
+            let totalSoal = Object.keys(quizData).length;
+            let reviewHTML = '';
+
+            for (let q in quizData) {
+                let selected = document.querySelector(`input[name="${q}"]:checked`);
+                let isCorrect = selected && selected.value === quizData[q].correct;
+                
+                if (isCorrect) score += (100 / totalSoal);
+
+                if (selected) {
+                    if (isCorrect) {
+                        selected.parentElement.classList.add('bg-emerald-50', 'border-emerald-500', 'font-semibold');
+                    } else {
+                        selected.parentElement.classList.add('bg-red-50', 'border-red-500');
+                    }
+                }
+
+                reviewHTML += `
+                    <div class="p-4 rounded-xl border ${isCorrect ? 'bg-emerald-50/50 border-emerald-200' : 'bg-red-50/50 border-red-200'}">
+                        <p class="font-bold text-slate-900 text-sm mb-1">Soal ${q.replace('q','')}: ${isCorrect ? '<span class="text-emerald-600">✔ Benar</span>' : '<span class="text-red-600">✖ Salah</span>'}</p>
+                        <p class="text-xs text-slate-700 mb-2"><b>Pembahasan:</b> ${quizData[q].explanation}</p>
+                    </div>
+                `;
+            }
+
+            let resultBox = document.getElementById('quizResult');
+            let scoreText = document.getElementById('scoreText');
+            let feedbackText = document.getElementById('feedbackText');
+            let detailedReview = document.getElementById('detailedReview');
+
+            resultBox.classList.remove('hidden');
+            scoreText.textContent = `Skor Akhir Anda: ${Math.round(score)} dari 100`;
+
+            if (score >= 80) {
+                feedbackText.textContent = "Luar biasa! Pemahaman murid sangat matang terhadap seluruh materi literasi digital, regulasi hukum siber, dan etika AI.";
+            } else if (score >= 60) {
+                feedbackText.textContent = "Cukup baik, namun beberapa konsep hukum atau etika AI masih perlu ditinjau kembali pada pembahasan di bawah.";
+            } else {
+                feedbackText.textContent = "Ayo pelajari kembali materi pada modul agar lebih siap menguasai kompetensi literasi digital!";
+            }
+
+            detailedReview.innerHTML = '<h5 class="font-bold text-slate-900 text-lg mb-3">Pembahasan Detail Per Soal:</h5>' + reviewHTML;
+            resultBox.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function acakKelompokOtomatis() {
+            const rawText = document.getElementById('inputDaftarMurid').value.trim();
+            
+            if (!rawText) {
+                alert('Silakan masukkan daftar nama murid terlebih dahulu!');
+                return;
+            }
+
+            let daftarMurid = rawText.split('\n').map(nama => nama.trim()).filter(nama => nama.length > 0);
+
+            if (daftarMurid.length < 3) {
+                alert('Masukkan minimal 3 nama murid agar dapat dibagi ke dalam 3 kelompok.');
+                return;
+            }
+
+            for (let i = daftarMurid.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [daftarMurid[i], daftarMurid[j]] = [daftarMurid[j], daftarMurid[i]];
+            }
+
+            let kelompokA = [];
+            let kelompokB = [];
+            let kelompokC = [];
+
+            daftarMurid.forEach((nama, index) => {
+                if (index % 3 === 0) {
+                    kelompokA.push(nama);
+                } else if (index % 3 === 1) {
+                    kelompokB.push(nama);
+                } else {
+                    kelompokC.push(nama);
+                }
+            });
+
+            renderList('listKelompokA', kelompokA);
+            renderList('listKelompokB', kelompokB);
+            renderList('listKelompokC', kelompokC);
+        }
+
+        function renderList(elementId, arrayNama) {
+            const ulElement = document.getElementById(elementId);
+            ulElement.innerHTML = '';
+            
+            if (arrayNama.length === 0) {
+                ulElement.innerHTML = '<li class="italic text-indigo-400">Kosong</li>';
+                return;
+            }
+
+            arrayNama.forEach(nama => {
+                const li = document.createElement('li');
+                li.textContent = nama;
+                ulElement.appendChild(li);
+            });
+        }
+    </script>
+</body>
+</html>
