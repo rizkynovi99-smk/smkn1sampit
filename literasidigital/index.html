@@ -391,6 +391,70 @@
         </div>
     </section>
 
+    <!-- Section: Generator Pembagi 3 Kelompok Otomatis -->
+    <section id="pembagi-kelompok" class="py-16 px-4 max-w-7xl mx-auto">
+        <div class="bg-white p-8 md:p-12 rounded-3xl shadow-xl border border-slate-200">
+            <div class="text-center mb-8">
+                <span class="bg-indigo-100 text-indigo-700 font-bold text-xs px-3 py-1 rounded-full uppercase tracking-wider">Alat Bantu Guru</span>
+                <h3 class="text-2xl md:text-3xl font-extrabold text-slate-900 mt-2">Generator Pembagi 3 Kelompok Otomatis (LKPD 1)</h3>
+                <p class="text-slate-600 text-sm max-w-2xl mx-auto mt-1">Masukkan daftar nama murid di bawah ini. Sistem akan mengacak dan membaginya secara merata ke dalam 3 kelompok investigasi (Kelompok A, B, dan C).</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Input Daftar Nama -->
+                <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200 flex flex-col justify-between">
+                    <div>
+                        <label for="inputDaftarMurid" class="block font-bold text-slate-900 text-sm mb-2">
+                            <i class="fa-solid fa-users-line text-indigo-600 mr-2"></i> Daftar Nama Murid (Satu nama per baris):
+                        </label>
+                        <p class="text-xs text-slate-500 mb-3">Copy-paste daftar absen atau nama murid kelas Anda langsung di sini.</p>
+                        <textarea id="inputDaftarMurid" rows="8" class="w-full p-4 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:outline-none text-sm text-slate-800 font-mono" placeholder="Contoh:&#10;Andi Saputra&#10;Bunga Lestari&#10;Citra Kirana&#10;Dedi Kurniawan&#10;Eka Pratama&#10;Fajar Hidayat"></textarea>
+                    </div>
+                    <button type="button" onclick="acakKelompokOtomatis()" class="mt-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-xl shadow-lg transition transform hover:scale-[1.02] text-sm">
+                        <i class="fa-solid fa-shuffle mr-2"></i> Acak dan Bagi ke 3 Kelompok
+                    </button>
+                </div>
+
+                <!-- Hasil Pembagian Kelompok -->
+                <div class="bg-indigo-900 text-white p-6 rounded-2xl shadow-md flex flex-col justify-between">
+                    <div>
+                        <h4 class="font-bold text-indigo-200 text-base mb-4 flex items-center">
+                            <i class="fa-solid fa-clipboard-list mr-2"></i> Hasil Pembagian Kelompok Otomatis:
+                        </h4>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+                            <!-- Kelompok A -->
+                            <div class="bg-indigo-950 p-4 rounded-xl border border-indigo-800">
+                                <h5 class="font-bold text-indigo-300 mb-2 border-b border-indigo-800 pb-1">Kelompok A (Deepfake)</h5>
+                                <ul id="listKelompokA" class="space-y-1 text-indigo-100 list-disc list-inside">
+                                    <li class="italic text-indigo-400">Belum diacak...</li>
+                                </ul>
+                            </div>
+                            <!-- Kelompok B -->
+                            <div class="bg-indigo-950 p-4 rounded-xl border border-indigo-800">
+                                <h5 class="font-bold text-amber-300 mb-2 border-b border-indigo-800 pb-1">Kelompok B (Hak Cipta)</h5>
+                                <ul id="listKelompokB" class="space-y-1 text-indigo-100 list-disc list-inside">
+                                    <li class="italic text-indigo-400">Belum diacak...</li>
+                                </ul>
+                            </div>
+                            <!-- Kelompok C -->
+                            <div class="bg-indigo-950 p-4 rounded-xl border border-indigo-800">
+                                <h5 class="font-bold text-emerald-300 mb-2 border-b border-indigo-800 pb-1">Kelompok C (UU PDP)</h5>
+                                <ul id="listKelompokC" class="space-y-1 text-indigo-100 list-disc list-inside">
+                                    <li class="italic text-indigo-400">Belum diacak...</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-4 pt-3 border-t border-indigo-800 text-[11px] text-indigo-300 text-center">
+                        <i class="fa-solid fa-circle-info mr-1"></i> Anggota kelompok terdistribusi secara acak dan merata otomatis.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
 <!-- Section 7: Proyek Poster Digital -->
     <section id="proyek-berikutnya" class="py-16 px-4 max-w-6xl mx-auto">
         <div class="bg-gradient-to-r from-purple-900 to-indigo-900 text-white p-8 md:p-12 rounded-3xl shadow-2xl border-2 border-purple-500/50">
@@ -949,6 +1013,66 @@
             detailedReview.innerHTML = '<h5 class="font-bold text-slate-900 text-lg mb-3">Pembahasan Detail Per Soal:</h5>' + reviewHTML;
             resultBox.scrollIntoView({ behavior: 'smooth' });
         }
+
+        function acakKelompokOtomatis() {
+            const rawText = document.getElementById('inputDaftarMurid').value.trim();
+            
+            if (!rawText) {
+                alert('Silakan masukkan daftar nama murid terlebih dahulu!');
+                return;
+            }
+
+            // Memisahkan baris teks menjadi array nama dan menghapus baris kosong
+            let daftarMurid = rawText.split('\n').map(nama => nama.trim()).filter(nama => nama.length > 0);
+
+            if (daftarMurid.length < 3) {
+                alert('Masukkan minimal 3 nama murid agar dapat dibagi ke dalam 3 kelompok.');
+                return;
+            }
+
+            // Mengacak array nama murid (Fisher-Yates Shuffle Algorithm)
+            for (let i = daftarMurid.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [daftarMurid[i], daftarMurid[j]] = [daftarMurid[j], daftarMurid[i]];
+            }
+
+            // Membagi array menjadi 3 kelompok secara merata
+            let kelompokA = [];
+            let kelompokB = [];
+            let kelompokC = [];
+
+            daftarMurid.forEach((nama, index) => {
+                if (index % 3 === 0) {
+                    kelompokA.push(nama);
+                } else if (index % 3 === 1) {
+                    kelompokB.push(nama);
+                } else {
+                    kelompokC.push(nama);
+                }
+            });
+
+            // Merender hasil ke dalam elemen HTML list
+            renderList('listKelompokA', kelompokA);
+            renderList('listKelompokB', kelompokB);
+            renderList('listKelompokC', kelompokC);
+        }
+
+        function renderList(elementId, arrayNama) {
+            const ulElement = document.getElementById(elementId);
+            ulElement.innerHTML = '';
+            
+            if (arrayNama.length === 0) {
+                ulElement.innerHTML = '<li class="italic text-indigo-400">Kosong</li>';
+                return;
+            }
+
+            arrayNama.forEach(nama => {
+                const li = document.createElement('li');
+                li.textContent = nama;
+                ulElement.appendChild(li);
+            });
+        }
+
     </script>
 </body>
 </html>
