@@ -1239,163 +1239,181 @@
     </footer>
 
     <!-- Script Chart.js & Interaksi -->
-    <script>
-       
-    
-
-        const ctx1 = document.getElementById('chartAdopsiAI').getContext('2d');
-        new Chart(ctx1, {
-            type: 'line',
-            data: {
-                labels: ['2024', '2025', '2026'],
-                datasets: [{
-                    label: 'Tingkat Adopsi AI (%)',
-                    data: [45, 72, 88],
-                    borderColor: '#4f46e5',
-                    backgroundColor: 'rgba(79, 70, 229, 0.1)',
-                    borderWidth: 3,
-                    fill: true,
-                    tension: 0.3
-                }]
-            },
-            options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, max: 100 } } }
-        });
-
-        const ctx2 = document.getElementById('chartManipulasiAI').getContext('2d');
-        new Chart(ctx2, {
-            type: 'bar',
-            data: {
-                labels: ['2024', '2025', '2026'],
-                datasets: [{
-                    label: 'Kasus Deepfake & Sintetis (Ribuan)',
-                    data: [120, 250, 410],
-                    backgroundColor: ['#f87171', '#fb923c', '#ef4444'],
-                    borderWidth: 1
-                }]
-            },
-            options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } } }
-        });
-
-        const quizData = {
-            q1: { correct: 'b', explanation: 'Manipulasi dokumen elektronik atau metadata struk agar seolah-olah otentik diatur secara tegas dalam Pasal 35 UU ITE dengan ancaman pidana berat.' },
-            q2: { correct: 'b', explanation: 'NIK dan riwayat kesehatan diklasifikasikan sebagai data spesifik rahasia dalam UU PDP; kelalaian institusi/operator dalam penyebarannya dapat dikenakan sanksi administratif dan pidana.' },
-            q3: { correct: 'b', explanation: 'Mengunggah data rahasia perusahaan atau password server ke AI publik melanggar kerahasiaan karena input tersebut dapat tersimpan dan terekam dalam database pelatihan sistem.' },
-            q4: { correct: 'b', explanation: 'Lisensi MIT adalah lisensi open-source yang sangat permisif, namun tetap mewajibkan penyertaan atribusi atau catatan hak cipta pembuat aslinya.' },
-            q5: { correct: 'b', explanation: 'Penerapan berpikir komputasional mengharuskan dekomposisi masalah, pengecekan sinkronisasi visual/audio, serta verifikasi silang sebelum menyebarkan konten.' },
-            q6: { correct: 'b', explanation: 'Revisi UU ITE terbaru (UU No. 1 Tahun 2024) menegaskan pencemaran nama baik (Pasal 27A) sebagai murni delik aduan serta mengedepankan prinsip keadilan restoratif.' },
-            q7: { correct: 'c', explanation: 'Data kesehatan, biometrik (sidik jari/wajah), dan catatan keuangan pribadi adalah data spesifik yang memerlukan proteksi ekstra berdasarkan UU PDP.' },
-            q8: { correct: 'b', explanation: 'Halusinasi AI (AI Hallucination) terjadi ketika model memberikan informasi keliru dengan tingkat keyakinan yang sangat tinggi karena cara kerja berbasis probabilitas statistik.' },
-            q9: { correct: 'b', explanation: 'Berdasarkan UU PDP, korporasi yang lalai menjaga keamanan data pengguna dapat dikenakan sanksi administratif berupa denda hingga 2% dari pendapatan tahunan.' },
-            q10: { correct: 'b', explanation: 'Kasus tersebut mencakup pelanggaran multi-pilar: UU Hak Cipta (pencurian desain UI/UX), UU ITE Pasal 28 & 35 (manipulasi informasi & hoaks ekonomi), serta etika deepfake.' }
+   <script>
+    // Memastikan seluruh elemen HTML sudah siap sebelum script dijalankan
+    document.addEventListener("DOMContentLoaded", function() {
+        
+        // Fungsi Tombol Pemantik
+        window.closePemantikModal = function() {
+            const modal = document.getElementById('pemantikModal');
+            if (modal) {
+                modal.classList.add('hidden');
+            }
         };
 
-        function evaluateQuiz() {
-            let score = 0;
-            let reviewHTML = '';
-
-            for (let q in quizData) {
-                let selected = document.querySelector(`input[name="${q}"]:checked`);
-                let isCorrect = selected && selected.value === quizData[q].correct;
-                
-                if (isCorrect) score += 10;
-
-                if (selected) {
-                    if (isCorrect) {
-                        selected.parentElement.classList.add('bg-emerald-50', 'border-emerald-500', 'font-semibold');
-                    } else {
-                        selected.parentElement.classList.add('bg-red-50', 'border-red-500');
-                    }
-                }
-
-                reviewHTML += `
-                    <div class="p-4 rounded-xl border ${isCorrect ? 'bg-emerald-50/50 border-emerald-200' : 'bg-red-50/50 border-red-200'}">
-                        <p class="font-bold text-slate-900 text-sm mb-1">Soal ${q.replace('q','')}: ${isCorrect ? '<span class="text-emerald-600">✔ Benar</span>' : '<span class="text-red-600">✖ Salah</span>'}</p>
-                        <p class="text-xs text-slate-700 mb-2"><b>Pembahasan:</b> ${quizData[q].explanation}</p>
-                    </div>
-                `;
-            }
-
-            let resultBox = document.getElementById('quizResult');
-            let scoreText = document.getElementById('scoreText');
-            let feedbackText = document.getElementById('feedbackText');
-            let detailedReview = document.getElementById('detailedReview');
-
-            resultBox.classList.remove('hidden');
-            scoreText.textContent = `Skor Anda: ${score} dari 100`;
-
-            if (score >= 80) {
-                feedbackText.textContent = "Luar biasa! Murid memiliki pemahaman yang sangat matang mengenai Empat Pegangan Literasi Digital, Hukum Siber, dan Etika AI.";
-            } else if (score >= 60) {
-                feedbackText.textContent = "Cukup baik, namun beberapa konsep hukum atau etika AI masih perlu ditinjau kembali pada pembahasan di bawah.";
-            } else {
-                feedbackText.textContent = "Ayo pelajari kembali materi Empat Pegangan Utama agar lebih siap menghadapi tantangan dunia digital!";
-            }
-
-            detailedReview.innerHTML = '<h5 class="font-bold text-slate-900 text-lg mb-3">Pembahasan Detail Per Soal:</h5>' + reviewHTML;
-            resultBox.scrollIntoView({ behavior: 'smooth' });
+        // Inisialisasi Chart 1 (Adopsi AI)
+        const canvas1 = document.getElementById('chartAdopsiAI');
+        if (canvas1) {
+            const ctx1 = canvas1.getContext('2d');
+            new Chart(ctx1, {
+                type: 'line',
+                data: {
+                    labels: ['2024', '2025', '2026'],
+                    datasets: [{
+                        label: 'Tingkat Adopsi AI (%)',
+                        data: [45, 72, 88],
+                        borderColor: '#4f46e5',
+                        backgroundColor: 'rgba(79, 70, 229, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.3
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, max: 100 } } }
+            });
         }
 
-        function acakKelompokOtomatis() {
-            const rawText = document.getElementById('inputDaftarMurid').value.trim();
+        // Inisialisasi Chart 2 (Manipulasi AI)
+        const canvas2 = document.getElementById('chartManipulasiAI');
+        if (canvas2) {
+            const ctx2 = canvas2.getContext('2d');
+            new Chart(ctx2, {
+                type: 'bar',
+                data: {
+                    labels: ['2024', '2025', '2026'],
+                    datasets: [{
+                        label: 'Kasus Deepfake & Sintetis (Ribuan)',
+                        data: [120, 250, 410],
+                        backgroundColor: ['#f87171', '#fb923c', '#ef4444'],
+                        borderWidth: 1
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } } }
+            });
+        }
+    });
+
+    // Data dan Fungsi Kuis / Generator Kelompok Tetap di Luar / Global
+    const quizData = {
+        q1: { correct: 'b', explanation: 'Manipulasi dokumen elektronik atau metadata struk agar seolah-olah otentik diatur secara tegas dalam Pasal 35 UU ITE dengan ancaman pidana berat.' },
+        q2: { correct: 'b', explanation: 'NIK dan riwayat kesehatan diklasifikasikan sebagai data spesifik rahasia dalam UU PDP; kelalaian institusi/operator dalam penyebarannya dapat dikenakan sanksi administratif dan pidana.' },
+        q3: { correct: 'b', explanation: 'Mengunggah data rahasia perusahaan atau password server ke AI publik melanggar kerahasiaan karena input tersebut dapat tersimpan dan terekam dalam database pelatihan sistem.' },
+        q4: { correct: 'b', explanation: 'Mengambil dan memperjualbelikan karya cipta orang lain secara komersial tanpa izin melanggar ketentuan UU Hak Cipta No. 28 Tahun 2014 (Pasal 113) dengan ancaman pidana penjara dan denda.' },
+        q5: { correct: 'b', explanation: 'Penerapan berpikir komputasional mengharuskan dekomposisi masalah, pengecekan sinkronisasi visual/audio, serta verifikasi silang sebelum menyebarkan konten.' },
+        q6: { correct: 'b', explanation: 'Revisi UU ITE terbaru (UU No. 1 Tahun 2024) menegaskan pencemaran nama baik (Pasal 27A) sebagai murni delik aduan serta mengedepankan prinsip keadilan restoratif.' },
+        q7: { correct: 'c', explanation: 'Data kesehatan, biometrik (sidik jari/wajah), dan catatan keuangan pribadi adalah data spesifik yang memerlukan proteksi ekstra berdasarkan UU PDP.' },
+        q8: { correct: 'b', explanation: 'Halusinasi AI (AI Hallucination) terjadi ketika model memberikan informasi keliru dengan tingkat keyakinan yang sangat tinggi karena cara kerja berbasis probabilitas statistik.' },
+        q9: { correct: 'b', explanation: 'Berdasarkan UU PDP, korporasi yang lalai menjaga keamanan data pengguna dapat dikenakan sanksi administratif berupa denda hingga 2% dari pendapatan tahunan.' },
+        q10: { correct: 'b', explanation: 'Kasus tersebut mencakup pelanggaran multi-pilar: UU Hak Cipta (pencurian desain UI/UX), UU ITE Pasal 28 & 35 (manipulasi informasi & hoaks ekonomi), serta etika deepfake.' },
+        q11: { correct: 'salah', explanation: 'Salah. Berdasarkan ketentuan hukum di Indonesia dan aturan umum HKI, karya yang 100% dihasilkan oleh kecerdasan buatan (AI) tanpa sentuhan kreativitas manusia tidak mendapatkan pelindungan Hak Cipta.' },
+        q12: { correct: 'salah', explanation: 'Salah. Anak di bawah umur yang berkonflik dengan hukum dilindungi oleh UU Sistem Peradilan Pidana Anak (SPPA) yang mewajibkan upaya diversi dan pendekatan restoratif, bukan langsung dipenjara layaknya orang dewasa.' },
+        q13: { correct: 'benar', explanation: 'Benar. Restorative Justice berfokus pada dialog, pemulihan kerugian korban, dan tanggung jawab pelaku, bukan sekadar memenjarakan.' },
+        q14: { correct: 'salah', explanation: 'Salah. Berpikir komputasional sangat penting dalam literasi digital untuk melatih nalar kritis, dekomposisi masalah, dan verifikasi silang terhadap hoaks atau disinformasi.' },
+        q15: { correct: 'benar', explanation: 'Benar. Menggunakan elemen template atau mere-create desain AI secara manual di Canva dengan modifikasi kreatif melibatkan peran manusia (human-in-the-loop), sehingga bukan 100% buatan AI murni.' }
+    };
+
+    function evaluateQuiz() {
+        let score = 0;
+        let totalSoal = Object.keys(quizData).length;
+        let reviewHTML = '';
+
+        for (let q in quizData) {
+            let selected = document.querySelector(`input[name="${q}"]:checked`);
+            let isCorrect = selected && selected.value === quizData[q].correct;
             
-            if (!rawText) {
-                alert('Silakan masukkan daftar nama murid terlebih dahulu!');
-                return;
-            }
+            if (isCorrect) score += (100 / totalSoal);
 
-            // Memisahkan baris teks menjadi array nama dan menghapus baris kosong
-            let daftarMurid = rawText.split('\n').map(nama => nama.trim()).filter(nama => nama.length > 0);
-
-            if (daftarMurid.length < 3) {
-                alert('Masukkan minimal 3 nama murid agar dapat dibagi ke dalam 3 kelompok.');
-                return;
-            }
-
-            // Mengacak array nama murid (Fisher-Yates Shuffle Algorithm)
-            for (let i = daftarMurid.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [daftarMurid[i], daftarMurid[j]] = [daftarMurid[j], daftarMurid[i]];
-            }
-
-            // Membagi array menjadi 3 kelompok secara merata
-            let kelompokA = [];
-            let kelompokB = [];
-            let kelompokC = [];
-
-            daftarMurid.forEach((nama, index) => {
-                if (index % 3 === 0) {
-                    kelompokA.push(nama);
-                } else if (index % 3 === 1) {
-                    kelompokB.push(nama);
+            if (selected) {
+                if (isCorrect) {
+                    selected.parentElement.classList.add('bg-emerald-50', 'border-emerald-500', 'font-semibold');
                 } else {
-                    kelompokC.push(nama);
+                    selected.parentElement.classList.add('bg-red-50', 'border-red-500');
                 }
-            });
-
-            // Merender hasil ke dalam elemen HTML list
-            renderList('listKelompokA', kelompokA);
-            renderList('listKelompokB', kelompokB);
-            renderList('listKelompokC', kelompokC);
-        }
-
-        function renderList(elementId, arrayNama) {
-            const ulElement = document.getElementById(elementId);
-            ulElement.innerHTML = '';
-            
-            if (arrayNama.length === 0) {
-                ulElement.innerHTML = '<li class="italic text-indigo-400">Kosong</li>';
-                return;
             }
 
-            arrayNama.forEach(nama => {
-                const li = document.createElement('li');
-                li.textContent = nama;
-                ulElement.appendChild(li);
-            });
+            reviewHTML += `
+                <div class="p-4 rounded-xl border ${isCorrect ? 'bg-emerald-50/50 border-emerald-200' : 'bg-red-50/50 border-red-200'}">
+                    <p class="font-bold text-slate-900 text-sm mb-1">Soal ${q.replace('q','')}: ${isCorrect ? '<span class="text-emerald-600">✔ Benar</span>' : '<span class="text-red-600">✖ Salah</span>'}</p>
+                    <p class="text-xs text-slate-700 mb-2"><b>Pembahasan:</b> ${quizData[q].explanation}</p>
+                </div>
+            `;
         }
 
+        let resultBox = document.getElementById('quizResult');
+        let scoreText = document.getElementById('scoreText');
+        let feedbackText = document.getElementById('feedbackText');
+        let detailedReview = document.getElementById('detailedReview');
 
+        resultBox.classList.remove('hidden');
+        scoreText.textContent = `Skor Akhir Anda: ${Math.round(score)} dari 100`;
 
-    </script>
+        if (score >= 80) {
+            feedbackText.textContent = "Luar biasa! Pemahaman murid sangat matang terhadap seluruh materi literasi digital, regulasi hukum siber, dan etika AI.";
+        } else if (score >= 60) {
+            feedbackText.textContent = "Cukup baik, namun beberapa konsep hukum atau etika AI masih perlu ditinjau kembali pada pembahasan di bawah.";
+        } else {
+            feedbackText.textContent = "Ayo pelajari kembali materi pada modul agar lebih siap menguasai kompetensi literasi digital!";
+        }
+
+        detailedReview.innerHTML = '<h5 class="font-bold text-slate-900 text-lg mb-3">Pembahasan Detail Per Soal:</h5>' + reviewHTML;
+        resultBox.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function acakKelompokOtomatis() {
+        const rawText = document.getElementById('inputDaftarMurid').value.trim();
+        
+        if (!rawText) {
+            alert('Silakan masukkan daftar nama murid terlebih dahulu!');
+            return;
+        }
+
+        let daftarMurid = rawText.split('\n').map(nama => nama.trim()).filter(nama => nama.length > 0);
+
+        if (daftarMurid.length < 3) {
+            alert('Masukkan minimal 3 nama murid agar dapat dibagi ke dalam 3 kelompok.');
+            return;
+        }
+
+        for (let i = daftarMurid.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [daftarMurid[i], daftarMurid[j]] = [daftarMurid[j], daftarMurid[i]];
+        }
+
+        let kelompokA = [];
+        let kelompokB = [];
+        let kelompokC = [];
+
+        daftarMurid.forEach((nama, index) => {
+            if (index % 3 === 0) {
+                kelompokA.push(nama);
+            } else if (index % 3 === 1) {
+                kelompokB.push(nama);
+            } else {
+                kelompokC.push(nama);
+            }
+        });
+
+        renderList('listKelompokA', kelompokA);
+        renderList('listKelompokB', kelompokB);
+        renderList('listKelompokC', kelompokC);
+    }
+
+    function renderList(elementId, arrayNama) {
+        const ulElement = document.getElementById(elementId);
+        ulElement.innerHTML = '';
+        
+        if (arrayNama.length === 0) {
+            ulElement.innerHTML = '<li class="italic text-indigo-400">Kosong</li>';
+            return;
+        }
+
+        arrayNama.forEach(nama => {
+            const li = document.createElement('li');
+            li.textContent = nama;
+            ulElement.appendChild(li);
+        });
+    }
+</script>
+
 </body>
 </html>
