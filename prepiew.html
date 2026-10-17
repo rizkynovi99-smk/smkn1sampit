@@ -1,0 +1,685 @@
+
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CodeCraft Studio Pro - Advanced Web IDE & Live Previewer</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        dark: {
+                            bg: '#090d16',
+                            surface: '#111827',
+                            border: '#1f293d',
+                            text: '#f3f4f6',
+                            muted: '#9ca3af'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .code-font {
+            font-family: 'Fira Code', monospace;
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(150, 150, 150, 0.25);
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(150, 150, 150, 0.4);
+        }
+    </style>
+</head>
+<body class="bg-slate-100 dark:bg-dark-bg text-slate-800 dark:text-dark-text min-h-screen flex flex-col transition-colors duration-200">
+
+    <div id="toast" class="fixed bottom-5 right-5 z-50 transform translate-y-24 opacity-0 transition-all duration-300 bg-slate-900 dark:bg-slate-800 text-white px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3 border border-slate-700">
+        <i id="toast-icon" class="fa-solid fa-circle-check text-emerald-400"></i>
+        <span id="toast-message" class="text-sm font-medium">Berhasil!</span>
+    </div>
+
+    <header class="border-b border-slate-200 dark:border-dark-border bg-white/90 dark:bg-dark-surface/90 backdrop-blur-md sticky top-0 z-40 px-4 lg:px-6 py-2.5 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+            <div class="bg-gradient-to-tr from-indigo-600 to-violet-600 text-white p-2.5 rounded-xl shadow-lg shadow-indigo-500/25 flex items-center justify-center">
+                <i class="fa-solid fa-laptop-code text-sm"></i>
+            </div>
+            <div>
+                <h1 class="font-bold text-base sm:text-lg tracking-tight bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 bg-clip-text text-transparent">CodeCraft Studio Pro</h1>
+                <p class="text-[10px] text-slate-500 dark:text-dark-muted hidden sm:block">Advanced In-Browser Web IDE & Live Engine</p>
+            </div>
+        </div>
+
+        <!-- Header Action Controls -->
+        <div class="flex items-center gap-1.5 sm:gap-2">
+            <!-- Templates Dropdown -->
+            <div class="relative">
+                <button onclick="toggleDropdown('template-menu')" class="bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-medium px-3 py-2 rounded-xl transition flex items-center gap-1.5 border border-slate-200 dark:border-dark-border">
+                    <i class="fa-solid fa-wand-magic-sparkles text-amber-400"></i>
+                    <span class="hidden md:inline">Presets</span>
+                    <i class="fa-solid fa-chevron-down text-[10px] opacity-60"></i>
+                </button>
+                <div id="template-menu" class="hidden absolute right-0 mt-2 w-56 bg-white dark:bg-dark-surface rounded-2xl shadow-2xl border border-slate-200 dark:border-dark-border py-2 z-50">
+                    <div class="px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">Pilih Preset Template</div>
+                    <button onclick="loadTemplate('table')" class="w-full text-left px-4 py-2 text-xs hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center gap-2 text-slate-700 dark:text-slate-300">
+                        <i class="fa-solid fa-table text-indigo-500"></i> Tabel Hukum & Sanksi (Tailwind)
+                    </button>
+                    <button onclick="loadTemplate('card')" class="w-full text-left px-4 py-2 text-xs hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center gap-2 text-slate-700 dark:text-slate-300">
+                        <i class="fa-solid fa-id-card text-emerald-500"></i> Modern Profile Card
+                    </button>
+                    <button onclick="loadTemplate('game')" class="w-full text-left px-4 py-2 text-xs hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center gap-2 text-slate-700 dark:text-slate-300">
+                        <i class="fa-solid fa-gamepad text-purple-500"></i> Interactive Counter Game
+                    </button>
+                </div>
+            </div>
+
+            <!-- Auto-refresh Toggle Button -->
+            <button id="btn-auto-refresh" onclick="toggleAutoRefresh()" title="Toggle Auto-Refresh" class="bg-indigo-600 text-white text-xs font-medium px-3 py-2 rounded-xl transition flex items-center gap-1.5 shadow-sm shadow-indigo-600/20">
+                <i class="fa-solid fa-bolt text-[11px]"></i>
+                <span class="hidden sm:inline">Auto: <span id="auto-status">On</span></span>
+            </button>
+
+            <!-- Manual Run Button -->
+            <button onclick="updatePreview(true)" title="Run / Refresh Preview" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-medium px-3 py-2 rounded-xl transition flex items-center gap-1.5 shadow-sm">
+                <i class="fa-solid fa-play text-[11px]"></i>
+                <span class="hidden sm:inline">Run</span>
+            </button>
+
+            <!-- Reset Code -->
+            <button onclick="resetCode()" title="Reset ke Default" class="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition">
+                <i class="fa-solid fa-rotate-right text-xs"></i>
+            </button>
+
+            <!-- Export / Download -->
+            <button onclick="downloadCode()" title="Export File HTML Lengkap" class="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition">
+                <i class="fa-solid fa-download text-xs"></i>
+            </button>
+
+            <div class="h-5 w-[1px] bg-slate-200 dark:bg-dark-border mx-0.5"></div>
+
+            <!-- Theme Toggle -->
+            <button onclick="toggleTheme()" title="Ganti Tema Tampilan" class="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition">
+                <i id="theme-icon" class="fa-solid fa-moon text-xs"></i>
+            </button>
+        </div>
+    </header>
+
+    <main class="flex-1 p-3 lg:p-4 grid grid-cols-1 lg:grid-cols-2 gap-4 h-[calc(100vh-60px)]">
+        
+        <!-- Left Pane: Code Editor Section -->
+        <div class="flex flex-col gap-2.5 h-full overflow-hidden">
+            <!-- Tabs & Editor Controls -->
+            <div class="flex items-center justify-between bg-slate-200/80 dark:bg-slate-900/80 p-1.5 rounded-xl shrink-0 border border-slate-200 dark:border-dark-border">
+                <div class="flex gap-1 flex-1">
+                    <button onclick="switchTab('html')" id="btn-tab-html" class="flex-1 py-1.5 px-3 text-xs font-semibold rounded-lg transition bg-white dark:bg-slate-800 shadow-sm text-indigo-600 dark:text-indigo-400 flex items-center justify-center gap-2">
+                        <i class="fa-brands fa-html5 text-orange-500 text-sm"></i> index.html
+                    </button>
+                    <button onclick="switchTab('css')" id="btn-tab-css" class="flex-1 py-1.5 px-3 text-xs font-semibold rounded-lg transition text-slate-600 dark:text-dark-muted hover:text-slate-800 dark:hover:text-white flex items-center justify-center gap-2">
+                        <i class="fa-brands fa-css3-alt text-blue-500 text-sm"></i> style.css
+                    </button>
+                    <button onclick="switchTab('js')" id="btn-tab-js" class="flex-1 py-1.5 px-3 text-xs font-semibold rounded-lg transition text-slate-600 dark:text-dark-muted hover:text-slate-800 dark:hover:text-white flex items-center justify-center gap-2">
+                        <i class="fa-brands fa-js text-yellow-400 text-sm"></i> script.js
+                    </button>
+                </div>
+                
+                <!-- Extra Editor Actions -->
+                <div class="flex items-center gap-1 pl-2">
+                    <button onclick="toggleWordWrap()" id="btn-wrap" title="Toggle Word Wrap" class="px-2.5 py-1.5 text-[11px] font-medium rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 transition">
+                        Wrap: Off
+                    </button>
+                    <button onclick="copyCurrentEditor()" title="Salin Kode Aktif" class="px-2.5 py-1.5 text-[11px] font-medium rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 transition">
+                        <i class="fa-regular fa-copy"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Code Editors Container (with Line Numbers simulation) -->
+            <div class="relative flex-1 flex flex-col rounded-2xl border border-slate-200 dark:border-dark-border bg-white dark:bg-dark-surface shadow-sm overflow-hidden">
+                
+                <!-- HTML Editor Box -->
+                <div id="editor-html" class="editor-pane flex flex-col h-full">
+                    <div class="bg-slate-50 dark:bg-slate-900/60 px-4 py-1.5 border-b border-slate-200 dark:border-dark-border flex items-center justify-between text-[11px] text-slate-400 font-medium">
+                        <span>HTML Markup Structure</span>
+                        <span id="html-stats">0 lines</span>
+                    </div>
+                    <div class="flex-1 flex overflow-hidden">
+                        <div id="lines-html" class="code-font py-4 px-2.5 bg-slate-50 dark:bg-slate-900/30 text-slate-400 dark:text-slate-600 text-right select-none text-xs leading-relaxed border-r border-slate-100 dark:border-slate-800/60 overflow-hidden">1</div>
+                        <textarea id="html-code" oninput="handleEditorInput('html')" onscroll="syncScroll('html')" spellcheck="false" placeholder="Tulis kode HTML di sini..." class="code-font flex-1 w-full bg-transparent p-4 text-xs sm:text-sm resize-none focus:outline-none text-slate-800 dark:text-slate-200 leading-relaxed whitespace-pre overflow-x-auto"></textarea>
+                    </div>
+                </div>
+
+                <!-- CSS Editor Box -->
+                <div id="editor-css" class="editor-pane flex flex-col h-full hidden">
+                    <div class="bg-slate-50 dark:bg-slate-900/60 px-4 py-1.5 border-b border-slate-200 dark:border-dark-border flex items-center justify-between text-[11px] text-slate-400 font-medium">
+                        <span>CSS Styling Rules</span>
+                        <span id="css-stats">0 lines</span>
+                    </div>
+                    <div class="flex-1 flex overflow-hidden">
+                        <div id="lines-css" class="code-font py-4 px-2.5 bg-slate-50 dark:bg-slate-900/30 text-slate-400 dark:text-slate-600 text-right select-none text-xs leading-relaxed border-r border-slate-100 dark:border-slate-800/60 overflow-hidden">1</div>
+                        <textarea id="css-code" oninput="handleEditorInput('css')" onscroll="syncScroll('css')" spellcheck="false" placeholder="Tulis kode CSS di sini..." class="code-font flex-1 w-full bg-transparent p-4 text-xs sm:text-sm resize-none focus:outline-none text-slate-800 dark:text-slate-200 leading-relaxed whitespace-pre overflow-x-auto"></textarea>
+                    </div>
+                </div>
+
+                <!-- JS Editor Box -->
+                <div id="editor-js" class="editor-pane flex flex-col h-full hidden">
+                    <div class="bg-slate-50 dark:bg-slate-900/60 px-4 py-1.5 border-b border-slate-200 dark:border-dark-border flex items-center justify-between text-[11px] text-slate-400 font-medium">
+                        <span>JavaScript Logic & Interactions</span>
+                        <span id="js-stats">0 lines</span>
+                    </div>
+                    <div class="flex-1 flex overflow-hidden">
+                        <div id="lines-js" class="code-font py-4 px-2.5 bg-slate-50 dark:bg-slate-900/30 text-slate-400 dark:text-slate-600 text-right select-none text-xs leading-relaxed border-r border-slate-100 dark:border-slate-800/60 overflow-hidden">1</div>
+                        <textarea id="js-code" oninput="handleEditorInput('js')" onscroll="syncScroll('js')" spellcheck="false" placeholder="Tulis kode JavaScript di sini..." class="code-font flex-1 w-full bg-transparent p-4 text-xs sm:text-sm resize-none focus:outline-none text-slate-800 dark:text-slate-200 leading-relaxed whitespace-pre overflow-x-auto"></textarea>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="flex flex-col h-full gap-2.5 overflow-hidden">
+            <!-- Preview Controls Bar -->
+            <div class="flex items-center justify-between bg-slate-200/80 dark:bg-slate-900/80 p-1.5 rounded-xl shrink-0 border border-slate-200 dark:border-dark-border">
+                <div class="flex items-center gap-2 px-2">
+                    <span class="flex h-2 w-2 relative">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                    </span>
+                    <span class="text-xs font-semibold text-slate-600 dark:text-slate-300">Live Preview Output</span>
+                </div>
+
+                <!-- Viewport Sizers & Fullscreen -->
+                <div class="flex items-center gap-1.5">
+                    <div class="hidden sm:flex bg-slate-100 dark:bg-slate-800 p-0.5 rounded-lg border border-slate-200 dark:border-dark-border">
+                        <button onclick="setViewport('100%')" title="Desktop View" class="px-2 py-1 text-[11px] font-medium rounded-md bg-white dark:bg-slate-700 text-slate-700 dark:text-white shadow-sm vp-btn">Full</button>
+                        <button onclick="setViewport('768px')" title="Tablet View" class="px-2 py-1 text-[11px] font-medium rounded-md text-slate-500 hover:text-slate-800 dark:hover:text-white vp-btn">Tab</button>
+                        <button onclick="setViewport('375px')" title="Mobile View" class="px-2 py-1 text-[11px] font-medium rounded-md text-slate-500 hover:text-slate-800 dark:hover:text-white vp-btn">Mob</button>
+                    </div>
+                    
+                    <button onclick="toggleConsole()" title="Toggle JS Console" id="console-toggle-btn" class="bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:text-white text-slate-600 dark:text-slate-300 text-xs font-medium px-2.5 py-1.5 rounded-lg transition flex items-center gap-1">
+                        <i class="fa-solid fa-terminal text-indigo-400"></i>
+                        <span class="hidden md:inline">Console</span>
+                    </button>
+
+                    <button onclick="toggleFullscreen()" title="Fullscreen Preview" class="bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:text-white text-slate-600 dark:text-slate-300 text-xs font-medium px-2.5 py-1.5 rounded-lg transition">
+                        <i class="fa-solid fa-expand"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Preview Frame Wrapper -->
+            <div id="preview-wrapper" class="flex-1 bg-white relative rounded-2xl border border-slate-200 dark:border-dark-border shadow-sm overflow-hidden flex flex-col justify-center items-center">
+                <div id="viewport-container" class="w-full h-full transition-all duration-300 flex flex-col bg-white">
+                    <iframe id="preview-window" class="w-full h-full border-none bg-white" sandbox="allow-scripts allow-modals allow-forms allow-same-origin"></iframe>
+                </div>
+
+                <!-- Embedded Console Drawer (Hidden by default) -->
+                <div id="console-drawer" class="hidden absolute bottom-0 left-0 right-0 h-40 bg-slate-900/95 dark:bg-slate-950/95 backdrop-blur-md border-t border-slate-800 text-slate-200 flex flex-col z-30 shadow-2xl">
+                    <div class="px-3 py-1.5 bg-slate-900 dark:bg-slate-900 border-b border-slate-800 flex items-center justify-between text-xs">
+                        <span class="font-bold flex items-center gap-2 text-indigo-400">
+                            <i class="fa-solid fa-terminal"></i> JavaScript Console Output
+                        </span>
+                        <div class="flex items-center gap-2">
+                            <button onclick="clearConsole()" class="text-[11px] text-slate-400 hover:text-white transition">Clear</button>
+                            <button onclick="toggleConsole()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+                        </div>
+                    </div>
+                    <div id="console-logs" class="code-font flex-1 p-3 overflow-y-auto text-[11px] space-y-1 select-text">
+                        <div class="text-slate-500 italic">// Konsol siap memuat log & error...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        // Preset Templates Data
+        const templates = {
+            table: {
+                html: `<section class="py-12 px-4 bg-slate-50 min-h-screen">
+    <div class="max-w-6xl mx-auto">
+        <div class="text-center mb-10">
+            <span class="text-indigo-600 font-bold text-xs uppercase tracking-wider bg-indigo-50 px-3 py-1 rounded-full">Referensi Resmi</span>
+            <h2 class="text-2xl font-bold text-slate-900 mt-2">Tabel Sanksi & Pasal Hukum Indonesia</h2>
+            <p class="text-slate-500 text-sm mt-1">Ringkasan pelanggaran siber dan sanksi pidana berdasarkan perundang-undangan.</p>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-md overflow-hidden border border-slate-200">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse text-sm">
+                    <thead>
+                        <tr class="bg-indigo-900 text-white text-xs uppercase tracking-wider">
+                            <th class="p-3.5">No</th>
+                            <th class="p-3.5">Regulasi</th>
+                            <th class="p-3.5">Pasal & Perbuatan Dilanggar</th>
+                            <th class="p-3.5">Ancaman Hukuman</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-200 text-slate-700">
+                        <tr class="hover:bg-slate-50">
+                            <td class="p-3.5 font-bold">1</td>
+                            <td class="p-3.5 font-semibold text-indigo-900">UU ITE</td>
+                            <td class="p-3.5">Pasal 27 ayat (1) - Distribusi konten asusila secara elektronik.</td>
+                            <td class="p-3.5 font-bold text-red-600">Pidana 6 Tahun / Denda Rp1 Miliar</td>
+                        </tr>
+                        <tr class="hover:bg-slate-50">
+                            <td class="p-3.5 font-bold">2</td>
+                            <td class="p-3.5 font-semibold text-indigo-900">UU ITE</td>
+                            <td class="p-3.5">Pasal 28 ayat (1) - Penyebaran berita bohong (hoaks) merugikan konsumen.</td>
+                            <td class="p-3.5 font-bold text-red-600">Pidana 6 Tahun / Denda Rp1 Miliar</td>
+                        </tr>
+                        <tr class="hover:bg-slate-50">
+                            <td class="p-3.5 font-bold">3</td>
+                            <td class="p-3.5 font-semibold text-emerald-800">UU PDP</td>
+                            <td class="p-3.5">Pasal 65 - Memperoleh atau mengumpulkan data pribadi secara melawan hukum.</td>
+                            <td class="p-3.5 font-bold text-red-600">Pidana 5 Tahun / Denda Rp5 Miliar</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>`,
+                css: `body { margin: 0; font-family: 'Inter', sans-serif; }`,
+                js: `console.log("Tabel Hukum & Sanksi berhasil dirender.");`
+            },
+            card: {
+                html: `<div class="min-h-screen bg-slate-900 flex items-center justify-center p-4">
+    <div class="bg-slate-800 border border-slate-700 rounded-3xl p-6 max-w-sm w-full shadow-2xl text-center relative overflow-hidden">
+        <div class="absolute top-0 left-0 right-0 h-24 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500"></div>
+        <div class="relative mt-8 mb-4">
+            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150" alt="Avatar" class="w-24 h-24 rounded-full mx-auto border-4 border-slate-800 object-cover shadow-lg">
+        </div>
+        <h3 class="text-xl font-bold text-white">Jessica Alexandra</h3>
+        <p class="text-indigo-400 text-xs font-semibold uppercase tracking-wider mt-1">Lead Fullstack Engineer</p>
+        <p class="text-slate-400 text-xs mt-3 px-4">Membangun arsitektur web modern yang responsif, interaktif, dan berkinerja tinggi.</p>
+        
+        <div class="mt-6 flex gap-3 justify-center">
+            <button onclick="alert('Menghubungkan profil...')" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-medium px-5 py-2.5 rounded-xl shadow-lg shadow-indigo-600/30 transition">Follow</button>
+            <button onclick="alert('Mengirim pesan langsung...')" class="bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs font-medium px-5 py-2.5 rounded-xl transition">Message</button>
+        </div>
+    </div>
+</div>`,
+                css: `body { margin: 0; font-family: 'Inter', sans-serif; }`,
+                js: `console.log("Card Profile berhasil dimuat.");`
+            },
+            game: {
+                html: `<div class="min-h-screen bg-gradient-to-br from-indigo-950 to-slate-900 flex items-center justify-center p-4 text-white">
+    <div class="bg-slate-900/80 backdrop-blur-md border border-slate-800 p-8 rounded-3xl text-center max-w-sm w-full shadow-2xl">
+        <h2 class="text-2xl font-bold mb-1 bg-gradient-to-r from-amber-400 to-orange-500 bg-clip-text text-transparent">Interactive Clicker</h2>
+        <p class="text-slate-400 text-xs mb-6">Uji kecepatan klik interaktif dengan JavaScript</p>
+        
+        <div class="text-6xl font-black text-indigo-400 mb-6 font-mono" id="score">0</div>
+        
+        <div class="flex gap-2">
+            <button onclick="incrementScore()" class="flex-1 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-bold py-3 px-6 rounded-xl shadow-lg shadow-indigo-600/30 transition active:scale-95 text-sm">
+                Klik Saya!
+            </button>
+            <button onclick="resetScore()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-4 py-3 rounded-xl transition">
+                <i class="fa-solid fa-rotate-right"></i>
+            </button>
+        </div>
+    </div>
+</div>`,
+                css: `body { margin: 0; font-family: 'Inter', sans-serif; }`,
+                js: `let count = 0;
+function incrementScore() {
+    count++;
+    document.getElementById('score').innerText = count;
+    console.log("Skor saat ini:", count);
+}
+function resetScore() {
+    count = 0;
+    document.getElementById('score').innerText = count;
+    console.log("Skor di-reset ke 0.");
+}`
+            }
+        };
+
+        let autoRefresh = true;
+        let updateTimer;
+
+        // Initialize App on DOM Load
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedHtml = localStorage.getItem('cc_html');
+            const savedCss = localStorage.getItem('cc_css');
+            const savedJs = localStorage.getItem('cc_js');
+
+            document.getElementById('html-code').value = savedHtml !== null ? savedHtml : templates.table.html;
+            document.getElementById('css-code').value = savedCss !== null ? savedCss : templates.table.css;
+            document.getElementById('js-code').value = savedJs !== null ? savedJs : templates.table.js;
+
+            updateLineNumbers('html');
+            updateLineNumbers('css');
+            updateLineNumbers('js');
+            updatePreview(true);
+        });
+
+        // Tab Switcher
+        function switchTab(tab) {
+            ['html', 'css', 'js'].forEach(t => {
+                document.getElementById(`editor-${t}`).classList.add('hidden');
+                const btn = document.getElementById(`btn-tab-${t}`);
+                btn.classList.remove('bg-white', 'dark:bg-slate-800', 'shadow-sm', 'text-indigo-600', 'dark:text-indigo-400');
+                btn.classList.add('text-slate-600', 'dark:text-dark-muted');
+            });
+
+            document.getElementById(`editor-${tab}`).classList.remove('hidden');
+            const activeBtn = document.getElementById(`btn-tab-${tab}`);
+            activeBtn.classList.remove('text-slate-600', 'dark:text-dark-muted');
+            activeBtn.classList.add('bg-white', 'dark:bg-slate-800', 'shadow-sm', 'text-indigo-600', 'dark:text-indigo-400');
+        }
+
+        // Handle Input & Line Numbers
+        function handleEditorInput(type) {
+            updateLineNumbers(type);
+            saveToStorage();
+            if (autoRefresh) {
+                clearTimeout(updateTimer);
+                updateTimer = setTimeout(() => updatePreview(false), 300);
+            }
+        }
+
+        function updateLineNumbers(type) {
+            const textarea = document.getElementById(`${type}-code`);
+            const linesEl = document.getElementById(`lines-${type}`);
+            const statsEl = document.getElementById(`${type}-stats`);
+            
+            const linesCount = textarea.value.split('\n').length;
+            statsEl.innerText = `${linesCount} lines`;
+
+            let numbersStr = '';
+            for (let i = 1; i <= linesCount; i++) {
+                numbersStr += i + '\n';
+            }
+            linesEl.innerText = numbersStr;
+        }
+
+        function syncScroll(type) {
+            const textarea = document.getElementById(`${type}-code`);
+            const linesEl = document.getElementById(`lines-${type}`);
+            linesEl.scrollTop = textarea.scrollTop;
+        }
+
+        function saveToStorage() {
+            localStorage.setItem('cc_html', document.getElementById('html-code').value);
+            localStorage.setItem('cc_css', document.getElementById('css-code').value);
+            localStorage.setItem('cc_js', document.getElementById('js-code').value);
+        }
+
+        // Core Preview Update
+        function updatePreview(isManual = false) {
+            const html = document.getElementById('html-code').value;
+            const css = document.getElementById('css-code').value;
+            const js = document.getElementById('js-code').value;
+            const iframe = document.getElementById('preview-window');
+
+            const fullContent = `
+                <!DOCTYPE html>
+                <html lang="id">
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <script src="https://cdn.tailwindcss.com"><\/script>
+                    <style>
+                        body { margin: 0; font-family: 'Inter', sans-serif; }
+                        ${css}
+                    </style>
+                </head>
+                <body>
+                    ${html}
+                    <script>
+                        // Override console.log untuk dikirim ke parent window
+                        const originalLog = console.log;
+                        const originalError = console.error;
+                        
+                        console.log = function(...args) {
+                            originalLog.apply(console, args);
+                            window.parent.postMessage({ type: 'CONSOLE_LOG', level: 'log', message: args.map(a => typeof a === 'object' ? JSON.stringify(a) : a).join(' ') }, '*');
+                        };
+                        
+                        console.error = function(...args) {
+                            originalError.apply(console, args);
+                            window.parent.postMessage({ type: 'CONSOLE_LOG', level: 'error', message: args.map(a => typeof a === 'object' ? JSON.stringify(a) : a).join(' ') }, '*');
+                        };
+
+                        window.onerror = function(msg, url, line) {
+                            window.parent.postMessage({ type: 'CONSOLE_LOG', level: 'error', message: \`Uncaught Error: \${msg} (Line \${line})\` }, '*');
+                        };
+
+                        window.alert = function(msg) {
+                            const old = document.getElementById('custom-alert');
+                            if (old) old.remove();
+
+                            const div = document.createElement('div');
+                            div.id = 'custom-alert';
+                            div.style.cssText = "position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#1e293b;color:#f8fafc;padding:12px 24px;border-radius:12px;box-shadow:0 10px 25px rgba(0,0,0,0.4);z-index:99999;font-family:sans-serif;font-size:13px;border:1px solid #334155;";
+                            div.innerText = msg;
+                            document.body.appendChild(div);
+                            setTimeout(() => { if(div) div.remove(); }, 3500);
+                        };
+
+                        try {
+                            ${js}
+                        } catch(err) {
+                            console.error(err.message);
+                        }
+                    <\/script>
+                </body>
+                </html>
+            `;
+
+            try {
+                const doc = iframe.contentDocument || iframe.contentWindow.document;
+                doc.open();
+                doc.write(fullContent);
+                doc.close();
+
+                if (isManual) {
+                    showToast("Preview berhasil diperbarui!", "fa-play", "text-emerald-400");
+                }
+            } catch (err) {
+                console.error("Gagal merender preview:", err);
+            }
+        }
+
+        // Listen to Console Messages from Iframe
+        window.addEventListener('message', (event) => {
+            if (event.data && event.data.type === 'CONSOLE_LOG') {
+                appendConsoleLog(event.data.message, event.data.level);
+            }
+        });
+
+        function appendConsoleLog(msg, level) {
+            const logsContainer = document.getElementById('console-logs');
+            const div = document.createElement('div');
+            div.className = level === 'error' ? 'text-rose-400 font-semibold' : 'text-slate-300';
+            div.textContent = `> ${msg}`;
+            logsContainer.appendChild(div);
+            logsContainer.scrollTop = logsContainer.scrollHeight;
+        }
+
+        function clearConsole() {
+            document.getElementById('console-logs').innerHTML = '<div class="text-slate-500 italic">// Konsol dibersihkan...</div>';
+        }
+
+        function toggleConsole() {
+            const drawer = document.getElementById('console-drawer');
+            drawer.classList.toggle('hidden');
+        }
+
+        // Viewport Sizers
+        function setViewport(width) {
+            const container = document.getElementById('viewport-container');
+            container.style.width = width;
+            container.style.margin = width === '100%' ? '0' : '0 auto';
+        }
+
+        // Fullscreen Preview
+        function toggleFullscreen() {
+            const wrapper = document.getElementById('preview-wrapper');
+            if (!document.fullscreenElement) {
+                wrapper.requestFullscreen().catch(err => {
+                    showToast("Gagal masuk mode fullscreen", "fa-triangle-exclamation", "text-rose-400");
+                });
+            } else {
+                document.exitFullscreen();
+            }
+        }
+
+        // Templates Loader
+        function toggleDropdown(id) {
+            document.getElementById(id).classList.toggle('hidden');
+        }
+
+        function loadTemplate(key) {
+            const t = templates[key];
+            if (t) {
+                document.getElementById('html-code').value = t.html;
+                document.getElementById('css-code').value = t.css;
+                document.getElementById('js-code').value = t.js;
+                
+                updateLineNumbers('html');
+                updateLineNumbers('css');
+                updateLineNumbers('js');
+                saveToStorage();
+                updatePreview(true);
+                toggleDropdown('template-menu');
+                showToast(`Template berhasil dimuat!`, "fa-wand-magic-sparkles", "text-amber-400");
+            }
+        }
+
+        // Auto Refresh Toggle
+        function toggleAutoRefresh() {
+            autoRefresh = !autoRefresh;
+            const btn = document.getElementById('btn-auto-refresh');
+            const status = document.getElementById('auto-status');
+            status.innerText = autoRefresh ? 'On' : 'Off';
+            btn.className = autoRefresh ? 'bg-indigo-600 text-white text-xs font-medium px-3 py-2 rounded-xl transition flex items-center gap-1.5 shadow-sm shadow-indigo-600/20' : 'bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-medium px-3 py-2 rounded-xl transition flex items-center gap-1.5';
+            showToast(`Auto-refresh ${autoRefresh ? 'diaktifkan' : 'dinonaktifkan'}`, "fa-bolt", "text-indigo-400");
+        }
+
+        // Word Wrap Toggle
+        let isWrapped = false;
+        function toggleWordWrap() {
+            isWrapped = !isWrapped;
+            ['html', 'css', 'js'].forEach(t => {
+                const ta = document.getElementById(`${t}-code`);
+                ta.style.whiteSpace = isWrapped ? 'pre-wrap' : 'pre';
+            });
+            const btn = document.getElementById('btn-wrap');
+            btn.innerText = `Wrap: ${isWrapped ? 'On' : 'Off'}`;
+        }
+
+        // Copy Current Active Editor Code
+        function copyCurrentEditor() {
+            let activeTab = 'html';
+            ['html', 'css', 'js'].forEach(t => {
+                if (!document.getElementById(`editor-${t}`).classList.contains('hidden')) {
+                    activeTab = t;
+                }
+            });
+            const code = document.getElementById(`${activeTab}-code`).value;
+            const ta = document.createElement('textarea');
+            ta.value = code;
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            document.body.removeChild(ta);
+            showToast(`Kode ${activeTab.toUpperCase()} berhasil disalin!`, "fa-copy", "text-indigo-400");
+        }
+
+        // Export Standalone File
+        function downloadCode() {
+            const html = document.getElementById('html-code').value;
+            const css = document.getElementById('css-code').value;
+            const js = document.getElementById('js-code').value;
+
+            const fullContent = `<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exported Web App</title>
+    <script src="https://cdn.tailwindcss.com"><\/script>
+    <style>${css}</style>
+</head>
+<body>
+    ${html}
+    <script>${js}<\/script>
+</body>
+</html>`;
+
+            const blob = new Blob([fullContent], { type: 'text/html;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'index.html';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showToast("File index.html berhasil diunduh!", "fa-download", "text-indigo-400");
+        }
+
+        // Reset Code
+        function resetCode() {
+            if (confirm("Reset seluruh kode kembali ke default?")) {
+                loadTemplate('table');
+            }
+        }
+
+        // Theme Toggle
+        function toggleTheme() {
+            const htmlEl = document.documentElement;
+            const icon = document.getElementById('theme-icon');
+            if (htmlEl.classList.contains('dark')) {
+                htmlEl.classList.remove('dark');
+                icon.className = "fa-solid fa-sun text-xs";
+                localStorage.setItem('cc_theme', 'light');
+            } else {
+                htmlEl.classList.add('dark');
+                icon.className = "fa-solid fa-moon text-xs";
+                localStorage.setItem('cc_theme', 'dark');
+            }
+        }
+
+        if (localStorage.getItem('cc_theme') === 'light') {
+            document.documentElement.classList.remove('dark');
+            document.getElementById('theme-icon').className = "fa-solid fa-sun text-xs";
+        }
+
+        // Toast Helper
+        function showToast(message, iconClass = "fa-circle-check", iconColor = "text-emerald-400") {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-message').innerText = message;
+            document.getElementById('toast-icon').className = `fa-solid ${iconClass} ${iconColor}`;
+
+            toast.classList.remove('translate-y-24', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-24', 'opacity-0');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
