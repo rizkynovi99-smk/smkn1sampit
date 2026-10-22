@@ -28,7 +28,7 @@
         const { useState, useEffect, useRef } = React;
 
         // 🔴 MASUKKAN URL MACRO WEBHOOK GOOGLE APPS SCRIPT ANDA DI SINI
-        const DEFAULT_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbwEkZ7s5aqeaFXoX_jB59MHprk_SRW8skEqO616I3xzkhXRnU6dXph09HofLm-44Kil/exec";
+        const DEFAULT_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbxYOUR_SCRIPT_ID_HERE/exec";
 
         const quizData = [
             // --- 10 SOAL PILIHAN GANDA ---
@@ -232,10 +232,9 @@
             const [studentName, setStudentName] = useState('');
             const [studentClass, setStudentClass] = useState('X DKV 1');
             
-            // Status Koneksi Database Otomatis
+            // Status Validasi Database
             const [dbConnected, setDbConnected] = useState(false);
-            const [isTestingDb, setIsTestingDb] = useState(true);
-            const [dbStatusText, setDbStatusText] = useState('Menghubungkan ke database...');
+            const [dbStatusText, setDbStatusText] = useState('Memeriksa Konfigurasi Database...');
 
             const [currentQuestion, setCurrentQuestion] = useState(0);
             const [answers, setAnswers] = useState({});
@@ -250,43 +249,27 @@
             const answersRef = useRef(answers);
             const stepRef = useRef(step);
             const violationsRef = useRef(violations);
+            const isSubmittedRef = useRef(false); // Flag pengunci pengiriman tunggal
 
             answersRef.current = answers;
             stepRef.current = step;
             violationsRef.current = violations;
 
-            // Cek Koneksi Otomatis saat Halaman Dimuat
+            // Validasi URL Konfigurasi Database (Tanpa melakukan ping HTTP POST)
             useEffect(() => {
-                const verifyConnection = async () => {
-                    setIsTestingDb(true);
-                    setDbStatusText('Memeriksa koneksi ke Google Spreadsheet...');
-
-                    try {
-                        await fetch(DEFAULT_WEBHOOK_URL, {
-                            method: 'POST',
-                            mode: 'no-cors',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ ping: true, testTime: new Date().toISOString() })
-                        });
-                        
-                        setDbConnected(true);
-                        setDbStatusText('Database Terhubung (Online)');
-                    } catch (error) {
-                        console.error("Gagal terhubung ke database:", error);
-                        setDbConnected(false);
-                        setDbStatusText('Gagal Terhubung ke Database. Hubungi Guru.');
-                    } finally {
-                        setIsTestingDb(false);
-                    }
-                };
-
-                verifyConnection();
+                if (DEFAULT_WEBHOOK_URL && DEFAULT_WEBHOOK_URL.startsWith("https://script.google.com/")) {
+                    setDbConnected(true);
+                    setDbStatusText('Database Siap (Terhubung)');
+                } else {
+                    setDbConnected(false);
+                    setDbStatusText('URL Database Belum Konfigurasi');
+                }
             }, []);
 
             // Deteksi Alih Tab / Pindah Aplikasi (Anti-Curang)
             useEffect(() => {
                 const handleSecurityViolation = () => {
-                    if (stepRef.current === 'quiz') {
+                    if (stepRef.current === 'quiz' && !isSubmittedRef.current) {
                         const nextViolations = violationsRef.current + 1;
                         setViolations(nextViolations);
 
@@ -314,7 +297,7 @@
             const handleStart = (e) => {
                 e.preventDefault();
                 if (!dbConnected) {
-                    alert("Aplikasi gagal terhubung ke Database. Pastikan koneksi internet stabil lalu muat ulang halaman.");
+                    alert("Sistem belum terhubung ke Database. Pastikan URL Google Apps Script sudah terpasang.");
                     return;
                 }
                 if (nis.trim() && studentName.trim() && studentClass) {
@@ -337,6 +320,10 @@
             };
 
             const handleSubmitQuiz = async (forceSubmit = false) => {
+                // Mencegah pengiriman berulang
+                if (isSubmittedRef.current) return;
+                isSubmittedRef.current = true;
+                
                 setIsSubmitting(true);
                 const finalScore = calculateScore();
                 
@@ -398,12 +385,12 @@
                             <div className="flex items-center justify-between p-3.5 bg-slate-50 border border-slate-200 rounded-xl">
                                 <div className="flex items-center space-x-2">
                                     <div className={`w-2.5 h-2.5 rounded-full ${
-                                        isTestingDb ? 'bg-amber-400 animate-pulse' : dbConnected ? 'bg-emerald-500' : 'bg-rose-500'
+                                        dbConnected ? 'bg-emerald-500' : 'bg-rose-500'
                                     }`}></div>
                                     <span className="text-xs font-semibold text-slate-700">Status Database:</span>
                                 </div>
                                 <span className={`text-xs font-bold ${
-                                    isTestingDb ? 'text-amber-600' : dbConnected ? 'text-emerald-600' : 'text-rose-600'
+                                    dbConnected ? 'text-emerald-600' : 'text-rose-600'
                                 }`}>
                                     {dbStatusText}
                                 </span>
@@ -455,18 +442,16 @@
 
                             <button 
                                 type="submit" 
-                                disabled={!dbConnected || isTestingDb}
+                                disabled={!dbConnected}
                                 className={`w-full mt-4 font-semibold py-3 rounded-xl transition duration-200 shadow-md ${
-                                    dbConnected && !isTestingDb
+                                    dbConnected 
                                         ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-blue-500/20' 
                                         : 'bg-slate-200 text-slate-400 cursor-not-allowed'
                                 }`}
                             >
-                                {isTestingDb 
-                                    ? "Menghubungkan ke Database..." 
-                                    : dbConnected 
-                                        ? "Mulai Kerjakan Kuis" 
-                                        : "Gagal Terhubung ke Database"}
+                                {dbConnected 
+                                    ? "Mulai Kerjakan Kuis" 
+                                    : "Gagal Terhubung ke Database"}
                             </button>
                         </form>
                     )}
@@ -533,7 +518,7 @@
                                     <button
                                         disabled={isSubmitting}
                                         onClick={() => handleSubmitQuiz(false)}
-                                        className="px-6 py-2 bg-emerald-600 text-white rounded-lg text-xs font-semibold hover:bg-emerald-700"
+                                        className="px-6 py-2 bg-emerald-600 text-white rounded-lg text-xs font-semibold hover:bg-emerald-700 disabled:opacity-50"
                                     >
                                         {isSubmitting ? "Mengirim..." : "Selesai & Kirim"}
                                     </button>
@@ -542,7 +527,7 @@
                         </div>
                     )}
 
-                    {/* Step 3: Hasil Akhir (Tanpa Pembahasan) */}
+                    {/* Step 3: Hasil Akhir */}
                     {step === 'result' && (
                         <div className="text-center py-6">
                             <div className="inline-block p-4 bg-emerald-100 border border-emerald-200 rounded-full mb-3 text-emerald-600">
@@ -566,7 +551,7 @@
 
                             {submitStatus === 'success' && (
                                 <div className="p-3 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs rounded-xl max-w-md mx-auto">
-                                    ✓ Nilai dan data Anda telah berhasil terhubung dan tersimpan di Google Spreadsheet!
+                                    ✓ Nilai dan data Anda telah berhasil tersimpan di Google Spreadsheet!
                                 </div>
                             )}
 
