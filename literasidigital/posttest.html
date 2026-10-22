@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kuis Uji Nalar Kritis Murid - Light Theme</title>
+    <!-- React & ReactDOM CDN -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+    <!-- Babel CDN -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #f1f5f9;
+            color: #0f172a;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+
+    <div id="root" class="w-full max-w-4xl"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        // 🔴 MASUKKAN URL MACRO WEBHOOK GOOGLE APPS SCRIPT ANDA DI SINI
+        const DEFAULT_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbxYOUR_SCRIPT_ID_HERE/exec";
+
+        const quizData = [
+            // --- 10 SOAL PILIHAN GANDA ---
+            {
+                id: 1,
+                type: 'pg',
+                question: "1. Manipulasi Dokumen Elektronik dan Pembuktian Hukum\nBudi mengubah nominal pada gambar struk pembayaran digital milik temannya dari Rp150.000 menjadi Rp1.500.000. Ia mengunggah gambar tersebut untuk membangun citra bahwa dirinya mampu membeli barang mahal. Seorang teman kemudian menggunakan unggahan itu sebagai bukti transaksi dalam perselisihan utang. Budi berdalih bahwa gambar tersebut hanya untuk hiburan dan tidak pernah digunakan langsung oleh dirinya sebagai alat pembayaran.\n\nBerdasarkan kasus tersebut, kesimpulan yang paling dapat dipertanggungjawabkan adalah ....",
+                options: [
+                    "A. Budi tidak dapat dimintai pertanggungjawaban hukum karena gambar yang diubah bukan dokumen transaksi asli dan tidak dibuat untuk memperoleh keuntungan secara langsung.",
+                    "B. Budi pasti melakukan tindak pidana pemalsuan dokumen elektronik karena perubahan nominal dengan sengaja sudah cukup membuktikan seluruh unsur pidana.",
+                    "C. Perubahan nominal dapat menjadi bukti adanya manipulasi yang disengaja, tetapi penerapan ketentuan pidana harus mempertimbangkan unsur pasal yang relevan, tujuan, penggunaan, serta fakta yang dapat dibuktikan.",
+                    "D. Persoalan hukum baru muncul jika teman Budi mengalami kerugian finansial yang telah diputuskan melalui pengadilan, sehingga unggahan awal tidak relevan untuk dianalisis."
+                ],
+                correct: 2,
+                explanation: "Manipulasi disengaja belum otomatis membuktikan semua unsur tindak pidana."
+            },
+            {
+                id: 2,
+                type: 'pg',
+                question: "2. Kebocoran Data Murid dan Tanggung Jawab Pengelola\nSeorang operator sekolah mengirimkan tautan spreadsheet kepada grup publik. Spreadsheet tersebut memuat nama, NIK, riwayat kesehatan, dan catatan konseling murid. Operator segera mencabut akses setelah menyadari kesalahannya. Kepala sekolah menyatakan bahwa tidak ada pelanggaran karena penyebaran tersebut tidak disengaja dan akses telah ditutup.\n\nSebagai tim evaluasi perlindungan data sekolah, rekomendasi yang paling tepat adalah ....",
+                options: [
+                    "A. Menganggap insiden selesai karena tidak ada kesengajaan, kemudian mengingatkan operator agar lebih berhati-hati tanpa perlu memeriksa kemungkinan salinan data.",
+                    "B. Mempertahankan bukti insiden, membatasi akses, menilai data dan dampak kebocoran, menentukan kewajiban pemberitahuan, serta mengevaluasi tanggung jawab pengendali dan pihak terkait.",
+                    "C. Langsung menjatuhkan sanksi pidana kepada operator karena seluruh kebocoran data pribadi, termasuk akibat kelalaian, secara otomatis memenuhi unsur tindak pidana dalam UU PDP.",
+                    "D. Menunggu laporan dari murid atau orang tua sebelum melakukan pemeriksaan karena tanggung jawab perlindungan data baru timbul setelah korban menyatakan keberatan."
+                ],
+                correct: 1,
+                explanation: "Respons insiden harus dilakukan meskipun kebocoran tidak disengaja."
+            },
+            {
+                id: 3,
+                type: 'pg',
+                question: "3. Penggunaan AI dan Kerahasiaan Perusahaan\nSaat magang, Siti diminta menyusun laporan analisis sistem. Untuk mempercepat pekerjaannya, ia mengunggah kode program internal, nama pelanggan, dan kata sandi server perusahaan ke chatbot AI publik. Ia tidak menemukan larangan eksplisit dalam buku panduan magang. Layanan AI tersebut juga menyatakan bahwa data pengguna dapat diproses untuk meningkatkan layanan, bergantung pada pengaturan akun.\n\nTindakan korektif yang paling tepat adalah ....",
+                options: [
+                    "A. Melanjutkan penggunaan chatbot dengan menghapus nama pelanggan dari unggahan berikutnya, sebab kata sandi dan kode program tidak termasuk data pribadi sehingga tidak menimbulkan risiko hukum.",
+                    "B. Menghentikan penggunaan layanan tersebut dan langsung menghapus akun AI, karena seluruh data yang pernah diunggah pasti telah menjadi data pelatihan dan tidak mungkin lagi diamankan.",
+                    "C. Meminta izin kepada pembimbing magang setelah laporan selesai, sebab persetujuan atasan dapat mengesahkan penggunaan data rahasia yang telah terlanjur diunggah.",
+                    "D. Menghentikan pengunggahan, melaporkan insiden kepada pihak berwenang di perusahaan, menilai paparan data, mengganti kredensial yang berisiko, serta menggunakan AI hanya melalui mekanisme yang telah disetujui dan diamankan."
+                ],
+                correct: 3,
+                explanation: "Mengurangi paparan, melaporkan insiden, dan mengamankan kredensial merupakan langkah mitigasi utama."
+            },
+            {
+                id: 4,
+                type: 'pg',
+                question: "4. Hak Cipta, Transformasi Karya, dan Penggunaan Komersial\nRaka mengambil ilustrasi digital dari internet yang mencantumkan nama penciptanya. Ia mengubah warna, mengganti latar belakang, menambahkan tipografi, kemudian mencetaknya pada kaus untuk dijual. Raka menyatakan bahwa karyanya sudah berbeda secara visual dan nama ilustrator masih tercantum pada label produk.\n\nManakah analisis yang paling tepat?",
+                options: [
+                    "A. Perubahan visual yang dilakukan dapat menghasilkan unsur kreatif baru, tetapi tidak otomatis menghapus hak atas ilustrasi asal; penggunaan komersial perlu dinilai berdasarkan izin, lisensi, hak yang digunakan, dan pengecualian yang berlaku.",
+                    "B. Pencantuman nama ilustrator telah memenuhi kewajiban hukum, sehingga izin penggunaan komersial tidak lagi diperlukan selama Raka tidak mengklaim sebagai pencipta ilustrasi awal.",
+                    "C. Penggunaan ilustrasi untuk produk komersial baru melanggar hak cipta apabila hasil akhir identik dengan karya asli; perubahan warna dan tata letak cukup untuk menghindari pelanggaran.",
+                    "D. Semua karya turunan yang dibuat melalui penyuntingan manual menjadi hak eksklusif penyunting, sebab unsur kreativitas baru secara otomatis menggantikan hak pencipta karya sebelumnya."
+                ],
+                correct: 0,
+                explanation: "Modifikasi dan atribusi tidak otomatis menggantikan izin penggunaan karya asal."
+            },
+            {
+                id: 5,
+                type: 'pg',
+                question: "5. Deepfake dan Validitas Informasi\nSebuah video memperlihatkan pejabat publik mengumumkan kebijakan ekonomi yang kontroversial. Video tersebut viral, memiliki jutaan penayangan, dan dibagikan oleh beberapa akun berita. Seorang murid menemukan bahwa gerak bibir pejabat kurang sinkron dengan suara, tetapi kualitas video rendah sehingga penyebabnya belum dapat dipastikan. Tidak ditemukan video yang sama pada akun resmi pejabat tersebut.\n\nStrategi verifikasi yang paling kuat adalah ....",
+                options: [
+                    "A. Menyatakan video palsu karena ketidaksinkronan bibir merupakan bukti yang cukup, kemudian melaporkan seluruh akun yang menyebarkannya.",
+                    "B. Menganggap video autentik untuk sementara karena banyak akun berita membagikannya, kecuali terdapat pernyataan resmi yang membantah isi video.",
+                    "C. Memisahkan pemeriksaan identitas sumber, konteks peristiwa, keaslian audio-visual, dan isi pernyataan; kemudian membandingkannya dengan rekaman atau konfirmasi independen yang kredibel sebelum menyimpulkan.",
+                    "D. Menggunakan detektor deepfake sebagai penentu akhir; apabila alat tersebut menyatakan video autentik, pemeriksaan sumber dan konteks tidak lagi diperlukan."
+                ],
+                correct: 2,
+                explanation: "Keaslian perlu diuji dari beberapa sumber dan jenis bukti, bukan satu indikator."
+            },
+            {
+                id: 6,
+                type: 'pg',
+                question: "6. Kritik Publik, Pencemaran Nama Baik, dan UU ITE\nSeorang murid mengunggah kritik terhadap pengelola suatu lembaga. Ia menulis bahwa pengelola tersebut “sengaja menggelapkan dana” berdasarkan tangkapan layar laporan keuangan yang belum terverifikasi. Unggahan itu menjadi viral. Pengelola menyatakan reputasinya dirusak, sedangkan murid beralasan bahwa ia sedang membela kepentingan publik.\n\nPendekatan analisis hukum yang paling tepat adalah ....",
+                options: [
+                    "A. Menganggap unggahan terlindungi sepenuhnya karena membahas kepentingan publik, meskipun tuduhan faktual yang disampaikan belum diverifikasi.",
+                    "B. Menilai isi dan konteks pernyataan, dasar faktual, unsur hukum yang relevan, serta ketentuan dan pengecualian dalam UU ITE; status kritik sebagai kepentingan publik tidak dengan sendirinya menyelesaikan seluruh persoalan hukum.",
+                    "C. Menetapkan pencemaran nama baik karena pengelola merasa dirugikan dan unggahan tersebar luas, sehingga pemeriksaan kebenaran tuduhan tidak lagi diperlukan.",
+                    "D. Menganggap perkara hanya dapat diselesaikan melalui mediasi karena ketentuan pencemaran nama baik dalam UU ITE menghapus seluruh kemungkinan proses hukum formal."
+                ],
+                correct: 1,
+                explanation: "Kritik kepentingan publik tidak otomatis menghapus kebutuhan menguji fakta dan unsur hukum."
+            },
+            {
+                id: 7,
+                type: 'pg',
+                question: "7. Klasifikasi Data Pribadi dan Prioritas Perlindungan\nSebuah sekolah merancang aplikasi yang mengumpulkan nama lengkap, alamat, nomor telepon, hasil pemindaian wajah, riwayat kesehatan, dan catatan konseling murid. Tim pengembang berpendapat bahwa semua data cukup dilindungi dengan kata sandi yang sama karena seluruh informasi digunakan untuk keperluan pendidikan.\n\nKeputusan desain yang paling tepat adalah ....",
+                options: [
+                    "A. Mengutamakan enkripsi hasil pemindaian wajah saja, karena data lain baru menjadi sensitif apabila digabungkan dengan data biometrik.",
+                    "B. Mengizinkan seluruh guru mengakses semua data setelah masuk menggunakan akun sekolah, sebab tujuan pendidikan membenarkan akses internal secara luas.",
+                    "C. Memisahkan data kesehatan dari basis data utama, tetapi menyimpan kata sandi dan catatan konseling bersama data umum agar proses administrasi lebih sederhana.",
+                    "D. Mengklasifikasikan data sesuai jenis dan risikonya, menerapkan pembatasan akses berdasarkan kebutuhan, pengamanan yang proporsional, minimisasi data, serta dasar pemrosesan yang sah."
+                ],
+                correct: 3,
+                explanation: "Perlindungan perlu mempertimbangkan klasifikasi data, kebutuhan akses, dan risiko."
+            },
+            {
+                id: 8,
+                type: 'pg',
+                question: "8. Halusinasi AI dan Evaluasi Jawaban\nDalam tugas matematika, AI menghasilkan solusi dengan urutan langkah yang rapi, menyebutkan rumus yang relevan, dan menyimpulkan jawaban sebesar 240. Dua murid memeriksa hasilnya. Murid pertama menerima jawaban karena penjelasannya sistematis, sedangkan murid kedua menghitung ulang dan memperoleh hasil 120. Ketika diminta mengoreksi, AI memberikan jawaban baru sebesar 180 dengan penjelasan yang sama meyakinkannya.\n\nSikap yang paling mencerminkan nalar kritis adalah ....",
+                options: [
+                    "A. Menggunakan hasil perhitungan yang dapat diverifikasi secara mandiri, menelusuri langkah yang keliru, dan memeriksa asumsi atau rumus tanpa menganggap kefasihan penjelasan sebagai jaminan kebenaran.",
+                    "B. Mengambil nilai tengah antara ketiga jawaban karena perbedaan hasil menunjukkan bahwa jawaban benar kemungkinan berada di antara keluaran AI.",
+                    "C. Memilih jawaban pertama karena model telah menyertakan rumus, sedangkan hasil hitung manual dapat dipengaruhi kesalahan pengguna.",
+                    "D. Menolak seluruh penggunaan AI untuk matematika karena satu ketidakkonsistenan membuktikan bahwa model tidak dapat digunakan sebagai alat bantu belajar."
+                ],
+                correct: 0,
+                explanation: "Hasil perlu diuji dengan perhitungan yang dapat diverifikasi, bukan kefasihan AI."
+            },
+            {
+                id: 9,
+                type: 'pg',
+                question: "9. Kebocoran Data Perusahaan dan Penentuan Sanksi\nSebuah perusahaan perdagangan elektronik mengalami kebocoran data jutaan pengguna. Investigasi awal menunjukkan bahwa server tidak menerapkan pengamanan yang memadai. Perusahaan menyatakan bahwa kebocoran dilakukan oleh peretas eksternal sehingga seluruh tanggung jawab berada pada pelaku peretasan. Di sisi lain, masyarakat menuntut agar perusahaan langsung dipidana dan didenda sebesar 2% dari seluruh omzet globalnya.\n\nKesimpulan yang paling tepat adalah ....",
+                options: [
+                    "A. Perusahaan tidak dapat dimintai pertanggungjawaban karena serangan berasal dari pihak luar, selama perusahaan tidak ikut menyebarkan data yang bocor.",
+                    "B. Perusahaan harus otomatis membayar denda 2% dari omzet global dan seluruh pengurusnya dipenjara karena jumlah data yang bocor sudah membuktikan adanya tindak pidana.",
+                    "C. Perlu dilakukan pemeriksaan terhadap kewajiban pengamanan, penyebab insiden, tanggung jawab pengendali data, dan ketentuan sanksi yang relevan; sanksi administratif maupun pidana harus ditentukan berdasarkan dasar hukum dan unsur yang terpenuhi.",
+                    "D. Perusahaan cukup memberikan kompensasi kepada pengguna yang mengajukan klaim, karena penyelesaian kerugian individual menggantikan kewajiban administratif dan pelaporan insiden."
+                ],
+                correct: 2,
+                explanation: "Tanggung jawab dan sanksi memerlukan pemeriksaan kewajiban, bukti, dan dasar hukum."
+            },
+            {
+                id: 10,
+                type: 'pg',
+                question: "10. Manipulasi Desain, Deepfake, dan Dampak Ekonomi\nSebuah tim kreator mengambil desain antarmuka startup pesaing dan mengubah beberapa elemen visual. Tim tersebut kemudian membuat video sintetis yang meniru suara CEO pesaing seolah-olah mengumumkan kebangkrutan. Video disebarkan menjelang pembukaan perdagangan saham, dan harga saham perusahaan turun. Tim kreator berdalih bahwa video tersebut merupakan karya satir dan tidak mencantumkan logo resmi perusahaan.\n\nManakah evaluasi yang paling kuat?",
+                options: [
+                    "A. Penambahan elemen desain baru dan tidak digunakannya logo resmi cukup untuk menghilangkan risiko pelanggaran hak cipta maupun tanggung jawab atas video sintetis.",
+                    "B. Kasus harus dianalisis sebagai beberapa perbuatan berbeda: penggunaan desain, pembuatan representasi sintetis, penyebaran informasi, tujuan dan dampak ekonominya; setiap dugaan pelanggaran harus diuji berdasarkan unsur hukum dan bukti yang relevan.",
+                    "C. Penurunan harga saham sudah cukup untuk membuktikan bahwa seluruh anggota tim melakukan tindak pidana manipulasi informasi, tanpa perlu memeriksa peran dan niat masing-masing.",
+                    "D. Label satir membuat video otomatis terlindungi sebagai ekspresi kreatif, kecuali tim menerima pembayaran langsung dari pihak yang memperoleh keuntungan akibat penurunan harga saham."
+                ],
+                correct: 1,
+                explanation: "Setiap tindakan memiliki unsur dan potensi konsekuensi berbeda yang perlu dianalisis."
+            },
+
+            // --- 10 SOAL BENAR / SALAH ---
+            {
+                id: 11,
+                type: 'tf',
+                question: "11. Manipulasi Dokumen Elektronik\nSeseorang mengubah angka pada struk pembayaran digital untuk membuat konten hiburan. Karena tidak ada transaksi nyata yang dilakukan menggunakan struk tersebut, tindakan itu tidak mungkin menimbulkan persoalan hukum berdasarkan UU ITE.",
+                options: ["Benar", "Salah"],
+                correct: 1,
+                explanation: "Salah: Tidak adanya transaksi nyata tidak otomatis meniadakan semua kemungkinan persoalan hukum. Konteks, tujuan, penggunaan, dan unsur hukum tetap perlu diperiksa."
+            },
+            {
+                id: 12,
+                type: 'tf',
+                question: "12. Pelindungan Data Pribadi\nOperator sekolah yang tidak sengaja membocorkan data kesehatan murid tetap perlu melakukan penanganan insiden. Namun, terjadinya kebocoran saja belum cukup untuk menyimpulkan bahwa operator pasti melakukan tindak pidana karena unsur dan dasar pertanggungjawabannya tetap harus diperiksa.",
+                options: ["Benar", "Salah"],
+                correct: 0,
+                explanation: "Benar: Respons insiden tetap diperlukan. Kebocoran tidak otomatis membuktikan bahwa setiap pihak yang terlibat melakukan tindak pidana."
+            },
+            {
+                id: 13,
+                type: 'tf',
+                question: "13. Kerahasiaan Data dalam Penggunaan AI\nJika suatu layanan AI menyatakan bahwa percakapan pengguna tidak digunakan untuk melatih model, pengguna dapat langsung mengunggah kata sandi server dan dokumen rahasia perusahaan tanpa meminta izin, sebab risiko kebocoran data telah dihilangkan sepenuhnya.",
+                options: ["Benar", "Salah"],
+                correct: 1,
+                explanation: "Salah: Pengaturan pelatihan model bukan jaminan keamanan mutlak. Kerahasiaan, kebijakan perusahaan, kontrol akses, dan risiko penyimpanan tetap harus diperhatikan."
+            },
+            {
+                id: 14,
+                type: 'tf',
+                question: "14. Hak Cipta dan Modifikasi Karya\nSeseorang yang mengubah warna, tata letak, dan tipografi ilustrasi milik orang lain mungkin menghasilkan unsur kreatif baru. Akan tetapi, kreativitas tambahan tersebut tidak otomatis memberinya hak untuk menggunakan ilustrasi asal secara komersial tanpa memperhatikan izin, lisensi, atau pengecualian hukum yang berlaku.",
+                options: ["Benar", "Salah"],
+                correct: 0,
+                explanation: "Benar: Unsur kreatif baru tidak otomatis menghapus hak atas karya asal atau memberikan izin penggunaan komersial."
+            },
+            {
+                id: 15,
+                type: 'tf',
+                question: "15. Verifikasi Video Deepfake\nSebuah video yang lolos pemeriksaan satu aplikasi pendeteksi deepfake dapat dianggap autentik tanpa verifikasi tambahan, karena alat pendeteksi digital lebih objektif daripada pemeriksaan sumber dan konteks oleh manusia.",
+                options: ["Benar", "Salah"],
+                correct: 1,
+                explanation: "Salah: Alat pendeteksi memiliki keterbatasan. Hasilnya perlu dibandingkan dengan sumber asli, konteks, dan bukti independen."
+            },
+            {
+                id: 16,
+                type: 'tf',
+                question: "16. Kritik di Media Sosial dan UU ITE\nPernyataan yang ditujukan untuk kepentingan umum tidak otomatis menyelesaikan seluruh persoalan hukum pencemaran nama baik. Isi pernyataan, konteks, dasar faktual, dan unsur hukum yang relevan tetap perlu dianalisis sebelum menarik kesimpulan.",
+                options: ["Benar", "Salah"],
+                correct: 0,
+                explanation: "Benar: Kepentingan umum merupakan faktor penting, tetapi tidak menggantikan analisis terhadap fakta dan unsur hukum."
+            },
+            {
+                id: 17,
+                type: 'tf',
+                question: "17. Klasifikasi Data Pribadi\nNama lengkap dan nomor telepon dapat termasuk data pribadi umum, sedangkan data kesehatan dan biometrik termasuk data pribadi spesifik menurut UU PDP. Oleh karena itu, sekolah dapat mengabaikan pengamanan data umum selama data spesifik telah dilindungi dengan baik.",
+                options: ["Benar", "Salah"],
+                correct: 1,
+                explanation: "Salah: Data pribadi umum tetap harus dilindungi. Kategori data memengaruhi tingkat dan bentuk perlindungan, bukan menentukan apakah perlindungan diperlukan sama sekali."
+            },
+            {
+                id: 18,
+                type: 'tf',
+                question: "18. Evaluasi Keluaran Kecerdasan Artifisial\nKetika AI menghasilkan dua jawaban yang saling bertentangan, murid sebaiknya memilih jawaban yang memiliki penjelasan paling panjang dan paling meyakinkan. Panjangnya uraian merupakan indikator yang cukup untuk menentukan tingkat kebenaran suatu jawaban.",
+                options: ["Benar", "Salah"],
+                correct: 1,
+                explanation: "Salah: Penjelasan panjang dan meyakinkan tidak menjamin kebenaran. Jawaban perlu diverifikasi melalui perhitungan, bukti, atau sumber tepercaya."
+            },
+            {
+                id: 19,
+                type: 'tf',
+                question: "19. Kebocoran Data dan Sanksi Korporasi\nApabila perusahaan mengalami kebocoran data akibat lemahnya pengamanan, keberadaan peretas eksternal tidak dengan sendirinya menghapus kemungkinan tanggung jawab perusahaan. Namun, sanksi administratif atau pidana tetap harus ditentukan berdasarkan kewajiban, bukti, dan ketentuan hukum yang relevan.",
+                options: ["Benar", "Salah"],
+                correct: 0,
+                explanation: "Benar: Serangan pihak luar tidak otomatis menghapus tanggung jawab pengelola data. Jenis sanksi tetap bergantung pada dasar hukum dan fakta yang terbukti."
+            },
+            {
+                id: 20,
+                type: 'tf',
+                question: "20. Berpikir Komputasional dan Keputusan Digital\nDalam memeriksa informasi yang diduga palsu, berpikir komputasional dapat digunakan untuk memecah persoalan menjadi beberapa bagian, menemukan pola yang mencurigakan, memisahkan informasi relevan dari yang tidak relevan, dan menyusun langkah verifikasi. Namun, proses tersebut tetap memerlukan bukti yang memadai sebelum kesimpulan ditetapkan.",
+                options: ["Benar", "Salah"],
+                correct: 0,
+                explanation: "Benar: Berpikir komputasional membantu menyusun proses analisis, tetapi tidak menggantikan verifikasi dan penilaian bukti."
+            }
+        ];
+
+        function App() {
+            const [step, setStep] = useState('welcome'); // 'welcome', 'quiz', 'result'
+            const [nis, setNis] = useState('');
+            const [studentName, setStudentName] = useState('');
+            const [studentClass, setStudentClass] = useState('X DKV 1');
+            
+            // Status Koneksi Database Otomatis
+            const [dbConnected, setDbConnected] = useState(false);
+            const [isTestingDb, setIsTestingDb] = useState(true);
+            const [dbStatusText, setDbStatusText] = useState('Menghubungkan ke database...');
+
+            const [currentQuestion, setCurrentQuestion] = useState(0);
+            const [answers, setAnswers] = useState({});
+            
+            // Pelanggaran Alih Tab
+            const [violations, setViolations] = useState(0);
+            const [isAutoSubmitted, setIsAutoSubmitted] = useState(false);
+            
+            const [isSubmitting, setIsSubmitting] = useState(false);
+            const [submitStatus, setSubmitStatus] = useState(null);
+
+            const answersRef = useRef(answers);
+            const stepRef = useRef(step);
+            const violationsRef = useRef(violations);
+
+            answersRef.current = answers;
+            stepRef.current = step;
+            violationsRef.current = violations;
+
+            // Cek Koneksi Otomatis saat Halaman Dimuat
+            useEffect(() => {
+                const verifyConnection = async () => {
+                    setIsTestingDb(true);
+                    setDbStatusText('Memeriksa koneksi ke Google Spreadsheet...');
+
+                    try {
+                        await fetch(DEFAULT_WEBHOOK_URL, {
+                            method: 'POST',
+                            mode: 'no-cors',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ ping: true, testTime: new Date().toISOString() })
+                        });
+                        
+                        setDbConnected(true);
+                        setDbStatusText('Database Terhubung (Online)');
+                    } catch (error) {
+                        console.error("Gagal terhubung ke database:", error);
+                        setDbConnected(false);
+                        setDbStatusText('Gagal Terhubung ke Database. Hubungi Guru.');
+                    } finally {
+                        setIsTestingDb(false);
+                    }
+                };
+
+                verifyConnection();
+            }, []);
+
+            // Deteksi Alih Tab / Pindah Aplikasi (Anti-Curang)
+            useEffect(() => {
+                const handleSecurityViolation = () => {
+                    if (stepRef.current === 'quiz') {
+                        const nextViolations = violationsRef.current + 1;
+                        setViolations(nextViolations);
+
+                        if (nextViolations >= 3) {
+                            alert("PERINGATAN KETAT: Anda telah berpindah tab/aplikasi sebanyak 3 kali! Kuis dihentikan dan jawaban Anda otomatis terkirim.");
+                            setIsAutoSubmitted(true);
+                            handleSubmitQuiz(true);
+                        } else {
+                            alert(`PERINGATAN! Terdeteksi meninggalkan halaman kuis (${nextViolations}/3 kali). Kuis otomatis terkirim jika mencapai 3 kali pelanggaran!`);
+                        }
+                    }
+                };
+
+                const handleVisibilityChange = () => {
+                    if (document.hidden) handleSecurityViolation();
+                };
+
+                window.addEventListener('visibilitychange', handleVisibilityChange);
+
+                return () => {
+                    window.removeEventListener('visibilitychange', handleVisibilityChange);
+                };
+            }, []);
+
+            const handleStart = (e) => {
+                e.preventDefault();
+                if (!dbConnected) {
+                    alert("Aplikasi gagal terhubung ke Database. Pastikan koneksi internet stabil lalu muat ulang halaman.");
+                    return;
+                }
+                if (nis.trim() && studentName.trim() && studentClass) {
+                    setStep('quiz');
+                }
+            };
+
+            const handleSelectOption = (questionIndex, optionIndex) => {
+                setAnswers({ ...answers, [questionIndex]: optionIndex });
+            };
+
+            const calculateScore = () => {
+                let score = 0;
+                quizData.forEach((q, idx) => {
+                    if (answersRef.current[idx] === q.correct) {
+                        score += 5; // 20 soal x 5 poin = 100
+                    }
+                });
+                return score;
+            };
+
+            const handleSubmitQuiz = async (forceSubmit = false) => {
+                setIsSubmitting(true);
+                const finalScore = calculateScore();
+                
+                // Format Waktu & Jam Pengerjaan
+                const now = new Date();
+                const tglWaktu = now.toLocaleDateString('id-ID') + ' ' + now.toLocaleTimeString('id-ID');
+
+                const payload = {
+                    tglWaktu: tglWaktu,
+                    nis: nis,
+                    nama: studentName,
+                    kelas: studentClass,
+                    nilai: finalScore,
+                    catatan: forceSubmit ? "Terkirim Otomatis (Pelanggaran Tab > 3x)" : "Selesai Normal"
+                };
+
+                try {
+                    await fetch(DEFAULT_WEBHOOK_URL, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    setSubmitStatus('success');
+                } catch (error) {
+                    console.error("Gagal mengirim data:", error);
+                    setSubmitStatus('error');
+                }
+
+                setIsSubmitting(false);
+                setStep('result');
+            };
+
+            return (
+                <div className="bg-white border border-slate-200 rounded-2xl shadow-xl p-6 sm:p-8">
+                    {/* Header */}
+                    <div className="flex flex-wrap items-center justify-between border-b border-slate-200 pb-4 mb-6 gap-2">
+                        <div>
+                            <h1 className="text-xl font-bold text-slate-800">Kuis Uji Nalar Kritis Murid</h1>
+                            <p className="text-xs text-slate-500">Literasi Digital, Hukum Siber, & Kecerdasan Artifisial</p>
+                        </div>
+                        {step === 'quiz' && (
+                            <div className="flex items-center space-x-3">
+                                <span className={`text-xs px-3 py-1 rounded-full font-bold border ${
+                                    violations > 0 ? 'bg-amber-100 text-amber-800 border-amber-300' : 'bg-slate-100 text-slate-700 border-slate-200'
+                                }`}>
+                                    Pelanggaran Tab: {violations} / 3
+                                </span>
+                                <span className="text-sm font-semibold bg-blue-50 text-blue-700 border border-blue-200 px-3 py-1 rounded-full">
+                                    Soal {currentQuestion + 1} / {quizData.length}
+                                </span>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Step 1: Form Identitas & Status Database */}
+                    {step === 'welcome' && (
+                        <form onSubmit={handleStart} className="space-y-4">
+                            <div className="flex items-center justify-between p-3.5 bg-slate-50 border border-slate-200 rounded-xl">
+                                <div className="flex items-center space-x-2">
+                                    <div className={`w-2.5 h-2.5 rounded-full ${
+                                        isTestingDb ? 'bg-amber-400 animate-pulse' : dbConnected ? 'bg-emerald-500' : 'bg-rose-500'
+                                    }`}></div>
+                                    <span className="text-xs font-semibold text-slate-700">Status Database:</span>
+                                </div>
+                                <span className={`text-xs font-bold ${
+                                    isTestingDb ? 'text-amber-600' : dbConnected ? 'text-emerald-600' : 'text-rose-600'
+                                }`}>
+                                    {dbStatusText}
+                                </span>
+                            </div>
+
+                            <h2 className="text-base font-semibold text-slate-800 pt-2">Identitas Peserta</h2>
+
+                            <div>
+                                <label className="block text-xs font-medium text-slate-600 mb-1">NIS (Nomor Induk Siswa) *</label>
+                                <input 
+                                    type="text" 
+                                    required 
+                                    value={nis}
+                                    onChange={(e) => setNis(e.target.value)}
+                                    placeholder="Masukkan NIS Anda"
+                                    className="w-full bg-white border border-slate-300 rounded-xl px-4 py-2.5 text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-xs font-medium text-slate-600 mb-1">Nama Lengkap *</label>
+                                <input 
+                                    type="text" 
+                                    required 
+                                    value={studentName}
+                                    onChange={(e) => setStudentName(e.target.value)}
+                                    placeholder="Masukkan Nama Lengkap Anda"
+                                    className="w-full bg-white border border-slate-300 rounded-xl px-4 py-2.5 text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-xs font-medium text-slate-600 mb-1">Kelas *</label>
+                                <select 
+                                    value={studentClass}
+                                    onChange={(e) => setStudentClass(e.target.value)}
+                                    className="w-full bg-white border border-slate-300 rounded-xl px-4 py-2.5 text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                                >
+                                    <option value="X DKV 1">X DKV 1</option>
+                                    <option value="X DKV 2">X DKV 2</option>
+                                    <option value="X PM 1">X PM 1</option>
+                                    <option value="X PM 2">X PM 2</option>
+                                </select>
+                            </div>
+
+                            <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl text-amber-800 text-xs leading-relaxed">
+                                ⚠️ <strong>Aturan Pengerjaan:</strong> Dilarang berpindah tab browser atau keluar dari aplikasi. Jika terdeteksi pindah tab lebih dari 3 kali, kuis akan otomatis terkirim secara paksa.
+                            </div>
+
+                            <button 
+                                type="submit" 
+                                disabled={!dbConnected || isTestingDb}
+                                className={`w-full mt-4 font-semibold py-3 rounded-xl transition duration-200 shadow-md ${
+                                    dbConnected && !isTestingDb
+                                        ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-blue-500/20' 
+                                        : 'bg-slate-200 text-slate-400 cursor-not-allowed'
+                                }`}
+                            >
+                                {isTestingDb 
+                                    ? "Menghubungkan ke Database..." 
+                                    : dbConnected 
+                                        ? "Mulai Kerjakan Kuis" 
+                                        : "Gagal Terhubung ke Database"}
+                            </button>
+                        </form>
+                    )}
+
+                    {/* Step 2: Halaman Soal */}
+                    {step === 'quiz' && (
+                        <div>
+                            <div className="mb-6">
+                                <span className={`inline-block px-2.5 py-1 text-[11px] font-bold rounded-md mb-2 ${
+                                    quizData[currentQuestion].type === 'pg' 
+                                        ? 'bg-blue-100 text-blue-700 border border-blue-200' 
+                                        : 'bg-purple-100 text-purple-700 border border-purple-200'
+                                }`}>
+                                    {quizData[currentQuestion].type === 'pg' ? 'Pilihan Ganda' : 'Benar / Salah'}
+                                </span>
+                                
+                                <h2 className="text-sm sm:text-base font-medium text-slate-800 leading-relaxed whitespace-pre-line mb-4">
+                                    {quizData[currentQuestion].question}
+                                </h2>
+
+                                <div className="space-y-3">
+                                    {quizData[currentQuestion].options.map((option, idx) => {
+                                        const isSelected = answers[currentQuestion] === idx;
+                                        return (
+                                            <button
+                                                key={idx}
+                                                onClick={() => handleSelectOption(currentQuestion, idx)}
+                                                className={`w-full text-left p-3.5 rounded-xl border text-xs sm:text-sm transition duration-150 flex items-center justify-between ${
+                                                    isSelected 
+                                                        ? 'bg-blue-50 border-blue-500 text-blue-900 font-medium' 
+                                                        : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
+                                                }`}
+                                            >
+                                                <span>{option}</span>
+                                                <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${
+                                                    isSelected ? 'border-blue-600 bg-blue-600' : 'border-slate-300'
+                                                }`}>
+                                                    {isSelected && <div className="w-1.5 h-1.5 bg-white rounded-full"></div>}
+                                                </div>
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+
+                            {/* Navigasi Soal */}
+                            <div className="flex items-center justify-between border-t border-slate-200 pt-4">
+                                <button
+                                    disabled={currentQuestion === 0}
+                                    onClick={() => setCurrentQuestion(currentQuestion - 1)}
+                                    className="px-4 py-2 bg-slate-100 text-slate-700 rounded-lg text-xs font-medium border border-slate-200 disabled:opacity-40 hover:bg-slate-200"
+                                >
+                                    Sebelumnya
+                                </button>
+                                
+                                {currentQuestion < quizData.length - 1 ? (
+                                    <button
+                                        onClick={() => setCurrentQuestion(currentQuestion + 1)}
+                                        className="px-5 py-2 bg-blue-600 text-white rounded-lg text-xs font-semibold hover:bg-blue-700"
+                                    >
+                                        Selanjutnya
+                                    </button>
+                                ) : (
+                                    <button
+                                        disabled={isSubmitting}
+                                        onClick={() => handleSubmitQuiz(false)}
+                                        className="px-6 py-2 bg-emerald-600 text-white rounded-lg text-xs font-semibold hover:bg-emerald-700"
+                                    >
+                                        {isSubmitting ? "Mengirim..." : "Selesai & Kirim"}
+                                    </button>
+                                )}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Step 3: Hasil & Review */}
+                    {step === 'result' && (
+                        <div className="text-center py-4">
+                            <h2 className="text-2xl font-bold text-slate-800 mb-1">
+                                {isAutoSubmitted ? "Kuis Terkirim Otomatis!" : "Kuis Selesai!"}
+                            </h2>
+                            <p className="text-xs text-slate-500">
+                                {studentName} | NIS: {nis} | Kelas: {studentClass}
+                            </p>
+
+                            <div className="my-6 bg-blue-50 border border-blue-100 rounded-2xl p-6 max-w-xs mx-auto">
+                                <span className="text-xs text-blue-600 font-semibold uppercase tracking-wider">Nilai Akhir Anda</span>
+                                <div className="text-5xl font-extrabold text-blue-700 mt-2">{calculateScore()}</div>
+                                <p className="text-xs text-slate-500 mt-2">dari total nilai maksimum 100</p>
+                            </div>
+
+                            {submitStatus === 'success' && (
+                                <div className="mb-6 p-3 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs rounded-xl">
+                                    ✓ Nilai dan data Anda telah terhubung dan tersimpan di Google Spreadsheet!
+                                </div>
+                            )}
+
+                            {/* Pembahasan Soal */}
+                            <div className="text-left mt-8 border-t border-slate-200 pt-6">
+                                <h3 className="text-sm font-bold text-slate-800 mb-4">Pembahasan Kunci Jawaban</h3>
+                                <div className="space-y-4">
+                                    {quizData.map((q, idx) => {
+                                        const isCorrect = answers[idx] === q.correct;
+                                        return (
+                                            <div key={idx} className="bg-slate-50 border border-slate-200 rounded-xl p-4 text-xs">
+                                                <div className="flex items-start justify-between mb-2 gap-2">
+                                                    <p className="font-medium text-slate-800 whitespace-pre-line">{q.question}</p>
+                                                    <span className={`px-2 py-0.5 rounded text-[10px] font-bold whitespace-nowrap ${
+                                                        isCorrect ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : 'bg-rose-100 text-rose-800 border border-rose-300'
+                                                    }`}>
+                                                        {isCorrect ? 'Benar (+5)' : 'Salah (0)'}
+                                                    </span>
+                                                </div>
+                                                <p className="text-slate-600">Jawaban Anda: <span className="text-slate-900 font-medium">{answers[idx] !== undefined ? q.options[answers[idx]] : 'Tidak diisi'}</span></p>
+                                                <p className="text-slate-600">Kunci Jawaban: <span className="text-emerald-700 font-medium">{q.options[q.correct]}</span></p>
+                                                <p className="mt-2 text-slate-600 bg-white p-2.5 rounded-lg border border-slate-200 leading-relaxed">
+                                                    💡 <strong className="text-slate-800">Alasan:</strong> {q.explanation}
+                                                </p>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+        }
+
+        ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+    </script>
+</body>
+</html>
