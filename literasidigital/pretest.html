@@ -320,42 +320,42 @@
             };
 
             const handleSubmitQuiz = async (forceSubmit = false) => {
-                // Mencegah pengiriman berulang
-                if (isSubmittedRef.current) return;
-                isSubmittedRef.current = true;
-                
-                setIsSubmitting(true);
-                const finalScore = calculateScore();
-                
-                // Format Waktu & Jam Pengerjaan
-                const now = new Date();
-                const tglWaktu = now.toLocaleDateString('id-ID') + ' ' + now.toLocaleTimeString('id-ID');
+    // Mencegah pengiriman berulang
+    if (isSubmittedRef.current) return;
+    isSubmittedRef.current = true;
+    
+    setIsSubmitting(true);
+    const finalScore = calculateScore();
+    
+    // Format Waktu & Jam Pengerjaan
+    const now = new Date();
+    const tglWaktu = now.toLocaleDateString('id-ID') + ' ' + now.toLocaleTimeString('id-ID');
 
-                const payload = {
-                    tglWaktu: tglWaktu,
-                    nis: nis,
-                    nama: studentName,
-                    kelas: studentClass,
-                    nilai: finalScore,
-                    catatan: forceSubmit ? "Terkirim Otomatis (Pelanggaran Tab > 3x)" : "Selesai Normal"
-                };
+    const payload = {
+        tglWaktu: tglWaktu,
+        nis: nis.trim(),          // Memastikan NIS terkirim tanpa spasi kosong
+        nama: studentName.trim(),  // Memastikan Nama Terkirim
+        kelas: studentClass,
+        nilai: finalScore,
+        catatan: forceSubmit ? "Terkirim Otomatis (Pelanggaran Tab > 3x)" : "Selesai Normal"
+    };
 
-                try {
-                    await fetch(DEFAULT_WEBHOOK_URL, {
-                        method: 'POST',
-                        mode: 'no-cors',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload)
-                    });
-                    setSubmitStatus('success');
-                } catch (error) {
-                    console.error("Gagal mengirim data:", error);
-                    setSubmitStatus('error');
-                }
+    try {
+        await fetch(DEFAULT_WEBHOOK_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // Menggunakan text/plain agar payload JSON terbaca utuh di Apps Script
+            body: JSON.stringify(payload)
+        });
+        setSubmitStatus('success');
+    } catch (error) {
+        console.error("Gagal mengirim data:", error);
+        setSubmitStatus('error');
+    }
 
-                setIsSubmitting(false);
-                setStep('result');
-            };
+    setIsSubmitting(false);
+    setStep('result');
+};
 
             return (
                 <div className="bg-white border border-slate-200 rounded-2xl shadow-xl p-6 sm:p-8">
