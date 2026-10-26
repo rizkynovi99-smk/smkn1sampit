@@ -326,7 +326,7 @@
                 timeStyle: "medium" 
             });
 
-            // Payload data yang dikirim ke sheet: Tgl Waktu-Jam Pengerjaan, NIS, Nama, Kelas, Nilai, Catatan
+            // Payload data yang dikirim ke sheet
             const payload = {
                 timestamp: formattedDate,
                 nis: studentData.nis,
@@ -336,11 +336,11 @@
                 catatan: isAutoSubmit ? `Auto-Submitted (Pelanggaran: ${violationCount})` : `Selesai Normal (Pelanggaran: ${violationCount})`
             };
 
-            // Kirim data ke Google Apps Script (Backend) secara asinkronus
+            // Kirim data ke Google Apps Script menggunakan text/plain agar terbaca utuh
             fetch(SCRIPT_URL, { 
                 method: 'POST', 
                 mode: 'no-cors', 
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                 body: JSON.stringify(payload) 
             }).catch(err => console.error("Gagal menyinkronkan ke cloud:", err));
         }
