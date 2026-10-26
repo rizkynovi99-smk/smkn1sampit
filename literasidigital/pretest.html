@@ -46,7 +46,7 @@
         <!-- STEP 1: Input Identitas Siswa (NIS & Nama) -->
         <section id="step-1" class="hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sm:p-8">
             <h2 class="text-2xl font-bold text-slate-900 mb-2">Identitas Peserta Ujian</h2>
-            <p class="text-slate-600 text-sm mb-6">Silakan masukkan NIS dan Nama Lengkap Anda sebelum memulai asesmen.</p>
+            <p class="text-slate-600 text-sm mb-6">Silakan masukkan NIS, Nama Lengkap, dan Kelas Anda sebelum memulai asesmen.</p>
             
             <form id="identity-form" class="space-y-4">
                 <div>
@@ -63,8 +63,10 @@
                         <option value="">Pilih Kelas</option>
                         <option value="X DKV 1">X DKV 1</option>
                         <option value="X DKV 2">X DKV 2</option>
-                        <option value="X PM 1">X PM 1</option>
-                        <option value="X PM 2">X PM 2</option>
+                        <option value="XI TKJ 1">XI TKJ 1</option>
+                        <option value="XI TKJ 2">XI TKJ 2</option>
+                        <option value="XII IPA 1">XII IPA 1</option>
+                        <option value="XII IPS 1">XII IPS 1</option>
                     </select>
                 </div>
                 <div class="bg-indigo-50 border border-indigo-200 p-4 rounded-xl text-xs text-indigo-800 space-y-1">
@@ -103,7 +105,6 @@
                 <p class="text-slate-600 text-sm mt-1">Jawaban Anda berhasil direkap ke server cloud.</p>
             </div>
 
-            <!-- Tampilan hanya memuat Skor Nilai -->
             <div class="bg-slate-50 border border-slate-200 rounded-xl p-6 max-w-sm mx-auto space-y-2">
                 <p class="text-sm text-slate-500 uppercase tracking-wider font-semibold">Skor Nilai Anda</p>
                 <p id="res-score" class="text-4xl font-extrabold text-indigo-600">0 / 100</p>
@@ -123,30 +124,183 @@
         // ----------------------------------------------------
         // MASUKKAN URL GOOGLE APPS SCRIPT DI SINI
         // ----------------------------------------------------
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyOl8ImnO44J_qK3a26HM3PkKKLFApoUpj1NJowuzrBwIewjE6kza_F5bXSIUW5bLN6/exec"; 
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz.../exec"; 
 
-        // Data Bank Soal (Pilihan Ganda 1-10 & Benar/Salah 11-20)
+        // 20 Soal Terbaru (10 Pilihan Ganda & 10 Benar/Salah) sesuai Dokumen Referensi
         const quizData = [
-            { id: 1, type: "pg", question: "1. Budi mengubah nominal struk pembayaran digital dari Rp150.000 menjadi Rp1.500.000 untuk pamer. Kesimpulan yang paling dapat dipertanggungjawabkan adalah...", options: ["Budi bebas hukum karena bukan dokumen asli.", "Budi pasti melakukan pemalsuan dokumen elektronik.", "Perubahan nominal adalah indikasi manipulasi, namun penerapan hukum harus mempertimbangkan unsur pasal, tujuan, dan fakta.", "Persoalan hukum muncul jika ada kerugian finansial."], answer: 2 },
-            { id: 2, type: "pg", question: "2. Operator sekolah tidak sengaja menyebarkan link spreadsheet berisi data pribadi murid. Rekomendasi tim evaluasi yang paling tepat adalah...", options: ["Menganggap selesai karena tidak disengaja.", "Mempertahankan bukti insiden, batasi akses, menilai dampak, serta mengevaluasi tanggung jawab pengendali.", "Langsung menjatuhkan sanksi pidana kepada operator.", "Menunggu laporan dari orang tua korban."], answer: 1 },
-            { id: 3, type: "pg", question: "3. Siti mengunggah kode program internal dan data pelanggan perusahaan ke chatbot AI publik. Tindakan korektif yang paling tepat adalah...", options: ["Melanjutkan penggunaan dengan menghapus nama pelanggan.", "Menghapus akun AI dan mengabaikannya.", "Meminta izin pembimbing setelah laporan selesai.", "Menghentikan pengunggahan, melaporkan insiden, menilai paparan, dan mengganti kredensial."], answer: 3 },
-            { id: 4, type: "pg", question: "4. Raka mengambil ilustrasi orang lain, mengubah warna & tata letak, lalu mencetaknya pada kaus untuk dijual. Analisis hukum yang tepat adalah...", options: ["Perubahan visual menghasilkan unsur kreatif baru, namun penggunaan komersial tetap memerlukan lisensi/izin.", "Pencantuman nama ilustrator menghapus kewajiban izin.", "Selama hasil tidak identik, tidak melanggar hukum.", "Karya turunan otomatis menjadi hak penyunting."], answer: 0 },
-            { id: 5, type: "pg", question: "5. Ditemukan video deepfake pejabat publik yang viral dengan kualitas rendah dan gerak bibir kurang sinkron. Strategi verifikasi terkuat adalah...", options: ["Menyatakan video palsu dan laporkan pengunggah.", "Menganggap autentik kecuali ada bantahan resmi.", "Memisahkan pemeriksaan identitas sumber, konteks, keaslian audio-visual, dan membandingkannya dengan konfirmasi independen.", "Menggunakan detektor deepfake sebagai penentu tunggal."], answer: 2 },
-            { id: 6, type: "pg", question: "6. Murid mengunggah kritik lembaga dengan menuduh 'sengaja menggelapkan dana' berdasarkan laporan belum terverifikasi. Pendekatan hukum yang tepat adalah...", options: ["Terlindungi sepenuhnya karena untuk kepentingan publik.", "Menilai isi, konteks, dasar faktual, serta ketentuan UU ITE; status kepentingan publik tidak otomatis menyelesaikan masalah hukum.", "Menetapkan pencemaran nama baik tanpa memeriksa kebenaran.", "Hanya diselesaikan lewat mediasi."], answer: 1 },
-            { id: 7, type: "pg", question: "7. Sekolah membuat aplikasi pengumpul data sensitif murid (biometrik, kesehatan) tetapi hanya diamankan kata sandi tunggal. Keputusan desain terbaik adalah...", options: ["Mengutamakan enkripsi wajah saja.", "Mengizinkan seluruh guru mengakses semua data.", "Menyimpan catatan konseling bersama data umum.", "Mengklasifikasikan data sesuai risiko, batasi akses, minimisasi data, dan pengamanan proporsional."], answer: 3 },
-            { id: 8, type: "pg", question: "8. AI memberikan jawaban matematika yang meyakinkan tetapi salah (diverifikasi manual berbeda). Sikap nalar kritis adalah...", options: ["Menggunakan hasil perhitungan mandiri, menelusuri langkah, dan menguji asumsi tanpa terkecoh kefasihan AI.", "Mengambil nilai tengah dari jawaban.", "Memilih jawaban pertama karena ada rumus.", "Menolak total penggunaan AI."], answer: 0 },
-            { id: 9, type: "pg", question: "9. Perusahaan E-commerce mengalami kebocoran data akibat pengamanan server yang lemah, meski pelakunya hacker eksternal. Kesimpulan yang tepat adalah...", options: ["Perusahaan bebas tanggung jawab karena dari pihak luar.", "Perusahaan wajib otomatis didenda 2% omzet.", "Perlu pemeriksaan kewajiban pengamanan, penyebab insiden, dan sanksi sesuai dasar hukum yang terpenuhi.", "Cukup beri kompensasi individual."], answer: 2 },
-            { id: 10, type: "pg", question: "10. Kreator mendesain video sintetis suara CEO pesaing yang mengumumkan kebangkrutan hingga saham turun, berdalih konten satir. Evaluasi terkuat adalah...", options: ["Tidak ada logo resmi, jadi bebas risiko.", "Kasus dianalisis sebagai beberapa perbuatan berbeda: desain, video sintetis, penyebaran, dan dampak ekonomi berdasarkan unsur hukum.", "Penurunan saham membuktikan tindak pidana tanpa niat.", "Label satir otomatis melindungi pembuat."], answer: 1 },
-            { id: 11, type: "bs", question: "11. Mengubah angka struk pembayaran digital untuk hiburan tanpa transaksi nyata tidak mungkin menimbulkan persoalan hukum UU ITE.", options: ["Benar", "Salah"], answer: 1 },
-            { id: 12, type: "bs", question: "12. Kebocoran data kesehatan murid oleh operator sekolah tetap memerlukan penanganan insiden, namun kebocoran saja belum tentu otomatis merupakan tindak pidana.", options: ["Benar", "Salah"], answer: 0 },
-            { id: 13, type: "bs", question: "13. Jika layanan AI menjamin percakapan tidak dipakai melatih model, pengguna bebas langsung mengunggah kata sandi server dan dokumen rahasia perusahaan.", options: ["Benar", "Salah"], answer: 1 },
-            { id: 14, type: "bs", question: "14. Modifikasi warna dan tata letak ilustrasi orang lain tidak otomatis memberikan hak komersial tanpa izin atau lisensi dari pencipta asli.", options: ["Benar", "Salah"], answer: 0 },
-            { id: 15, type: "bs", question: "15. Video yang lolos satu alat pendeteksi deepfake dapat langsung dianggap autentik tanpa verifikasi sumber dan konteks manusia.", options: ["Benar", "Salah"], answer: 1 },
-            { id: 16, type: "bs", question: "16. Kritik atas nama kepentingan umum tidak otomatis menghapus kebutuhan menguji fakta dan unsur hukum dalam kasus pencemaran nama baik.", options: ["Benar", "Salah"], answer: 0 },
-            { id: 17, type: "bs", question: "17. Sekolah boleh mengabaikan pengamanan data pribadi umum (nama/telepon) selama data spesifik (kesehatan/biometrik) sudah dilindungi.", options: ["Benar", "Salah"], answer: 1 },
-            { id: 18, type: "bs", question: "18. Panjang dan meyakinkannya penjelasan AI merupakan indikator yang cukup untuk menjamin kebenaran suatu jawaban tanpa verifikasi.", options: ["Benar", "Salah"], answer: 1 },
-            { id: 19, type: "bs", question: "19. Peretas eksternal tidak menghapus tanggung jawab pengelola data yang lemah pengamanannya; penentuan sanksi tetap berdasarkan bukti dan hukum.", options: ["Benar", "Salah"], answer: 0 },
-            { id: 20, type: "bs", question: "20. Berpikir komputasional membantu memecah masalah verifikasi informasi, namun tetap memerlukan bukti memadai sebelum kesimpulan ditetapkan.", options: ["Benar", "Salah"], answer: 0 }
+            // Pilihan Ganda (1-10)
+            { 
+                id: 1, type: "pg", 
+                question: "1. Manipulasi Dokumen Elektronik dan Pembuktian Hukum: Budi mengubah nominal struk pembayaran digital dari Rp150.000 menjadi Rp1.500.000 untuk pamer. Temannya menggunakan itu sebagai bukti utang, sementara Budi berdalih hanya untuk hiburan. Kesimpulan yang paling dapat dipertanggungjawabkan adalah...", 
+                options: [
+                    "Budi tidak dapat dimintai pertanggungjawaban hukum karena gambar yang diubah bukan dokumen transaksi asli dan tidak dibuat untuk memperoleh keuntungan secara langsung.",
+                    "Budi pasti melakukan tindak pidana pemalsuan dokumen elektronik karena perubahan nominal dengan sengaja sudah cukup membuktikan seluruh unsur pidana.",
+                    "Perubahan nominal dapat menjadi bukti adanya manipulasi yang disengaja, tetapi penerapan ketentuan pidana harus mempertimbangkan unsur pasal yang relevan, tujuan, penggunaan, serta fakta yang dapat dibuktikan.",
+                    "Persoalan hukum baru muncul jika teman Budi mengalami kerugian finansial yang telah diputuskan melalui pengadilan, sehingga unggahan awal tidak relevan untuk dianalisis."
+                ], 
+                answer: 2 
+            },
+            { 
+                id: 2, type: "pg", 
+                question: "2. Kebocoran Data Murid dan Tanggung Jawab Pengelola: Operator sekolah tidak sengaja mengirim tautan spreadsheet berisi data pribadi dan kesehatan murid ke grup publik, lalu segera mencabutnya. Kepala sekolah menyatakan tidak ada pelanggaran karena tidak disengaja. Rekomendasi tim evaluasi yang paling tepat adalah...", 
+                options: [
+                    "Menganggap insiden selesai karena tidak ada kesengajaan, kemudian mengingatkan operator agar lebih berhati-hati tanpa perlu memeriksa kemungkinan salinan data.",
+                    "Mempertahankan bukti insiden, membatasi akses, menilai data dan dampak kebocoran, menentukan kewajiban pemberitahuan, serta mengevaluasi tanggung jawab pengendali dan pihak terkait.",
+                    "Langsung menjatuhkan sanksi pidana kepada operator karena seluruh kebocoran data pribadi, termasuk akibat kelalaian, secara otomatis memenuhi unsur tindak pidana dalam UU PDP.",
+                    "Menunggu laporan dari murid atau orang tua sebelum melakukan pemeriksaan karena tanggung jawab perlindungan data baru timbul setelah korban menyatakan keberatan."
+                ], 
+                answer: 1 
+            },
+            { 
+                id: 3, type: "pg", 
+                question: "3. Penggunaan AI dan Kerahasiaan Perusahaan: Siti mengunggah kode program internal, nama pelanggan, dan kata sandi server perusahaan ke chatbot AI publik saat magang untuk mempercepat pekerjaan tanpa ada larangan eksplisit di panduan. Tindakan korektif yang paling tepat adalah...", 
+                options: [
+                    "Melanjutkan penggunaan chatbot dengan menghapus nama pelanggan dari unggahan berikutnya, sebab kata sandi dan kode program tidak termasuk data pribadi sehingga tidak menimbulkan risiko hukum.",
+                    "Menghentikan penggunaan layanan tersebut dan langsung menghapus akun AI, karena seluruh data yang pernah diunggah pasti telah menjadi data pelatihan dan tidak mungkin lagi diamankan.",
+                    "Meminta izin kepada pembimbing magang setelah laporan selesai, sebab persetujuan atasan dapat mengesahkan penggunaan data rahasia yang telah terlanjur diunggah.",
+                    "Menghentikan pengunggahan, melaporkan insiden kepada pihak berwenang di perusahaan, menilai paparan data, mengganti kredensial yang berisiko, serta menggunakan AI hanya melalui mekanisme yang telah disetujui dan diamankan."
+                ], 
+                answer: 3 
+            },
+            { 
+                id: 4, type: "pg", 
+                question: "4. Hak Cipta, Transformasi Karya, dan Penggunaan Komersial: Raka mengubah warna, latar, dan tipografi ilustrasi digital orang lain lalu mencetaknya di kaus untuk dijual dengan tetap mencantumkan nama ilustrator. Analisis yang paling tepat adalah...", 
+                options: [
+                    "Perubahan visual yang dilakukan dapat menghasilkan unsur kreatif baru, tetapi tidak otomatis menghapus hak atas ilustrasi asal; penggunaan komersial perlu dinilai berdasarkan izin, lisensi, hak yang digunakan, dan pengecualian yang berlaku.",
+                    "Pencantuman nama ilustrator telah memenuhi kewajiban hukum, sehingga izin penggunaan komersial tidak lagi diperlukan selama Raka tidak mengklaim sebagai pencipta ilustrasi awal.",
+                    "Penggunaan ilustrasi untuk produk komersial baru melanggar hak cipta apabila hasil akhir identik dengan karya asli; perubahan warna dan tata letak cukup untuk menghindari pelanggaran.",
+                    "Semua karya turunan yang dibuat melalui penyuntingan manual menjadi hak eksklusif penyunting, sebab unsur kreativitas baru secara otomatis menggantikan hak pencipta karya sebelumnya."
+                ], 
+                answer: 0 
+            },
+            { 
+                id: 5, type: "pg", 
+                question: "5. Deepfake dan Validitas Informasi: Video viral menampilkan pejabat publik mengumumkan kebijakan kontroversial dengan gerak bibir kurang sinkron dan kualitas rendah, serta tidak ada di akun resmi. Strategi verifikasi yang paling kuat adalah...", 
+                options: [
+                    "Menyatakan video palsu karena ketidaksinkronan bibir merupakan bukti yang cukup, kemudian melaporkan seluruh akun yang menyebarkannya.",
+                    "Menganggap video autentik untuk sementara karena banyak akun berita membagikannya, kecuali terdapat pernyataan resmi yang membantah isi video.",
+                    "Memisahkan pemeriksaan identitas sumber, konteks peristiwa, keaslian audio-visual, dan isi pernyataan; kemudian membandingkannya dengan rekaman atau konfirmasi independen yang kredibel sebelum menyimpulkan.",
+                    "Menggunakan detektor deepfake sebagai penentu akhir; apabila alat tersebut menyatakan video autentik, pemeriksaan sumber dan konteks tidak lagi diperlukan."
+                ], 
+                answer: 2 
+            },
+            { 
+                id: 6, type: "pg", 
+                question: "6. Kritik Publik, Pencemaran Nama Baik, dan UU ITE: Murid mengunggah kritik menyebut pengelola lembaga 'sengaja menggelapkan dana' berdasarkan laporan keuangan belum terverifikasi hingga viral. Pendekatan analisis hukum yang paling tepat adalah...", 
+                options: [
+                    "Menganggap unggahan terlindungi sepenuhnya karena membahas kepentingan publik, meskipun tuduhan faktual yang disampaikan belum diverifikasi.",
+                    "Menilai isi dan konteks pernyataan, dasar faktual, unsur hukum yang relevan, serta ketentuan dan pengecualian dalam UU ITE; status kritik sebagai kepentingan publik tidak dengan sendirinya menyelesaikan seluruh persoalan hukum.",
+                    "Menetapkan pencemaran nama baik karena pengelola merasa dirugikan dan unggahan tersebar luas, sehingga pemeriksaan kebenaran tuduhan tidak lagi diperlukan.",
+                    "Menganggap perkara hanya dapat diselesaikan melalui mediasi karena ketentuan pencemaran nama baik dalam UU ITE menghapus seluruh kemungkinan proses hukum formal."
+                ], 
+                answer: 1 
+            },
+            { 
+                id: 7, type: "pg", 
+                question: "7. Klasifikasi Data Pribadi dan Prioritas Perlindungan: Sekolah merancang aplikasi pengumpul nama, alamat, telepon, wajah, riwayat kesehatan, dan konseling murid, dengan pengamanan satu kata sandi yang sama untuk semua data pendidikan. Keputusan desain yang paling tepat adalah...", 
+                options: [
+                    "Mengutamakan enkripsi hasil pemindaian wajah saja, karena data lain baru menjadi sensitif apabila digabungkan dengan data biometrik.",
+                    "Mengizinkan seluruh guru mengakses semua data setelah masuk menggunakan akun sekolah, sebab tujuan pendidikan membenarkan akses internal secara luas.",
+                    "Memisahkan data kesehatan dari basis data utama, tetapi menyimpan kata sandi dan catatan konseling bersama data umum agar proses administrasi lebih sederhana.",
+                    "Mengklasifikasikan data sesuai jenis dan risikonya, menerapkan pembatasan akses berdasarkan kebutuhan, pengamanan yang proporsional, minimisasi data, serta dasar pemrosesan yang sah."
+                ], 
+                answer: 3 
+            },
+            { 
+                id: 8, type: "pg", 
+                question: "8. Halusinasi AI dan Evaluasi Jawaban: AI memberi solusi matematika berurutan rapi dengan jawaban 240. Murid kedua menghitung ulang dan mendapat 120. Saat dikoreksi, AI memberikan jawaban baru 180 dengan penjelasan meyakinkan. Sikap yang mencerminkan nalar kritis adalah...", 
+                options: [
+                    "Menggunakan hasil perhitungan yang dapat diverifikasi secara mandiri, menelusuri langkah yang keliru, dan memeriksa asumsi atau rumus tanpa menganggap kefasihan penjelasan sebagai jaminan kebenaran.",
+                    "Mengambil nilai tengah antara ketiga jawaban karena perbedaan hasil menunjukkan bahwa jawaban benar kemungkinan berada di antara keluaran AI.",
+                    "Memilih jawaban pertama karena model telah menyertakan rumus, sedangkan hasil hitung manual dapat dipengaruhi kesalahan pengguna.",
+                    "Menolak seluruh penggunaan AI untuk matematika karena satu ketidakkonsistenan membuktikan bahwa model tidak dapat digunakan sebagai alat bantu belajar."
+                ], 
+                answer: 0 
+            },
+            { 
+                id: 9, type: "pg", 
+                question: "9. Kebocoran Data Perusahaan dan Penentuan Sanksi: E-commerce mengalami kebocoran data karena server kurang aman. Perusahaan berdalih pelakunya hacker eksternal, sementara publik menuntut denda 2% omzet global. Kesimpulan yang paling tepat adalah...", 
+                options: [
+                    "Perusahaan tidak dapat dimintai pertanggungjawaban karena serangan berasal dari pihak luar, selama perusahaan tidak ikut menyebarkan data yang bocor.",
+                    "Perusahaan harus otomatis membayar denda 2% dari omzet global dan seluruh pengurusnya dipenjara karena jumlah data yang bocor sudah membuktikan adanya tindak pidana.",
+                    "Perlu dilakukan pemeriksaan terhadap kewajiban pengamanan, penyebab insiden, tanggung jawab pengendali data, dan ketentuan sanksi yang relevan; sanksi administratif maupun pidana harus ditentukan berdasarkan dasar hukum dan unsur yang terpenuhi.",
+                    "Perusahaan cukup memberikan kompensasi kepada pengguna yang mengajukan klaim, karena penyelesaian kerugian individual menggantikan kewajiban administratif dan pelaporan insiden."
+                ], 
+                answer: 2 
+            },
+            { 
+                id: 10, type: "pg", 
+                question: "10. Manipulasi Desain, Deepfake, dan Dampak Ekonomi: Tim kreator mengubah desain antarmuka kompetitor, membuat video sintetis suara CEO pesaing menyatakan bangkrut menjelang pasar saham dibuka hingga saham turun, lalu berdalih karya satir tanpa logo resmi. Evaluasi yang paling kuat adalah...", 
+                options: [
+                    "Penambahan elemen desain baru dan tidak digunakannya logo resmi cukup untuk menghilangkan risiko pelanggaran hak cipta maupun tanggung jawab atas video sintetis.",
+                    "Kasus harus dianalisis sebagai beberapa perbuatan berbeda: penggunaan desain, pembuatan representasi sintetis, penyebaran informasi, tujuan dan dampak ekonominya; setiap dugaan pelanggaran harus diuji berdasarkan unsur hukum dan bukti yang relevan.",
+                    "Penurunan harga saham sudah cukup untuk membuktikan bahwa seluruh anggota tim melakukan tindak pidana manipulasi informasi, tanpa perlu memeriksa peran dan niat masing-masing.",
+                    "Label satir membuat video otomatis terlindungi sebagai ekspresi kreatif, kecuali tim menerima pembayaran langsung dari pihak yang memperoleh keuntungan akibat penurunan harga saham."
+                ], 
+                answer: 1 
+            },
+
+            // Soal Benar / Salah (11-20)
+            { 
+                id: 11, type: "bs", 
+                question: "11. Seseorang mengubah angka pada struk pembayaran digital untuk membuat konten hiburan. Karena tidak ada transaksi nyata, tindakan itu tidak mungkin menimbulkan persoalan hukum berdasarkan UU ITE.", 
+                options: ["Benar", "Salah"], 
+                answer: 1 
+            },
+            { 
+                id: 12, type: "bs", 
+                question: "12. Operator sekolah yang tidak sengaja membocorkan data kesehatan murid tetap perlu melakukan penanganan insiden, namun terjadinya kebocoran saja belum cukup menyimpulkan operator pasti melakukan tindak pidana.", 
+                options: ["Benar", "Salah"], 
+                answer: 0 
+            },
+            { 
+                id: 13, type: "bs", 
+                question: "13. Jika suatu layanan AI menyatakan percakapan tidak digunakan untuk melatih model, pengguna dapat langsung mengunggah kata sandi server dan dokumen rahasia tanpa meminta izin karena risiko telah hilang.", 
+                options: ["Benar", "Salah"], 
+                answer: 1 
+            },
+            { 
+                id: 14, type: "bs", 
+                question: "14. Seseorang yang mengubah warna, tata letak, dan tipografi ilustrasi orang lain mungkin menghasilkan unsur kreatif baru, tetapi kreativitas tambahan tersebut tidak otomatis memberinya hak menggunakan ilustrasi asal secara komersial tanpa izin.", 
+                options: ["Benar", "Salah"], 
+                answer: 0 
+            },
+            { 
+                id: 15, type: "bs", 
+                question: "15. Video yang lolos pemeriksaan satu aplikasi pendeteksi deepfake dapat dianggap autentik tanpa verifikasi tambahan karena alat digital lebih objektif daripada manusia.", 
+                options: ["Benar", "Salah"], 
+                answer: 1 
+            },
+            { 
+                id: 16, type: "bs", 
+                question: "16. Pernyataan yang ditujukan untuk kepentingan umum tidak otomatis menyelesaikan seluruh persoalan hukum pencemaran nama baik; konteks dan dasar faktual tetap perlu dianalisis.", 
+                options: ["Benar", "Salah"], 
+                answer: 0 
+            },
+            { 
+                id: 17, type: "bs", 
+                question: "17. Sekolah boleh mengabaikan pengamanan data pribadi umum (nama dan nomor telepon) selama data spesifik (kesehatan dan biometrik) sudah dilindungi dengan baik.", 
+                options: ["Benar", "Salah"], 
+                answer: 1 
+            },
+            { 
+                id: 18, type: "bs", 
+                question: "18. Ketika AI menghasilkan dua jawaban yang bertentangan, murid sebaiknya memilih jawaban dengan penjelasan paling panjang dan meyakinkan sebagai penjamin tingkat kebenaran.", 
+                options: ["Benar", "Salah"], 
+                answer: 1 
+            },
+            { 
+                id: 19, type: "bs", 
+                question: "19. Apabila perusahaan mengalami kebocoran data akibat lemahnya pengamanan, keberadaan peretas eksternal tidak serta-merta menghapus tanggung jawab perusahaan.", 
+                options: ["Benar", "Salah"], 
+                answer: 0 
+            },
+            { 
+                id: 20, type: "bs", 
+                question: "20. Berpikir komputasional dapat digunakan untuk memecah persoalan verifikasi informasi dan menyusun langkah pengecekan, namun tetap memerlukan bukti memadai sebelum kesimpulan ditetapkan.", 
+                options: ["Benar", "Salah"], 
+                answer: 0 
+            }
         ];
 
         let studentData = { nis: "", name: "", className: "" };
@@ -170,7 +324,6 @@
             title.textContent = "Memeriksa Koneksi Server...";
             status.textContent = "Menghubungkan ke database awan Google Spreadsheet...";
 
-            // Validasi apakah URL dasar sudah diubah dari placeholder
             if (!SCRIPT_URL || SCRIPT_URL.includes("AKfycbz...")) {
                 spinner.style.display = "none";
                 title.textContent = "URL Server Belum Dikonfigurasi";
@@ -179,16 +332,12 @@
                 return;
             }
 
-            // Melakukan Ping otomatis ke backend Google Apps Script (doGet)
             fetch(SCRIPT_URL)
                 .then(response => {
-                    if (response.ok) {
-                        return response.text();
-                    }
+                    if (response.ok) return response.text();
                     throw new Error("Respon server tidak valid.");
                 })
                 .then(data => {
-                    // Koneksi Berhasil, lanjut ke Step 1 (Input Identitas)
                     setTimeout(() => {
                         document.getElementById("step-0").classList.add("hidden");
                         document.getElementById("step-1").classList.remove("hidden");
@@ -202,7 +351,7 @@
                 });
         }
 
-        // Handler Step 1: Submit Identitas (NIS & Nama)
+        // Handler Step 1: Submit Identitas (NIS, Nama, Kelas)
         document.getElementById("identity-form").addEventListener("submit", (e) => {
             e.preventDefault();
             studentData.nis = document.getElementById("student-nis").value.trim();
@@ -227,13 +376,13 @@
 
             quizData.forEach((q) => {
                 html += `<div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-4">
-                    <p class="font-medium text-slate-900">${q.question}</p>
+                    <p class="font-medium text-slate-900 leading-relaxed">${q.question}</p>
                     <div class="space-y-2">`;
                 
                 q.options.forEach((opt, optIdx) => {
-                    html += `<label class="flex items-center gap-3 p-3 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer transition-all">
-                        <input type="radio" name="question-${q.id}" value="${optIdx}" required class="text-indigo-600 focus:ring-indigo-500">
-                        <span class="text-sm text-slate-700">${opt}</span>
+                    html += `<label class="flex items-start gap-3 p-3 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer transition-all">
+                        <input type="radio" name="question-${q.id}" value="${optIdx}" required class="mt-1 text-indigo-600 focus:ring-indigo-500">
+                        <span class="text-sm text-slate-700 leading-normal">${opt}</span>
                     </label>`;
                 });
 
@@ -285,7 +434,7 @@
             countText.textContent = `${violationCount}/3`;
 
             if (violationCount >= 3) {
-                alert("Peringatan Maksimal Tercapai! Anda telah melanggar aturan tab switching sebanyak 3 kali. Ujian akan dikirimkan otomatis.");
+                alert("Peringatan Maksimal Tercapai! Anda telah melanggar aturan tab sebanyak 3 kali. Ujian akan dikirimkan otomatis.");
                 submitQuiz(true);
             }
         }
@@ -319,14 +468,12 @@
                 document.getElementById("res-status").textContent = `Catatan: Terdeteksi ${violationCount} kali pelanggaran tab.`;
             }
 
-            // Format Tanggal Waktu / Jam Pengerjaan Selesai
             const now = new Date();
             const formattedDate = now.toLocaleString("id-ID", { 
                 dateStyle: "short", 
                 timeStyle: "medium" 
             });
 
-            // Payload data yang dikirim ke sheet
             const payload = {
                 timestamp: formattedDate,
                 nis: studentData.nis,
@@ -336,7 +483,6 @@
                 catatan: isAutoSubmit ? `Auto-Submitted (Pelanggaran: ${violationCount})` : `Selesai Normal (Pelanggaran: ${violationCount})`
             };
 
-            // Kirim data ke Google Apps Script menggunakan text/plain agar terbaca utuh
             fetch(SCRIPT_URL, { 
                 method: 'POST', 
                 mode: 'no-cors', 
