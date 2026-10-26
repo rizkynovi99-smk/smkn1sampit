@@ -80,10 +80,7 @@
 
         <!-- STEP 2: Lembar Soal Ujian -->
         <section id="step-2" class="hidden space-y-6">
-            <div id="warning-banner" class="hidden bg-amber-50 border border-amber-300 text-amber-900 px-4 py-3 rounded-xl text-sm flex items-center justify-between">
-                <span id="warning-text">⚠️ Peringatan: Anda terdeteksi keluar dari halaman ujian!</span>
-                <span id="violation-count" class="font-bold bg-amber-200 px-2 py-0.5 rounded-full text-xs">0/3</span>
-            </div>
+            
 
             <form id="quiz-form" class="space-y-6">
                 <div id="questions-container" class="space-y-6"></div>
@@ -302,7 +299,7 @@
         ];
 
         let studentData = { nis: "", name: "", className: "" };
-        let violationCount = 0;
+      
         let timerInterval;
         let timeLeft = 40 * 60; // 40 Menit
 
@@ -364,7 +361,7 @@
 
             renderQuestions();
             startTimer();
-            initAntiCheat();
+          
         });
 
         // Render Soal ke DOM
@@ -413,29 +410,7 @@
         }
 
         // Sistem Anti-Cheat (Tab Switching & Window Blur)
-        function initAntiCheat() {
-            document.addEventListener("visibilitychange", () => {
-                if (document.hidden) handleViolation();
-            });
-
-            window.addEventListener("blur", () => {
-                handleViolation();
-            });
-        }
-
-        function handleViolation() {
-            violationCount++;
-            const banner = document.getElementById("warning-banner");
-            const countText = document.getElementById("violation-count");
-            
-            banner.classList.remove("hidden");
-            countText.textContent = `${violationCount}/3`;
-
-            if (violationCount >= 3) {
-                alert("Peringatan Maksimal Tercapai! Anda telah melanggar aturan tab sebanyak 3 kali. Ujian akan dikirimkan otomatis.");
-                submitQuiz(true);
-            }
-        }
+        
 
         // Tombol Kirim Ujian
         document.getElementById("submit-quiz-btn").addEventListener("click", () => {
