@@ -453,7 +453,7 @@
                 name: studentData.name,
                 className: studentData.className,
                 score: score,
-                catatan: isAutoSubmit ? `Auto-Submitted (Pelanggaran: ${violationCount})` : `Selesai Normal (Pelanggaran: ${violationCount})`
+               catatan: isAutoSubmit ? "Waktu Habis" : "Selesai Normal"
             };
 
             fetch(SCRIPT_URL, { 
