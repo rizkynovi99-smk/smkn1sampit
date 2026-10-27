@@ -2,359 +2,229 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kuis Uji Nalar Kritis Murid - Literasi Digital & AI</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Super Nalar Bros - Platforms & I-Frames</title>
     <!-- Tailwind CSS via CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        .no-select {
-            user-select: none;
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-        }
+        body { background: #5c94fc; font-family: 'Courier New', Courier, monospace; touch-action: manipulation; user-select: none; }
+        canvas { background: linear-gradient(to bottom, #5c94fc 0%, #b8c6ff 80%, #d8e2dc 100%); display: block; margin: 0 auto; box-shadow: 0 10px 25px rgba(0,0,0,0.3); border-radius: 12px; image-rendering: pixelated; }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col justify-between font-sans">
+<body class="text-slate-900 min-h-screen flex flex-col justify-between p-2 overflow-x-hidden">
 
-    <!-- Header Utama -->
-    <header class="bg-indigo-600 text-white shadow-md py-4 px-6 sticky top-0 z-50">
-        <div class="max-w-4xl mx-auto flex justify-between items-center">
-            <h1 class="text-lg font-bold tracking-tight">Kuis Nalar Kritis & Hukum Siber</h1>
-            <div id="timer-container" class="hidden bg-indigo-700 px-3 py-1 rounded-full text-sm font-semibold flex items-center gap-2">
-                <span>⏱️ Waktu:</span>
-                <span id="timer-display">40:00</span>
-            </div>
-        </div>
+    <!-- Header / HUD Game -->
+    <header class="max-w-4xl w-full mx-auto bg-slate-900/90 backdrop-blur border-4 border-amber-400 text-white p-3 rounded-xl shadow-lg flex justify-between items-center text-xs sm:text-base font-bold z-20">
+        <div>🍄 <span id="hud-name" class="text-amber-300">PLAYER</span></div>
+        <div>❤️ NYAWA: <span id="hud-lives" class="text-rose-400">♥♥♥</span></div>
+        <div>🪙 SKOR: <span id="hud-score" class="text-yellow-400">0</span></div>
+        <div>⭐ POWER: <span id="hud-power" class="text-emerald-400">Normal</span></div>
     </header>
 
     <!-- Konten Utama -->
-    <main class="max-w-3xl w-full mx-auto p-4 sm:p-6 my-4 flex-grow">
+    <main class="max-w-4xl w-full mx-auto my-2 flex-grow flex flex-col items-center justify-center relative">
 
         <!-- STEP 0: Gatekeeper Koneksi Server -->
-        <section id="step-0" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sm:p-8 text-center">
-            <div id="gatekeeper-spinner" class="animate-spin inline-block w-10 h-10 border-4 border-indigo-600 border-t-transparent rounded-full mb-4"></div>
-            <h2 id="gatekeeper-title" class="text-xl font-bold text-slate-900 mb-2">Memeriksa Koneksi Server...</h2>
-            <p id="gatekeeper-status" class="text-slate-600 text-sm mb-4">Menghubungkan ke database awan Google Spreadsheet...</p>
+        <section id="step-0" class="bg-white border-4 border-amber-500 rounded-2xl shadow-xl p-6 text-center max-w-lg w-full z-30">
+            <div id="gatekeeper-spinner" class="animate-spin inline-block w-10 h-10 border-4 border-amber-500 border-t-transparent rounded-full mb-4"></div>
+            <h2 id="gatekeeper-title" class="text-xl font-bold mb-2">Memeriksa Koneksi Cloud...</h2>
+            <p id="gatekeeper-status" class="text-slate-600 text-xs sm:text-sm mb-4">Menghubungkan ke database Google Spreadsheet...</p>
             <div id="gatekeeper-retry-container" class="hidden">
-                <button onclick="checkServerConnection()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-4 py-2 rounded-lg text-sm transition-all shadow-sm">
+                <button onclick="checkServerConnection()" class="bg-amber-500 hover:bg-amber-600 text-white font-bold px-4 py-2 rounded-lg text-sm shadow">
                     Coba Hubungkan Ulang
                 </button>
             </div>
         </section>
 
-        <!-- STEP 1: Input Identitas Siswa -->
-        <section id="step-1" class="hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sm:p-8">
-            <h2 class="text-2xl font-bold text-slate-900 mb-2">Identitas Peserta Ujian</h2>
-            <p class="text-slate-600 text-sm mb-6">Silakan masukkan NIS, Nama Lengkap, dan Kelas Anda sebelum memulai asesmen.</p>
-            
-            <form id="identity-form" class="space-y-4">
+        <!-- STEP 1: Input Identitas Mario -->
+        <section id="step-1" class="hidden bg-white border-4 border-amber-500 rounded-2xl shadow-xl p-6 max-w-md w-full z-30">
+            <h2 class="text-2xl font-black text-amber-600 mb-2 text-center">🍄 SUPER NALAR BROS</h2>
+            <p class="text-slate-600 text-xs mb-4 text-center">Masukkan NIS dan Nama untuk memulai petualangan!</p>
+
+            <form id="identity-form" class="space-y-3 text-sm">
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">Nomor Induk Siswa (NIS)</label>
-                    <input type="text" id="student-nis" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none" placeholder="Contoh: 102938">
+                    <label class="block font-bold text-slate-700 mb-1">Nomor Induk Siswa (NIS)</label>
+                    <input type="text" id="student-nis" required class="w-full px-3 py-2 border-2 border-slate-300 rounded-lg focus:border-amber-500 focus:outline-none" placeholder="Contoh: 102938">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">Nama Lengkap</label>
-                    <input type="text" id="student-name" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none" placeholder="Contoh: Ahmad Rizki">
+                    <label class="block font-bold text-slate-700 mb-1">Nama Lengkap</label>
+                    <input type="text" id="student-name" required class="w-full px-3 py-2 border-2 border-slate-300 rounded-lg focus:border-amber-500 focus:outline-none" placeholder="Contoh: Mario Bros">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">Kelas</label>
-                    <select id="student-class" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                    <label class="block font-bold text-slate-700 mb-1">Kelas</label>
+                    <select id="student-class" required class="w-full px-3 py-2 border-2 border-slate-300 rounded-lg focus:border-amber-500 focus:outline-none">
                         <option value="">Pilih Kelas</option>
                         <option value="X DKV 1">X DKV 1</option>
                         <option value="X DKV 2">X DKV 2</option>
-                       <option value="X PM 1">X PM 1</option>
+                        <option value="X PM 1">X PM 1</option>
                         <option value="X PM 2">X PM 2</option>
                     </select>
                 </div>
-                <div class="bg-indigo-50 border border-indigo-200 p-4 rounded-xl text-xs text-indigo-800 space-y-1">
-                    <p class="font-semibold">Perhatian Aturan Ujian:</p>
-                    <p>• Dilarang berpindah tab browser atau meminimalkan layar (Maksimal 3 kali pelanggaran sebelum Auto-Submit).</p>
-                    <p>• Durasi pengerjaan adalah 40 menit.</p>
+                <div class="bg-amber-50 border-2 border-amber-200 p-3 rounded-xl text-xs text-amber-900 space-y-1">
+                    <p class="font-bold">Info Game & Kontrol:</p>
+                    <p>• Pipa hijau & lantai melayang bisa dinaiki/dipijak.</p>
+                    <p>• Injak musuh dari atas untuk mendapatkan reward poin!</p>
                 </div>
-                <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 rounded-lg transition-all shadow-sm">
-                    Mulai Ujian Sekarang
+                <button type="submit" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-black py-3 rounded-lg shadow uppercase tracking-wider">
+                    Mulai Petualangan!
                 </button>
             </form>
         </section>
 
-        <!-- STEP 2: Lembar Soal Ujian -->
-        <section id="step-2" class="hidden space-y-6">
-            <div id="warning-banner" class="hidden bg-amber-50 border border-amber-300 text-amber-900 px-4 py-3 rounded-xl text-sm flex items-center justify-between">
-                <span id="warning-text">⚠️ Peringatan: Anda terdeteksi keluar dari halaman ujian!</span>
-                <span id="violation-count" class="font-bold bg-amber-200 px-2 py-0.5 rounded-full text-xs">0/3</span>
-            </div>
+        <!-- STEP 2: Arena Canvas Game & Tombol Melayang Mobile -->
+        <div id="step-2" class="hidden w-full flex flex-col items-center relative">
+            <canvas id="gameCanvas" width="800" height="380" class="w-full max-w-[800px] h-[320px] sm:h-[380px] rounded-xl"></canvas>
 
-            <form id="quiz-form" class="space-y-6">
-                <div id="questions-container" class="space-y-6"></div>
-                <button type="button" id="submit-quiz-btn" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-3 rounded-xl transition-all shadow-sm">
-                    Kirim Jawaban Ujian
-                </button>
-            </form>
-        </section>
+            <!-- TOMBOL KONTROL MELAYANG (FLOATING MOBILE CONTROLS) -->
+            <div class="w-full max-w-[800px] flex justify-between items-center px-4 mt-3 z-10">
+                <div class="flex gap-3">
+                    <button id="btn-left" class="w-16 h-16 bg-slate-800/80 active:bg-amber-500 text-white rounded-full font-black text-xl shadow-lg border-2 border-white/50 flex items-center justify-center">⬅️</button>
+                    <button id="btn-right" class="w-16 h-16 bg-slate-800/80 active:bg-amber-500 text-white rounded-full font-black text-xl shadow-lg border-2 border-white/50 flex items-center justify-center">➡️</button>
+                </div>
+                <div>
+                    <button id="btn-jump" class="w-20 h-20 bg-amber-500 active:bg-amber-600 text-white rounded-full font-black text-sm shadow-xl border-4 border-white flex items-center justify-center uppercase tracking-wider">Lompat</button>
+                </div>
+            </div>
+        </div>
 
-        <!-- STEP 3: Hasil Akhir & Tombol Pembahasan -->
-        <section id="step-3" class="hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sm:p-8 text-center space-y-6">
-            <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto text-3xl">
-                🎉
-            </div>
-            <div>
-                <h2 class="text-2xl font-bold text-slate-900">Ujian Telah Selesai</h2>
-                <p class="text-slate-600 text-sm mt-1">Jawaban Anda berhasil direkap ke server cloud.</p>
-            </div>
-
-            <div class="bg-slate-50 border border-slate-200 rounded-xl p-6 max-w-sm mx-auto space-y-2">
-                <p class="text-sm text-slate-500 uppercase tracking-wider font-semibold">Skor Nilai Anda</p>
-                <p id="res-score" class="text-4xl font-extrabold text-indigo-600">0 / 100</p>
-                <p id="res-status" class="text-xs text-slate-400 pt-2"></p>
-            </div>
-
-            <div>
-                <button onclick="openModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-6 py-3 rounded-xl transition-all shadow-sm">
-                    📖 Lihat Pembahasan Masing-Masing Soal
-                </button>
-            </div>
-        </section>
-
-    </main>
-
-    <!-- MODAL POP-UP PEMBAHASAN SOAL -->
-    <div id="discussion-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[85vh] flex flex-col shadow-2xl overflow-hidden">
-            <!-- Header Modal -->
-            <div class="bg-indigo-600 text-white px-6 py-4 flex justify-between items-center">
-                <h3 class="font-bold text-lg">Kunci Jawaban & Pembahasan</h3>
-                <button onclick="closeModal()" class="text-indigo-200 hover:text-white text-xl font-bold">&times;</button>
-            </div>
-            <!-- Body Modal (Isi Pembahasan Dinamis) -->
-            <div id="modal-content" class="p-6 overflow-y-auto space-y-6 flex-grow">
-                <!-- Konten dimasukkan lewat JS -->
-            </div>
-            <!-- Footer Modal -->
-            <div class="bg-slate-100 px-6 py-3 text-right">
-                <button onclick="closeModal()" class="bg-slate-700 hover:bg-slate-800 text-white px-5 py-2 rounded-lg text-sm font-medium transition-all">
-                    Tutup Pembahasan
+        <!-- MODAL KUIS -->
+        <div id="quiz-modal" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <div class="bg-white border-4 border-amber-500 rounded-2xl max-w-xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden p-6 space-y-4">
+                <div class="flex justify-between items-center border-b pb-2">
+                    <span id="quiz-q-num" class="font-black text-amber-600 text-sm">SOAL NO. 1</span>
+                    <span class="bg-amber-100 text-amber-800 text-xs px-2.5 py-1 rounded-full font-bold">Kotak Misteri (?)</span>
+                </div>
+                <p id="quiz-question-text" class="text-xs sm:text-sm font-bold text-slate-800 leading-relaxed"></p>
+                <div id="quiz-options-container" class="space-y-2 overflow-y-auto max-h-[45vh] pr-1"></div>
+                <button id="quiz-submit-btn" onclick="submitQuizAnswer()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl shadow transition-all text-sm">
+                    Kirim Jawaban
                 </button>
             </div>
         </div>
-    </div>
+
+        <!-- STEP 3: Hasil Akhir & Pembahasan -->
+        <section id="step-3" class="hidden bg-white border-4 border-amber-500 rounded-2xl shadow-xl p-6 text-center max-w-lg w-full space-y-4 z-30">
+            <div class="text-4xl">🏆</div>
+            <div>
+                <h2 class="text-2xl font-black text-amber-600">Petualangan Selesai!</h2>
+                <p id="sync-status" class="text-slate-600 text-xs mt-1">Menyinkronkan data ke Google Spreadsheet...</p>
+            </div>
+
+            <div class="bg-amber-50 border-2 border-amber-200 rounded-xl p-4 max-w-xs mx-auto space-y-1">
+                <p class="text-xs text-slate-500 uppercase font-bold">Skor Akhir Anda</p>
+                <p id="res-score" class="text-3xl font-black text-amber-600">0 / 100</p>
+            </div>
+
+            <button onclick="openDiscussionModal()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl shadow text-sm">
+                📖 Lihat Kunci Jawaban & Pembahasan
+            </button>
+        </section>
+
+        <!-- MODAL PEMBAHASAN SOAL -->
+        <div id="discussion-modal" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <div class="bg-white border-4 border-indigo-500 rounded-2xl max-w-2xl w-full max-h-[85vh] flex flex-col shadow-2xl overflow-hidden">
+                <div class="bg-indigo-600 text-white px-6 py-4 flex justify-between items-center font-bold">
+                    <h3>Pembahasan Masing-Masing Soal</h3>
+                    <button onclick="closeDiscussionModal()" class="text-indigo-200 hover:text-white text-xl">&times;</button>
+                </div>
+                <div id="discussion-content" class="p-6 overflow-y-auto space-y-4 flex-grow text-xs sm:text-sm"></div>
+                <div class="bg-slate-100 px-6 py-3 text-right">
+                    <button onclick="closeDiscussionModal()" class="bg-slate-700 hover:bg-slate-800 text-white px-5 py-2 rounded-lg font-bold text-xs">Tutup</button>
+                </div>
+            </div>
+        </div>
+
+    </main>
 
     <!-- Footer -->
-    <footer class="text-center py-6 text-xs text-slate-400">
-        &copy; 2026 Platform Asesmen Digital Berbasis Web &bull; Mobile-First Anti-Cheat System
+    <footer class="text-center py-2 text-xs text-white/80 font-bold z-20">
+        &copy; 2026 Super Nalar Bros &bull; Mobile Version
     </footer>
 
-    <!-- Skrip Aplikasi -->
+    <!-- Skrip Game & Kuis -->
     <script>
-        // ----------------------------------------------------
-        // MASUKKAN URL GOOGLE APPS SCRIPT DI SINI
-        // ----------------------------------------------------
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyOl8ImnO44J_qK3a26HM3PkKKLFApoUpj1NJowuzrBwIewjE6kza_F5bXSIUW5bLN6/exec"; 
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwZJ797veQ3iYPKULXhEYDs3Uai3IG1XqDxe45vUzRoWuEwf6oCI54u0EAXQz5ZjjRd/exec";
 
-        // Data 20 Soal Lengkap dengan Kunci Jawaban (indeks 0-3 untuk PG, 0-1 untuk BS) dan Pembahasan Resminya
         const quizData = [
-            { 
-                id: 1, type: "pg", 
-                question: "1. Manipulasi Dokumen Elektronik dan Pembuktian Hukum: Budi mengubah nominal struk pembayaran digital dari Rp150.000 menjadi Rp1.500.000 untuk pamer. Temannya menggunakan itu sebagai bukti utang, sementara Budi berdalih hanya untuk hiburan. Kesimpulan yang paling dapat dipertanggungjawabkan adalah...", 
-                options: [
-                    "Budi tidak dapat dimintai pertanggungjawaban hukum karena gambar yang diubah bukan dokumen transaksi asli dan tidak dibuat untuk memperoleh keuntungan secara langsung.",
-                    "Budi pasti melakukan tindak pidana pemalsuan dokumen elektronik karena perubahan nominal dengan sengaja sudah cukup membuktikan seluruh unsur pidana.",
-                    "Perubahan nominal dapat menjadi bukti adanya manipulasi yang disengaja, tetapi penerapan ketentuan pidana harus mempertimbangkan unsur pasal yang relevan, tujuan, penggunaan, serta fakta yang dapat dibuktikan.",
-                    "Persoalan hukum baru muncul jika teman Budi mengalami kerugian finansial yang telah diputuskan melalui pengadilan, sehingga unggahan awal tidak relevan untuk dianalisis."
-                ], 
-                answer: 2,
-                discussion: "Manipulasi disengaja belum otomatis membuktikan semua unsur tindak pidana. Penerapan ketentuan pidana harus mempertimbangkan unsur pasal, tujuan, penggunaan, serta fakta yang terbukti."
-            },
-            { 
-                id: 2, type: "pg", 
-                question: "2. Kebocoran Data Murid dan Tanggung Jawab Pengelola: Operator sekolah tidak sengaja mengirim tautan spreadsheet berisi data pribadi dan kesehatan murid ke grup publik, lalu segera mencabutnya. Kepala sekolah menyatakan tidak ada pelanggaran karena tidak disengaja. Rekomendasi tim evaluasi yang paling tepat adalah...", 
-                options: [
-                    "Menganggap insiden selesai karena tidak ada kesengajaan, kemudian mengingatkan operator agar lebih berhati-hati tanpa perlu memeriksa kemungkinan salinan data.",
-                    "Mempertahankan bukti insiden, membatasi akses, menilai data dan dampak kebocoran, menentukan kewajiban pemberitahuan, serta mengevaluasi tanggung jawab pengendali dan pihak terkait.",
-                    "Langsung menjatuhkan sanksi pidana kepada operator karena seluruh kebocoran data pribadi, termasuk akibat kelalaian, secara otomatis memenuhi unsur tindak pidana dalam UU PDP.",
-                    "Menunggu laporan dari murid atau orang tua sebelum melakukan pemeriksaan karena tanggung jawab perlindungan data baru timbul setelah korban menyatakan keberatan."
-                ], 
-                answer: 1,
-                discussion: "Respons insiden harus dilakukan meskipun kebocoran tidak disengaja. Pengelola harus mempertahankan bukti, membatasi akses, dan menilai dampak kebocoran data."
-            },
-            { 
-                id: 3, type: "pg", 
-                question: "3. Penggunaan AI dan Kerahasiaan Perusahaan: Siti mengunggah kode program internal, nama pelanggan, dan kata sandi server perusahaan ke chatbot AI publik saat magang untuk mempercepat pekerjaan tanpa ada larangan eksplisit di panduan. Tindakan korektif yang paling tepat adalah...", 
-                options: [
-                    "Melanjutkan penggunaan chatbot dengan menghapus nama pelanggan dari unggahan berikutnya, sebab kata sandi dan kode program tidak termasuk data pribadi sehingga tidak menimbulkan risiko hukum.",
-                    "Menghentikan penggunaan layanan tersebut dan langsung menghapus akun AI, karena seluruh data yang pernah diunggah pasti telah menjadi data pelatihan dan tidak mungkin lagi diamankan.",
-                    "Meminta izin kepada pembimbing magang setelah laporan selesai, sebab persetujuan atasan dapat mengesahkan penggunaan data rahasia yang telah terlanjur diunggah.",
-                    "Menghentikan pengunggahan, melaporkan insiden kepada pihak berwenang di perusahaan, menilai paparan data, mengganti kredensial yang berisiko, serta menggunakan AI hanya melalui mekanisme yang telah disetujui dan diamankan."
-                ], 
-                answer: 3,
-                discussion: "Mengurangi paparan, melaporkan insiden kepada pihak berwenang, dan mengamankan kredensial merupakan langkah mitigasi utama dalam insiden kebocoran data perusahaan."
-            },
-            { 
-                id: 4, type: "pg", 
-                question: "4. Hak Cipta, Transformasi Karya, dan Penggunaan Komersial: Raka mengubah warna, latar, dan tipografi ilustrasi digital orang lain lalu mencetaknya di kaus untuk dijual dengan tetap mencantumkan nama ilustrator. Analisis yang paling tepat adalah...", 
-                options: [
-                    "Perubahan visual yang dilakukan dapat menghasilkan unsur kreatif baru, tetapi tidak otomatis menghapus hak atas ilustrasi asal; penggunaan komersial perlu dinilai berdasarkan izin, lisensi, hak yang digunakan, dan pengecualian yang berlaku.",
-                    "Pencantuman nama ilustrator telah memenuhi kewajiban hukum, sehingga izin penggunaan komersial tidak lagi diperlukan selama Raka tidak mengklaim sebagai pencipta ilustrasi awal.",
-                    "Penggunaan ilustrasi untuk produk komersial baru melanggar hak cipta apabila hasil akhir identik dengan karya asli; perubahan warna dan tata letak cukup untuk menghindari pelanggaran.",
-                    "Semua karya turunan yang dibuat melalui penyuntingan manual menjadi hak eksklusif penyunting, sebab unsur kreativitas baru secara otomatis menggantikan hak pencipta karya sebelumnya."
-                ], 
-                answer: 0,
-                discussion: "Modifikasi dan atribusi pencantuman nama tidak otomatis menggantikan izin penggunaan komersial atas karya asal."
-            },
-            { 
-                id: 5, type: "pg", 
-                question: "5. Deepfake dan Validitas Informasi: Video viral menampilkan pejabat publik mengumumkan kebijakan kontroversial dengan gerak bibir kurang sinkron dan kualitas rendah, serta tidak ada di akun resmi. Strategi verifikasi yang paling kuat adalah...", 
-                options: [
-                    "Menyatakan video palsu karena ketidaksinkronan bibir merupakan bukti yang cukup, kemudian melaporkan seluruh akun yang menyebarkannya.",
-                    "Menganggap video autentik untuk sementara karena banyak akun berita membagikannya, kecuali terdapat pernyataan resmi yang membantah isi video.",
-                    "Memisahkan pemeriksaan identitas sumber, konteks peristiwa, keaslian audio-visual, dan isi pernyataan; kemudian membandingkannya dengan rekaman atau konfirmasi independen yang kredibel sebelum menyimpulkan.",
-                    "Menggunakan detektor deepfake sebagai penentu akhir; apabila alat tersebut menyatakan video autentik, pemeriksaan sumber dan konteks tidak lagi diperlukan."
-                ], 
-                answer: 2,
-                discussion: "Keaslian informasi atau video perlu diuji dari beberapa sumber dan jenis bukti yang independen, bukan hanya bertumpu pada satu indikator."
-            },
-            { 
-                id: 6, type: "pg", 
-                question: "6. Kritik Publik, Pencemaran Nama Baik, dan UU ITE: Murid mengunggah kritik menyebut pengelola lembaga 'sengaja menggelapkan dana' berdasarkan laporan keuangan belum terverifikasi hingga viral. Pendekatan analisis hukum yang paling tepat adalah...", 
-                options: [
-                    "Menganggap unggahan terlindungi sepenuhnya karena membahas kepentingan publik, meskipun tuduhan faktual yang disampaikan belum diverifikasi.",
-                    "Menilai isi dan konteks pernyataan, dasar faktual, unsur hukum yang relevan, serta ketentuan dan pengecualian dalam UU ITE; status kritik sebagai kepentingan publik tidak dengan sendirinya menyelesaikan seluruh persoalan hukum.",
-                    "Menetapkan pencemaran nama baik karena pengelola merasa dirugikan dan unggahan tersebar luas, sehingga pemeriksaan kebenaran tuduhan tidak lagi diperlukan.",
-                    "Menganggap perkara hanya dapat diselesaikan melalui mediasi karena ketentuan pencemaran nama baik dalam UU ITE menghapus seluruh kemungkinan proses hukum formal."
-                ], 
-                answer: 1,
-                discussion: "Kritik atas nama kepentingan publik merupakan faktor penting, tetapi tidak otomatis menghapus kebutuhan untuk menguji fakta dan unsur hukum yang berlaku."
-            },
-            { 
-                id: 7, type: "pg", 
-                question: "7. Klasifikasi Data Pribadi dan Prioritas Perlindungan: Sekolah merancang aplikasi pengumpul nama, alamat, telepon, wajah, riwayat kesehatan, dan konseling murid, dengan pengamanan satu kata sandi yang sama untuk semua data pendidikan. Keputusan desain yang paling tepat adalah...", 
-                options: [
-                    "Mengutamakan enkripsi hasil pemindaian wajah saja, karena data lain baru menjadi sensitif apabila digabungkan dengan data biometrik.",
-                    "Mengizinkan seluruh guru mengakses semua data setelah masuk menggunakan akun sekolah, sebab tujuan pendidikan membenarkan akses internal secara luas.",
-                    "Memisahkan data kesehatan dari basis data utama, tetapi menyimpan kata sandi dan catatan konseling bersama data umum agar proses administrasi lebih sederhana.",
-                    "Mengklasifikasikan data sesuai jenis dan risikonya, menerapkan pembatasan akses berdasarkan kebutuhan, pengamanan yang proporsional, minimisasi data, serta dasar pemrosesan yang sah."
-                ], 
-                answer: 3,
-                discussion: "Perlindungan data pribadi harus mengacu pada klasifikasi data, tingkat risiko, pembatasan akses, dan pengamanan yang proporsional."
-            },
-            { 
-                id: 8, type: "pg", 
-                question: "8. Halusinasi AI dan Evaluasi Jawaban: AI memberi solusi matematika berurutan rapi dengan jawaban 240. Murid kedua menghitung ulang dan mendapat 120. Saat dikoreksi, AI memberikan jawaban baru 180 dengan penjelasan meyakinkan. Sikap yang mencerminkan nalar kritis adalah...", 
-                options: [
-                    "Menggunakan hasil perhitungan yang dapat diverifikasi secara mandiri, menelusuri langkah yang keliru, dan memeriksa asumsi atau rumus tanpa menganggap kefasihan penjelasan sebagai jaminan kebenaran.",
-                    "Mengambil nilai tengah antara ketiga jawaban karena perbedaan hasil menunjukkan bahwa jawaban benar kemungkinan berada di antara keluaran AI.",
-                    "Memilih jawaban pertama karena model telah menyertakan rumus, sedangkan hasil hitung manual dapat dipengaruhi kesalahan pengguna.",
-                    "Menolak seluruh penggunaan AI untuk matematika karena satu ketidakkonsistenan membuktikan bahwa model tidak dapat digunakan sebagai alat bantu belajar."
-                ], 
-                answer: 0,
-                discussion: "Hasil keluaran AI perlu diuji dengan perhitungan manual atau verifikasi mandiri yang andal, bukan menilai kebenaran dari kefasihan penjelasan semata."
-            },
-            { 
-                id: 9, type: "pg", 
-                question: "9. Kebocoran Data Perusahaan dan Penentuan Sanksi: E-commerce mengalami kebocoran data karena server kurang aman. Perusahaan berdalih pelakunya hacker eksternal, sementara publik menuntut denda 2% omzet global. Kesimpulan yang paling tepat adalah...", 
-                options: [
-                    "Perusahaan tidak dapat dimintai pertanggungjawaban karena serangan berasal dari pihak luar, selama perusahaan tidak ikut menyebarkan data yang bocor.",
-                    "Perusahaan harus otomatis membayar denda 2% dari omzet global dan seluruh pengurusnya dipenjara karena jumlah data yang bocor sudah membuktikan adanya tindak pidana.",
-                    "Perlu dilakukan pemeriksaan terhadap kewajiban pengamanan, penyebab insiden, tanggung jawab pengendali data, dan ketentuan sanksi yang relevan; sanksi administratif maupun pidana harus ditentukan berdasarkan dasar hukum dan unsur yang terpenuhi.",
-                    "Perusahaan cukup memberikan kompensasi kepada pengguna yang mengajukan klaim, karena penyelesaian kerugian individual menggantikan kewajiban administratif dan pelaporan insiden."
-                ], 
-                answer: 2,
-                discussion: "Tanggung jawab hukum dan sanksi korporasi memerlukan pemeriksaan terhadap kewajiban pengamanan, bukti empiris, serta dasar hukum yang relevan."
-            },
-            { 
-                id: 10, type: "pg", 
-                question: "10. Manipulasi Desain, Deepfake, dan Dampak Ekonomi: Tim kreator mengubah desain antarmuka kompetitor, membuat video sintetis suara CEO pesaing menyatakan bangkrut menjelang pasar saham dibuka hingga saham turun, lalu berdalih karya satir tanpa logo resmi. Evaluasi yang paling kuat adalah...", 
-                options: [
-                    "Penambahan elemen desain baru dan tidak digunakannya logo resmi cukup untuk menghilangkan risiko pelanggaran hak cipta maupun tanggung jawab atas video sintetis.",
-                    "Kasus harus dianalisis sebagai beberapa perbuatan berbeda: penggunaan desain, pembuatan representasi sintetis, penyebaran informasi, tujuan dan dampak ekonominya; setiap dugaan pelanggaran harus diuji berdasarkan unsur hukum dan bukti yang relevan.",
-                    "Penurunan harga saham sudah cukup untuk membuktikan bahwa seluruh anggota tim melakukan tindak pidana manipulasi informasi, tanpa perlu memeriksa peran dan niat masing-masing.",
-                    "Label satir membuat video otomatis terlindungi sebagai ekspresi kreatif, kecuali tim menerima pembayaran langsung dari pihak yang memperoleh keuntungan akibat penurunan harga saham."
-                ], 
-                answer: 1,
-                discussion: "Setiap tindakan dalam kasus tersebut memiliki unsur pelanggaran dan potensi konsekuensi hukum yang berbeda, sehingga harus dianalisis secara terpisah."
-            },
-            { 
-                id: 11, type: "bs", 
-                question: "11. Seseorang mengubah angka pada struk pembayaran digital untuk membuat konten hiburan. Karena tidak ada transaksi nyata, tindakan itu tidak mungkin menimbulkan persoalan hukum berdasarkan UU ITE.", 
-                options: ["Benar", "Salah"], 
-                answer: 1,
-                discussion: "Salah. Tidak adanya transaksi nyata tidak otomatis meniadakan semua kemungkinan persoalan hukum; konteks, tujuan, dan unsur pelanggaran lainnya tetap perlu diperiksa."
-            },
-            { 
-                id: 12, type: "bs", 
-                question: "12. Operator sekolah yang tidak sengaja membocorkan data kesehatan murid tetap perlu melakukan penanganan insiden, namun terjadinya kebocoran saja belum cukup menyimpulkan operator pasti melakukan tindak pidana.", 
-                options: ["Benar", "Salah"], 
-                answer: 0,
-                discussion: "Benar. Respons insiden wajib dilakukan, namun kebocoran data tidak otomatis membuktikan bahwa pihak yang terlibat pasti memenuhi unsur tindak pidana."
-            },
-            { 
-                id: 13, type: "bs", 
-                question: "13. Jika suatu layanan AI menyatakan percakapan tidak digunakan untuk melatih model, pengguna dapat langsung mengunggah kata sandi server dan dokumen rahasia tanpa meminta izin karena risiko telah hilang.", 
-                options: ["Benar", "Salah"], 
-                answer: 1,
-                discussion: "Salah. Pengaturan kebijakan pelatihan model bukan jaminan keamanan mutlak; kontrol akses internal, kerahasiaan perusahaan, dan risiko penyimpanan tetap harus dijaga."
-            },
-            { 
-                id: 14, type: "bs", 
-                question: "14. Seseorang yang mengubah warna, tata letak, dan tipografi ilustrasi orang lain mungkin menghasilkan unsur kreatif baru, tetapi kreativitas tambahan tersebut tidak otomatis memberinya hak menggunakan ilustrasi asal secara komersial tanpa izin.", 
-                options: ["Benar", "Salah"], 
-                answer: 0,
-                discussion: "Benar. Unsur kreatif tambahan pada karya turunan tidak secara otomatis menghapus hak cipta atas karya aslinya atau memberikan izin komersial."
-            },
-            { 
-                id: 15, type: "bs", 
-                question: "15. Video yang lolos pemeriksaan satu aplikasi pendeteksi deepfake dapat dianggap autentik tanpa verifikasi tambahan karena alat digital lebih objektif daripada manusia.", 
-                options: ["Benar", "Salah"], 
-                answer: 1,
-                discussion: "Salah. Alat pendeteksi memiliki keterbatasan teknis; hasilnya wajib divalidasi dan dibandingkan dengan sumber asli, konteks, serta bukti independen lainnya."
-            },
-            { 
-                id: 16, type: "bs", 
-                question: "16. Pernyataan yang ditujukan untuk kepentingan umum tidak otomatis menyelesaikan seluruh persoalan hukum pencemaran nama baik; konteks dan dasar faktual tetap perlu dianalisis.", 
-                options: ["Benar", "Salah"], 
-                answer: 0,
-                discussion: "Benar. Meskipun mengangkat kepentingan umum, analisis terhadap dasar faktual dan unsur hukum tetap diperlukan."
-            },
-            { 
-                id: 17, type: "bs", 
-                question: "17. Sekolah boleh mengabaikan pengamanan data pribadi umum (nama dan nomor telepon) selama data spesifik (kesehatan dan biometrik) sudah dilindungi dengan baik.", 
-                options: ["Benar", "Salah"], 
-                answer: 1,
-                discussion: "Salah. Data pribadi umum tetap wajib dilindungi. Kategori data hanya memengaruhi bentuk tingkat pengamanannya, bukan meniadakan kewajiban perlindungan."
-            },
-            { 
-                id: 18, type: "bs", 
-                question: "18. Ketika AI menghasilkan dua jawaban yang bertentangan, murid sebaiknya memilih jawaban dengan penjelasan paling panjang dan meyakinkan sebagai penjamin tingkat kebenaran.", 
-                options: ["Benar", "Salah"], 
-                answer: 1,
-                discussion: "Salah. Uraian yang panjang dan meyakinkan tidak menjamin kebenaran mutlak; jawaban harus diverifikasi melalui perhitungan atau rujukan tepercaya."
-            },
-            { 
-                id: 19, type: "bs", 
-                question: "19. Apabila perusahaan mengalami kebocoran data akibat lemahnya pengamanan, keberadaan peretas eksternal tidak serta-merta menghapus tanggung jawab perusahaan.", 
-                options: ["Benar", "Salah"], 
-                answer: 0,
-                discussion: "Benar. Adanya serangan dari pihak luar tidak otomatis menghapus tanggung jawab pengelola data yang lalai menerapkan sistem keamanan."
-            },
-            { 
-                id: 20, type: "bs", 
-                question: "20. Berpikir komputasional dapat digunakan untuk memecah persoalan verifikasi informasi dan menyusun langkah pengecekan, namun tetap memerlukan bukti memadai sebelum kesimpulan ditetapkan.", 
-                options: ["Benar", "Salah"], 
-                answer: 0,
-                discussion: "Benar. Berpikir komputasional membantu merumuskan alur analisis dan pemecahan masalah, tetapi pengambilan kesimpulan akhir tetap bertumpu pada bukti yang memadai."
-            }
+            { id: 1, type: "pg", question: "1. Budi mengubah nominal struk pembayaran digital dari Rp150.000 menjadi Rp1.500.000 untuk pamer. Temannya menggunakan itu sebagai bukti utang. Kesimpulan yang paling dapat dipertanggungjawabkan adalah...", options: ["Budi bebas hukum karena bukan dokumen asli.", "Budi pasti melakukan pemalsuan dokumen.", "Perubahan nominal adalah indikasi manipulasi, namun penerapan hukum harus mempertimbangkan unsur pasal, tujuan, dan fakta.", "Persoalan hukum baru muncul jika ada kerugian finansial di pengadilan."], answer: 2, discussion: "Manipulasi disengaja belum otomatis membuktikan semua unsur tindak pidana[cite: 3]. Penerapan ketentuan hukum harus mempertimbangkan unsur pasal, tujuan, dan fakta yang terbukti[cite: 3]." },
+            { id: 2, type: "pg", question: "2. Operator sekolah tidak sengaja mengirim tautan spreadsheet berisi data pribadi dan kesehatan murid ke grup publik. Rekomendasi tim evaluasi yang paling tepat adalah...", options: ["Menganggap selesai karena tidak disengaja.", "Mempertahankan bukti insiden, batasi akses, menilai data dan dampak kebocoran, serta mengevaluasi tanggung jawab pengendali.", "Langsung menjatuhkan sanksi pidana kepada operator.", "Menunggu laporan dari pihak korban."], answer: 1, discussion: "Respons insiden wajib dilakukan meskipun kebocoran tidak disengaja[cite: 3]. Pengelola harus mempertahankan bukti dan menilai dampak kebocoran[cite: 3]." },
+            { id: 3, type: "pg", question: "3. Siti mengunggah kode program internal dan kata sandi server perusahaan ke chatbot AI publik saat magang untuk mempercepat pekerjaan. Tindakan korektif yang tepat adalah...", options: ["Melanjutkan penggunaan dengan menghapus nama pelanggan.", "Langsung menghapus akun AI.", "Meminta izin pembimbing setelah selesai.", "Menghentikan pengunggahan, melaporkan insiden ke perusahaan, menilai paparan data, dan mengganti kredensial."], answer: 3, discussion: "Mengurangi paparan, melaporkan insiden, dan mengamankan kredensial merupakan langkah mitigasi utama[cite: 3]." },
+            { id: 4, type: "pg", question: "4. Raka mengubah warna, latar, dan tipografi ilustrasi digital orang lain lalu mencetaknya di kaus untuk dijual dengan mencantumkan nama ilustrator. Analisis yang tepat adalah...", options: ["Perubahan visual dapat menghasilkan unsur kreatif baru, tetapi tidak otomatis menghapus hak atas ilustrasi asal; izin/lisensi komersial tetap diperlukan.", "Pencantuman nama ilustrator memenuhi kewajiban hukum.", "Selama tidak identik, tidak melanggar hukum.", "Karya turunan otomatis menjadi milik penyunting."], answer: 0, discussion: "Modifikasi dan atribusi nama tidak otomatis menggantikan izin penggunaan komersial karya asal[cite: 3]." },
+            { id: 5, type: "pg", question: "5. Ditemukan video viral pejabat publik mengumumkan kebijakan kontroversial dengan gerak bibir kurang sinkron dan kualitas rendah. Strategi verifikasi terkuat adalah...", options: ["Menyatakan video palsu karena gerak bibir.", "Menganggap autentik kecuali ada bantahan.", "Memisahkan pemeriksaan identitas sumber, konteks, keaslian audio-visual, dan konfirmasi independen sebelum menyimpulkan.", "Menggunakan detektor deepfake sebagai penentu akhir."], answer: 2, discussion: "Keaslian informasi perlu diuji dari beberapa sumber dan jenis bukti yang independen[cite: 3]." },
+            { id: 6, type: "pg", question: "6. Murid mengunggah kritik menyebut pengelola lembaga 'sengaja menggelapkan dana' berdasarkan laporan belum terverifikasi hingga viral. Pendekatan hukum yang tepat adalah...", options: ["Terlindungi sepenuhnya karena untuk kepentingan publik.", "Menilai isi, konteks, dasar faktual, serta ketentuan UU ITE; status kepentingan publik tidak otomatis menyelesaikan persoalan hukum.", "Menetapkan pencemaran nama baik tanpa verifikasi.", "Hanya diselesaikan lewat mediasi."], answer: 1, discussion: "Kritik atas nama kepentingan publik tidak otomatis menghapus kebutuhan menguji fakta dan unsur hukum[cite: 3]." },
+            { id: 7, type: "pg", question: "7. Sekolah membuat aplikasi pengumpul data nama, alamat, wajah, dan riwayat kesehatan murid dengan pengamanan satu kata sandi yang sama. Keputusan desain terbaik adalah...", options: ["Mengutamakan enkripsi wajah saja.", "Mengizinkan seluruh guru mengakses semua data.", "Menyimpan catatan konseling bersama data umum.", "Mengklasifikasikan data sesuai risiko, batasi akses, minimisasi data, dan pengamanan proporsional."], answer: 3, discussion: "Perlindungan data harus mengacu pada klasifikasi data, tingkat risiko, dan pengamanan proporsional[cite: 3]." },
+            { id: 8, type: "pg", question: "8. AI memberi solusi matematika berurutan rapi dengan jawaban 240, namun dihitung ulang hasilnya 120. Sikap yang mencerminkan nalar kritis adalah...", options: ["Menggunakan hasil perhitungan mandiri, menelusuri langkah, dan memeriksa asumsi tanpa terkecoh kefasihan penjelasan AI.", "Mengambil nilai tengah jawaban.", "Memilih jawaban pertama karena ada rumus.", "Menolak total penggunaan AI."], answer: 0, discussion: "Hasil keluaran AI perlu diuji dengan perhitungan manual yang dapat diverifikasi, bukan kefasihan penjelasan[cite: 3]." },
+            { id: 9, type: "pg", question: "9. E-commerce mengalami kebocoran data karena server kurang aman, namun perusahaan berdalih pelakunya hacker eksternal. Kesimpulan yang tepat adalah...", options: ["Perusahaan bebas tanggung jawab karena dari pihak luar.", "Perusahaan wajib otomatis didenda 2% omzet.", "Perlu pemeriksaan kewajiban pengamanan, penyebab insiden, dan sanksi sesuai dasar hukum yang terpenuhi.", "Cukup beri kompensasi individual."], answer: 2, discussion: "Tanggung jawab hukum memerlukan pemeriksaan kewajiban pengamanan, bukti, dan dasar hukum[cite: 3]." },
+            { id: 10, type: "pg", question: "10. Tim kreator mengubah desain antarmuka kompetitor dan membuat video sintetis suara CEO menyatakan bangkrut menjelang pasar saham dibuka hingga saham turun, berdalih satir. Evaluasi terkuat adalah...", options: ["Tidak ada logo resmi, jadi bebas risiko.", "Kasus harus dianalisis sebagai beberapa perbuatan berbeda: desain, video sintetis, penyebaran, dan dampak ekonominya.", "Penurunan saham membuktikan tindak pidana.", "Label satir otomatis melindungi pembuat."], answer: 1, discussion: "Setiap tindakan memiliki unsur pelanggaran dan potensi konsekuensi berbeda yang harus dianalisis terpisah[cite: 3]." },
+            { id: 11, type: "bs", question: "11. Mengubah angka struk pembayaran digital untuk hiburan tanpa transaksi nyata tidak mungkin menimbulkan persoalan hukum UU ITE.", options: ["Benar", "Salah"], answer: 1, discussion: "Salah. Tidak adanya transaksi nyata tidak meniadakan semua kemungkinan persoalan hukum[cite: 3]." },
+            { id: 12, type: "bs", question: "12. Operator sekolah yang tidak sengaja membocorkan data kesehatan murid tetap perlu menangani insiden, namun kebocoran saja belum tentu otomatis merupakan tindak pidana.", options: ["Benar", "Salah"], answer: 0, discussion: "Benar. Respons insiden wajib dilakukan, namun kebocoran tidak otomatis membuktikan tindak pidana[cite: 3]." },
+            { id: 13, type: "bs", question: "13. Jika layanan AI menjamin percakapan tidak dipakai melatih model, pengguna bebas langsung mengunggah kata sandi server perusahaan tanpa izin.", options: ["Benar", "Salah"], answer: 1, discussion: "Salah. Pengaturan pelatihan model bukan jaminan keamanan mutlak terhadap kerahasiaan perusahaan[cite: 3]." },
+            { id: 14, type: "bs", question: "14. Modifikasi warna dan tata letak ilustrasi orang lain menghasilkan unsur kreatif baru, namun tidak otomatis memberikan hak komersial tanpa izin pembuat asli.", options: ["Benar", "Salah"], answer: 0, discussion: "Benar. Unsur kreatif tambahan tidak otomatis menghapus hak atas karya asal[cite: 3]." },
+            { id: 15, type: "bs", question: "15. Video yang lolos satu alat pendeteksi deepfake dapat dianggap autentik tanpa verifikasi tambahan karena alat digital lebih objektif.", options: ["Benar", "Salah"], answer: 1, discussion: "Salah. Alat pendeteksi memiliki keterbatasan dan wajib divalidasi dengan bukti independen[cite: 3]." },
+            { id: 16, type: "bs", question: "16. Kritik atas nama kepentingan umum tidak otomatis menghapus kebutuhan menguji fakta dan unsur hukum dalam pencemaran nama baik.", options: ["Benar", "Salah"], answer: 0, discussion: "Benar. Analisis terhadap dasar faktual dan unsur hukum tetap diperlukan[cite: 3]." },
+            { id: 17, type: "bs", question: "17. Sekolah boleh mengabaikan pengamanan data umum (nama/telepon) selama data spesifik (kesehatan/biometrik) sudah dilindungi.", options: ["Benar", "Salah"], answer: 1, discussion: "Salah. Data pribadi umum tetap wajib dilindungi[cite: 3]." },
+            { id: 18, type: "bs", question: "18. Panjang dan meyakinkannya penjelasan AI merupakan indikator yang cukup untuk menjamin kebenaran jawaban.", options: ["Benar", "Salah"], answer: 1, discussion: "Salah. Uraian panjang tidak menjamin kebenaran mutlak tanpa verifikasi[cite: 3]." },
+            { id: 19, type: "bs", question: "19. Peretas eksternal tidak serta-merta menghapus tanggung jawab perusahaan yang lalai mengamankan server datanya.", options: ["Benar", "Salah"], answer: 0, discussion: "Benar. Serangan pihak luar tidak menghapus tanggung jawab pengelola data[cite: 3]." },
+            { id: 20, type: "bs", question: "20. Berpikir komputasional membantu memecah persoalan verifikasi informasi, namun tetap memerlukan bukti memadai sebelum kesimpulan ditetapkan.", options: ["Benar", "Salah"], answer: 0, discussion: "Benar. Pengambilan kesimpulan akhir tetap bertumpu pada bukti yang memadai[cite: 3]." }
         ];
 
         let studentData = { nis: "", name: "", className: "" };
-        let studentAnswers = {}; // Menyimpan pilihan jawaban siswa untuk perbandingan di pembahasan
-        let violationCount = 0;
-        let timerInterval;
-        let timeLeft = 40 * 60; // 40 Menit
+        let studentAnswers = {};
+        let score = 0;
+        let lives = 3;
+        let powerType = "Normal";
+        let currentActiveQuestionIdx = 0;
+        let answeredQuestionsCount = 0;
+        let invulnerableTimer = 0; // Jeda kebal (I-Frames)
 
-        // Gatekeeper: Pengecekan Koneksi Otomatis saat Halaman Dimuat
-        window.addEventListener("DOMContentLoaded", () => {
-            checkServerConnection();
-        });
+        // Canvas Game Setup
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+        let gameRunning = false;
+        let animationFrameId;
+
+        let mario = { x: 50, y: 250, width: 36, height: 48, vx: 0, vy: 0, speed: 4.5, jumpPower: -11.5, grounded: false, facing: 'right' };
+        let gravity = 0.5;
+        let keys = { right: false, left: false };
+
+        // Item Power-Up
+        let powerUps = [
+            { x: 650, y: 280, width: 24, height: 24, type: 'mushroom', collected: false },
+            { x: 1350, y: 280, width: 24, height: 24, type: 'star', collected: false },
+            { x: 2100, y: 280, width: 24, height: 24, type: 'clock', collected: false }
+        ];
+
+        // Musuh
+        let enemies = [
+            { x: 500, y: 284, width: 32, height: 36, vx: 1.2, minX: 450, maxX: 700, alive: true },
+            { x: 1100, y: 284, width: 32, height: 36, vx: -1.5, minX: 1000, maxX: 1300, alive: true },
+            { x: 1750, y: 284, width: 32, height: 36, vx: 1.5, minX: 1650, maxX: 1950, alive: true }
+        ];
+
+        // Pipa dan Platform Melayang yang Bisa Dinaiki
+        let platforms = [
+            { x: 600, y: 260, width: 50, height: 60, type: 'pipe' },  // Pipa 1
+            { x: 950, y: 230, width: 100, height: 20, type: 'box' },  // Platform Melayang 1
+            { x: 1450, y: 210, width: 110, height: 20, type: 'box' }, // Platform Melayang 2
+            { x: 1900, y: 250, width: 50, height: 70, type: 'pipe' }   // Pipa 2
+        ];
+
+        // Kotak Pertanyaan (?)
+        let mysteryBlocks = [];
+        for (let i = 0; i < quizData.length; i++) {
+            mysteryBlocks.push({
+                x: 250 + (i * 220),
+                y: 140 + (i % 2) * 50,
+                width: 36,
+                height: 36,
+                questionIdx: i,
+                hit: false
+            });
+        }
+        let maxMapWidth = 250 + (quizData.length * 220) + 200;
+        let cameraX = 0;
+
+        window.addEventListener("DOMContentLoaded", () => { checkServerConnection(); });
 
         function checkServerConnection() {
             const spinner = document.getElementById("gatekeeper-spinner");
@@ -364,37 +234,31 @@
 
             spinner.style.display = "inline-block";
             retryContainer.classList.add("hidden");
-            title.textContent = "Memeriksa Koneksi Server...";
-            status.textContent = "Menghubungkan ke database awan Google Spreadsheet...";
 
             if (!SCRIPT_URL || SCRIPT_URL.includes("AKfycbz...")) {
                 spinner.style.display = "none";
                 title.textContent = "URL Server Belum Dikonfigurasi";
-                status.textContent = "Silakan masukkan URL deployment Google Apps Script Anda pada variabel SCRIPT_URL di dalam kode.";
+                status.textContent = "Masukkan URL Apps Script pada variabel SCRIPT_URL di dalam kode.";
                 retryContainer.classList.remove("hidden");
                 return;
             }
 
             fetch(SCRIPT_URL)
-                .then(response => {
-                    if (response.ok) return response.text();
-                    throw new Error("Respon server tidak valid.");
-                })
-                .then(data => {
+                .then(res => { if (res.ok) return res.text(); throw new Error(); })
+                .then(() => {
                     setTimeout(() => {
                         document.getElementById("step-0").classList.add("hidden");
                         document.getElementById("step-1").classList.remove("hidden");
-                    }, 1000);
+                    }, 800);
                 })
-                .catch(error => {
+                .catch(() => {
                     spinner.style.display = "none";
                     title.textContent = "Koneksi Gagal Terhubung";
-                    status.textContent = "Tidak dapat terhubung ke Google Spreadsheet. Pastikan URL benar dan skrip sudah di-deploy dengan akses publik ('Anyone').";
+                    status.textContent = "Gagal terhubung ke Google Spreadsheet. Pastikan deploy Apps Script diset 'Anyone'.";
                     retryContainer.classList.remove("hidden");
                 });
         }
 
-        // Handler Step 1: Submit Identitas (NIS, Nama, Kelas)
         document.getElementById("identity-form").addEventListener("submit", (e) => {
             e.preventDefault();
             studentData.nis = document.getElementById("student-nis").value.trim();
@@ -403,128 +267,353 @@
 
             if (!studentData.nis || !studentData.name || !studentData.className) return;
 
+            document.getElementById("hud-name").textContent = studentData.name.toUpperCase();
             document.getElementById("step-1").classList.add("hidden");
             document.getElementById("step-2").classList.remove("hidden");
-            document.getElementById("timer-container").classList.remove("hidden");
 
-            renderQuestions();
-            startTimer();
-            initAntiCheat();
+            startGame();
         });
 
-        // Render Soal ke DOM
-        function renderQuestions() {
-            const container = document.getElementById("questions-container");
-            let html = "";
+        // Kontrol Tombol Melayang Mobile
+        const bindButton = (id, startAction, endAction) => {
+            const btn = document.getElementById(id);
+            btn.addEventListener("touchstart", (e) => { e.preventDefault(); startAction(); });
+            btn.addEventListener("touchend", (e) => { e.preventDefault(); endAction(); });
+            btn.addEventListener("mousedown", () => startAction());
+            btn.addEventListener("mouseup", () => endAction());
+        };
 
-            quizData.forEach((q) => {
-                html += `<div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-4">
-                    <p class="font-medium text-slate-900 leading-relaxed">${q.question}</p>
-                    <div class="space-y-2">`;
-                
-                q.options.forEach((opt, optIdx) => {
-                    html += `<label class="flex items-start gap-3 p-3 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer transition-all">
-                        <input type="radio" name="question-${q.id}" value="${optIdx}" required class="mt-1 text-indigo-600 focus:ring-indigo-500">
-                        <span class="text-sm text-slate-700 leading-normal">${opt}</span>
-                    </label>`;
-                });
+        bindButton("btn-left", () => { keys.left = true; mario.facing = 'left'; }, () => { keys.left = false; });
+        bindButton("btn-right", () => { keys.right = true; mario.facing = 'right'; }, () => { keys.right = false; });
 
-                html += `</div></div>`;
-            });
+        document.getElementById("btn-jump").addEventListener("touchstart", (e) => { e.preventDefault(); triggerJump(); });
+        document.getElementById("btn-jump").addEventListener("mousedown", () => triggerJump());
 
-            container.innerHTML = html;
-        }
-
-        // Timer Hitung Mundur
-        function startTimer() {
-            const display = document.getElementById("timer-display");
-            timerInterval = setInterval(() => {
-                let minutes = Math.floor(timeLeft / 60);
-                let seconds = timeLeft % 60;
-
-                display.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-
-                if (timeLeft <= 300) { 
-                    display.parentElement.classList.add("bg-rose-600", "animate-pulse");
-                }
-
-                if (timeLeft <= 0) {
-                    clearInterval(timerInterval);
-                    alert("Waktu ujian telah habis! Sistem akan mengirimkan jawaban secara otomatis.");
-                    submitQuiz(true);
-                }
-                timeLeft--;
-            }, 1000);
-        }
-
-        // Sistem Anti-Cheat (Tab Switching & Window Blur)
-        function initAntiCheat() {
-            document.addEventListener("visibilitychange", () => {
-                if (document.hidden) handleViolation();
-            });
-
-            window.addEventListener("blur", () => {
-                handleViolation();
-            });
-        }
-
-        function handleViolation() {
-            violationCount++;
-            const banner = document.getElementById("warning-banner");
-            const countText = document.getElementById("violation-count");
-            
-            banner.classList.remove("hidden");
-            countText.textContent = `${violationCount}/3`;
-
-            if (violationCount >= 3) {
-                alert("Peringatan Maksimal Tercapai! Anda telah melanggar aturan tab sebanyak 3 kali. Ujian akan dikirimkan otomatis.");
-                submitQuiz(true);
+        function triggerJump() {
+            if (mario.grounded && gameRunning) {
+                mario.vy = mario.jumpPower;
+                mario.grounded = false;
             }
         }
 
-        // Tombol Kirim Ujian
-        document.getElementById("submit-quiz-btn").addEventListener("click", () => {
-            if (confirm("Apakah Anda yakin ingin mengumpulkan jawaban ujian ini?")) {
-                submitQuiz(false);
-            }
+        window.addEventListener("keydown", (e) => {
+            if (!gameRunning) return;
+            if (e.key === "ArrowRight" || e.key === "d") { keys.right = true; mario.facing = 'right'; }
+            if (e.key === "ArrowLeft" || e.key === "a") { keys.left = true; mario.facing = 'left'; }
+            if ((e.key === "ArrowUp" || e.key === " " || e.key === "w")) triggerJump();
         });
 
-        // Proses Penilaian & Pengiriman ke Backend
-        function submitQuiz(isAutoSubmit) {
-            clearInterval(timerInterval);
-            let score = 0;
+        window.addEventListener("keyup", (e) => {
+            if (e.key === "ArrowRight" || e.key === "d") keys.right = false;
+            if (e.key === "ArrowLeft" || e.key === "a") keys.left = false;
+        });
 
-            quizData.forEach((q) => {
-                const selected = document.querySelector(`input[name="question-${q.id}"]:checked`);
-                if (selected) {
-                    studentAnswers[q.id] = parseInt(selected.value);
-                    if (studentAnswers[q.id] === q.answer) {
-                        score += 5; // Total 20 soal x 5 poin = 100 max
+        function startGame() {
+            gameRunning = true;
+            loop();
+        }
+
+        // Game Loop Utama
+        function loop() {
+            if (!gameRunning) return;
+
+            // Kurangi timer kebal jika aktif
+            if (invulnerableTimer > 0) invulnerableTimer--;
+
+            mario.vx = 0;
+            if (keys.right) mario.vx = mario.speed;
+            if (keys.left) mario.vx = -mario.speed;
+
+            mario.x += mario.vx;
+            if (mario.x < 0) mario.x = 0;
+            if (mario.x > maxMapWidth - mario.width) mario.x = maxMapWidth - mario.width;
+
+            mario.vy += gravity;
+            mario.y += mario.vy;
+            mario.grounded = false;
+
+            let groundLevel = 320 - mario.height;
+            if (mario.y > groundLevel) {
+                mario.y = groundLevel;
+                mario.vy = 0;
+                mario.grounded = true;
+            }
+
+            // Deteksi Pijakan Pipa & Platform Melayang (Top Collision)
+            platforms.forEach(plat => {
+                if (mario.x + mario.width > plat.x &&
+                    mario.x < plat.x + plat.width &&
+                    mario.y + mario.height >= plat.y &&
+                    mario.y + mario.height - mario.vy <= plat.y + 12 &&
+                    mario.vy >= 0) {
+
+                    mario.y = plat.y - mario.height;
+                    mario.vy = 0;
+                    mario.grounded = true;
+                }
+            });
+
+            // Pergerakan & Logika Musuh
+            enemies.forEach(en => {
+                if (!en.alive) return;
+                en.x += en.vx;
+                if (en.x < en.minX || en.x > en.maxX) {
+                    en.vx *= -1;
+                }
+
+                // Cek Tabrakan Mario dengan Musuh
+                if (mario.x < en.x + en.width &&
+                    mario.x + mario.width > en.x &&
+                    mario.y < en.y + en.height &&
+                    mario.y + mario.height > en.y) {
+
+                    // Injak dari atas
+                    if (mario.vy > 0 && mario.y + mario.height - mario.vy <= en.y + 14) {
+                        en.alive = false;
+                        score += 10;
+                        mario.vy = -7;
+                        document.getElementById("hud-score").textContent = score;
+                    } else {
+                        // Terkena musuh (dengan proteksi jeda kebal / i-frames)
+                        if (powerType === "Star") {
+                            en.alive = false;
+                        } else if (invulnerableTimer === 0) {
+                            lives--;
+                            invulnerableTimer = 90; // Jeda kebal selama ±1.5 detik (90 frame)
+                            document.getElementById("hud-lives").textContent = "♥".repeat(Math.max(0, lives));
+                            mario.x -= 40; // Terpental
+                            if (lives <= 0) {
+                                gameRunning = false;
+                                finishGame();
+                            }
+                        }
                     }
-                } else {
-                    studentAnswers[q.id] = null; // Tidak dijawab
                 }
             });
 
-            // Tampilkan Step 3 (Hasil Akhir)
+            // Ambil Power-Up
+            powerUps.forEach(p => {
+                if (!p.collected &&
+                    mario.x < p.x + p.width &&
+                    mario.x + mario.width > p.x &&
+                    mario.y < p.y + p.height &&
+                    mario.y + mario.height > p.y) {
+
+                    p.collected = true;
+                    if (p.type === 'mushroom') {
+                        powerType = "Super 🍄";
+                        mario.height = 60;
+                        lives++;
+                    } else if (p.type === 'star') {
+                        powerType = "Bintang ⭐";
+                        score += 20;
+                    } else if (p.type === 'clock') {
+                        powerType = "Jam Waktu ⏱️";
+                        score += 15;
+                    }
+
+                    document.getElementById("hud-power").textContent = powerType;
+                    document.getElementById("hud-score").textContent = score;
+                    document.getElementById("hud-lives").textContent = "♥".repeat(Math.max(0, lives));
+                }
+            });
+
+            // Kotak Pertanyaan (?)
+            mysteryBlocks.forEach(block => {
+                if (!block.hit &&
+                    mario.x < block.x + block.width &&
+                    mario.x + mario.width > block.x &&
+                    mario.y <= block.y + block.height &&
+                    mario.y + mario.height >= block.y + block.height &&
+                    mario.vy < 0) {
+
+                    mario.vy = 0;
+                    mario.y = block.y + block.height;
+                    block.hit = true;
+                    openQuizModal(block.questionIdx);
+                }
+            });
+
+            cameraX = mario.x - 250;
+            if (cameraX < 0) cameraX = 0;
+            if (cameraX > maxMapWidth - canvas.width) cameraX = maxMapWidth - canvas.width;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            ctx.save();
+            ctx.translate(-cameraX, 0);
+
+            // Lantai
+            ctx.fillStyle = "#22c55e";
+            ctx.fillRect(0, 320, maxMapWidth, 60);
+            ctx.fillStyle = "#15803d";
+            ctx.fillRect(0, 320, maxMapWidth, 10);
+
+            // Render Pipa & Platform Melayang
+            platforms.forEach(plat => {
+                if (plat.type === 'pipe') {
+                    ctx.fillStyle = "#16a34a";
+                    ctx.fillRect(plat.x, plat.y, plat.width, plat.height);
+                    ctx.fillStyle = "#22c55e"; // Efek kilap pipa
+                    ctx.fillRect(plat.x + 4, plat.y, 6, plat.height);
+                } else {
+                    ctx.fillStyle = "#d97706"; // Warna balok platform
+                    ctx.fillRect(plat.x, plat.y, plat.width, plat.height);
+                    ctx.strokeStyle = "#92400e";
+                    ctx.strokeRect(plat.x, plat.y, plat.width, plat.height);
+                }
+            });
+
+            // Render Item Power-Up
+            powerUps.forEach(p => {
+                if (!p.collected) {
+                    ctx.fillStyle = p.type === 'mushroom' ? "#ef4444" : (p.type === 'star' ? "#eab308" : "#3b82f6");
+                    ctx.beginPath();
+                    ctx.arc(p.x + 12, p.y + 12, 12, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.fillStyle = "#ffffff";
+                    ctx.font = "bold 12px monospace";
+                    ctx.fillText(p.type === 'mushroom' ? "🍄" : (p.type === 'star' ? "⭐" : "⏱️"), p.x + 2, p.y + 16);
+                }
+            });
+
+            // Render Musuh
+            enemies.forEach(en => {
+                if (en.alive) {
+                    ctx.fillStyle = "#9a3412";
+                    ctx.fillRect(en.x, en.y, en.width, en.height);
+                    ctx.fillStyle = "#fef08a";
+                    ctx.fillRect(en.x + 6, en.y + 8, 6, 6);
+                    ctx.fillRect(en.x + 20, en.y + 8, 6, 6);
+                }
+            });
+
+            // Kotak Misteri (?)
+            mysteryBlocks.forEach(block => {
+                ctx.fillStyle = block.hit ? "#94a3b8" : "#f59e0b";
+                ctx.fillRect(block.x, block.y, block.width, block.height);
+                ctx.strokeStyle = "#b45309";
+                ctx.lineWidth = 2;
+                ctx.strokeRect(block.x, block.y, block.width, block.height);
+
+                ctx.fillStyle = "#ffffff";
+                ctx.font = "bold 20px monospace";
+                ctx.fillText(block.hit ? "✓" : "?", block.x + 11, block.y + 26);
+            });
+
+            // Bendera Finish
+            ctx.fillStyle = "#e2e8f0";
+            ctx.fillRect(maxMapWidth - 100, 120, 8, 200);
+            ctx.fillStyle = "#ef4444";
+            ctx.beginPath();
+            ctx.moveTo(maxMapWidth - 92, 120);
+            ctx.lineTo(maxMapWidth - 50, 140);
+            ctx.lineTo(maxMapWidth - 92, 160);
+            ctx.fill();
+
+            // Render Mario (Berkedip jika sedang kebal / invulnerable)
+            if (invulnerableTimer === 0 || Math.floor(invulnerableTimer / 4) % 2 === 0) {
+                ctx.save();
+                if (mario.facing === 'left') {
+                    ctx.translate(mario.x + mario.width, mario.y);
+                    ctx.scale(-1, 1);
+                } else {
+                    ctx.translate(mario.x, mario.y);
+                }
+
+                let mHeight = (powerType.includes("Super")) ? 60 : 48;
+                ctx.fillStyle = "#dc2626";
+                ctx.fillRect(8, 0, 22, powerType.includes("Super") ? 14 : 10);
+                ctx.fillStyle = "#fde047";
+                ctx.fillRect(12, powerType.includes("Super") ? 12 : 10, 16, 12);
+                ctx.fillStyle = "#78350f";
+                ctx.fillRect(16, powerType.includes("Super") ? 20 : 18, 12, 4);
+                ctx.fillStyle = powerType === "Bintang ⭐" ? "#eab308" : "#ef4444";
+                ctx.fillRect(6, powerType.includes("Super") ? 26 : 22, 24, powerType.includes("Super") ? 18 : 12);
+                ctx.fillStyle = "#2563eb";
+                ctx.fillRect(10, powerType.includes("Super") ? 34 : 28, 16, powerType.includes("Super") ? 18 : 14);
+                ctx.fillStyle = "#78350f";
+                ctx.fillRect(2, mHeight - 6, 10, 6);
+                ctx.fillRect(24, mHeight - 6, 10, 6);
+
+                ctx.restore();
+            }
+
+            ctx.restore();
+
+            if (mario.x >= maxMapWidth - 110 && answeredQuestionsCount >= quizData.length) {
+                gameRunning = false;
+                finishGame();
+            }
+
+            animationFrameId = requestAnimationFrame(loop);
+        }
+
+        function openQuizModal(qIdx) {
+            gameRunning = false;
+            currentActiveQuestionIdx = qIdx;
+            const q = quizData[qIdx];
+
+            document.getElementById("quiz-q-num").textContent = `SOAL NO. ${q.id} (Poin: 5)`;
+            document.getElementById("quiz-question-text").textContent = q.question;
+
+            let optHtml = "";
+            q.options.forEach((opt, oIdx) => {
+                optHtml += `<label class="flex items-start gap-3 p-3 rounded-xl border-2 border-slate-200 hover:bg-amber-50 cursor-pointer transition-all">
+                    <input type="radio" name="game-quiz-opt" value="${oIdx}" required class="mt-1 text-amber-600 focus:ring-amber-500">
+                    <span class="text-xs sm:text-sm text-slate-700 leading-normal">${opt}</span>
+                </label>`;
+            });
+
+            document.getElementById("quiz-options-container").innerHTML = optHtml;
+            document.getElementById("quiz-modal").classList.remove("hidden");
+        }
+
+        function submitQuizAnswer() {
+            const selected = document.querySelector('input[name="game-quiz-opt"]:checked');
+            if (!selected) {
+                alert("Silakan pilih salah satu jawaban terlebih dahulu!");
+                return;
+            }
+
+            const userAns = parseInt(selected.value);
+            const q = quizData[currentActiveQuestionIdx];
+            studentAnswers[q.id] = userAns;
+
+            if (userAns === q.answer) {
+                score += 5;
+                alert("🎉 Jawaban tercatat! Mario mendapatkan 5 Poin!");
+            } else {
+                lives--;
+                alert("❌ Jawaban tercatat! (Kurang tepat, nyawa berkurang).");
+            }
+
+            document.getElementById("hud-score").textContent = score;
+            document.getElementById("hud-lives").textContent = "♥".repeat(Math.max(0, lives));
+
+            document.getElementById("quiz-modal").classList.add("hidden");
+            answeredQuestionsCount++;
+
+            if (lives <= 0) {
+                alert("Game Over! Nyawa Mario habis.");
+                finishGame();
+                return;
+            }
+
+            gameRunning = true;
+            loop();
+        }
+
+        function finishGame() {
+            cancelAnimationFrame(animationFrameId);
             document.getElementById("step-2").classList.add("hidden");
-            document.getElementById("timer-container").classList.add("hidden");
             document.getElementById("step-3").classList.remove("hidden");
 
             document.getElementById("res-score").textContent = `${score} / 100`;
-            if (violationCount > 0) {
-                document.getElementById("res-status").textContent = `Catatan: Terdeteksi ${violationCount} kali pelanggaran tab.`;
-            }
-
-            // Generate Konten Modal Pembahasan
             buildDiscussionModal();
 
-            // Sinkronisasi ke Google Spreadsheet
             const now = new Date();
-            const formattedDate = now.toLocaleString("id-ID", { 
-                dateStyle: "short", 
-                timeStyle: "medium" 
-            });
+            const formattedDate = now.toLocaleString("id-ID", { dateStyle: "short", timeStyle: "medium" });
 
             const payload = {
                 timestamp: formattedDate,
@@ -532,60 +621,57 @@
                 name: studentData.name,
                 className: studentData.className,
                 score: score,
-                catatan: isAutoSubmit ? `Auto-Submitted (Pelanggaran: ${violationCount})` : `Selesai Normal (Pelanggaran: ${violationCount})`
+                catatan: lives <= 0 ? "Game Over (Nyawa Habis)" : "Selesai Normal"
             };
 
-            fetch(SCRIPT_URL, { 
-                method: 'POST', 
-                mode: 'no-cors', 
+            const syncStatus = document.getElementById("sync-status");
+            fetch(SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                body: JSON.stringify(payload) 
-            }).catch(err => console.error("Gagal menyinkronkan ke cloud:", err));
+                body: JSON.stringify(payload)
+            })
+            .then(() => {
+                syncStatus.textContent = "Data berhasil disinkronkan ke Google Spreadsheet!";
+                syncStatus.classList.add("text-emerald-600", "font-bold");
+            })
+            .catch(() => {
+                syncStatus.textContent = "Gagal menyinkronkan data ke cloud.";
+                syncStatus.classList.add("text-rose-600", "font-bold");
+            });
         }
 
-        // Fungsi Membangun Konten Pembahasan di Modal
         function buildDiscussionModal() {
-            const modalContent = document.getElementById("modal-content");
+            const container = document.getElementById("discussion-content");
             let html = "";
 
-            quizData.forEach((q, idx) => {
+            quizData.forEach((q) => {
                 const userAns = studentAnswers[q.id];
                 const isCorrect = userAns === q.answer;
-                const userAnsText = userAns !== null ? q.options[userAns] : "Tidak dijawab";
+                const userAnsText = userAns !== undefined && userAns !== null ? q.options[userAns] : "Tidak dijawab";
                 const correctAnsText = q.options[q.answer];
 
-                html += `<div class="border border-slate-200 rounded-xl p-4 space-y-3 bg-slate-50/50">
-                    <div class="flex justify-between items-start gap-2">
-                        <span class="font-bold text-slate-900 text-sm">Soal No. ${q.id}</span>
-                        <span class="text-xs font-semibold px-2.5 py-1 rounded-full ${isCorrect ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'}">
-                            ${isCorrect ? 'Benar (+5)' : 'Salah (0)'}
-                        </span>
+                html += `<div class="border-2 border-slate-200 rounded-xl p-4 space-y-2 bg-slate-50">
+                    <div class="flex justify-between font-bold">
+                        <span>Soal No. ${q.id}</span>
+                        <span class="${isCorrect ? 'text-emerald-600' : 'text-rose-600'}">${isCorrect ? 'Benar (+5)' : 'Salah (0)'}</span>
                     </div>
-                    <p class="text-xs text-slate-700 leading-relaxed font-medium">${q.question}</p>
-                    
-                    <div class="text-xs space-y-1 bg-white p-3 rounded-lg border border-slate-200">
-                        <p><strong class="text-slate-500">Jawaban Anda:</strong> <span class="${isCorrect ? 'text-emerald-600 font-semibold' : 'text-rose-600 font-semibold'}">${userAnsText}</span></p>
-                        ${!isCorrect ? `<p><strong class="text-slate-500">Kunci Jawaban:</strong> <span class="text-emerald-600 font-semibold">${correctAnsText}</span></p>` : ''}
+                    <p class="text-slate-700">${q.question}</p>
+                    <div class="bg-white p-2 rounded border text-xs space-y-1">
+                        <p><strong>Jawaban Anda:</strong> <span class="${isCorrect ? 'text-emerald-600' : 'text-rose-600'}">${userAnsText}</span></p>
+                        <p><strong>Kunci Jawaban:</strong> <span class="text-emerald-600 font-bold">${correctAnsText}</span></p>
                     </div>
-
-                    <div class="bg-indigo-50 border border-indigo-100 p-3 rounded-lg text-xs text-indigo-900 space-y-1">
-                        <p class="font-semibold text-indigo-950">💡 Pembahasan Guru:</p>
-                        <p class="leading-relaxed">${q.discussion}</p>
+                    <div class="bg-indigo-50 p-2 rounded text-indigo-900 text-xs">
+                        <strong>💡 Pembahasan Guru:</strong> ${q.discussion}
                     </div>
                 </div>`;
             });
 
-            modalContent.innerHTML = html;
+            container.innerHTML = html;
         }
 
-        // Kontrol Modal Pop-up
-        function openModal() {
-            document.getElementById("discussion-modal").classList.remove("hidden");
-        }
-
-        function closeModal() {
-            document.getElementById("discussion-modal").classList.add("hidden");
-        }
+        function openDiscussionModal() { document.getElementById("discussion-modal").classList.remove("hidden"); }
+        function closeDiscussionModal() { document.getElementById("discussion-modal").classList.add("hidden"); }
     </script>
 </body>
 </html>
