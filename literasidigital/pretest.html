@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Super Nalar Bros - Pre-Test Mode</title>
+    <title>Super Nalar Bros - Pre-Test Pure Mode</title>
     <!-- Tailwind CSS via CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -18,7 +18,6 @@
         <div>🍄 <span id="hud-name" class="text-amber-300">PLAYER</span></div>
         <div>❤️ NYAWA: <span id="hud-lives" class="text-rose-400">♥♥♥</span></div>
         <div>🪙 SKOR: <span id="hud-score" class="text-yellow-400">0</span></div>
-        <div>⭐ POWER: <span id="hud-power" class="text-emerald-400">Normal</span></div>
     </header>
 
     <!-- Konten Utama -->
@@ -53,17 +52,17 @@
                 <div>
                     <label class="block font-bold text-slate-700 mb-1">Kelas</label>
                     <select id="student-class" required class="w-full px-3 py-2 border-2 border-slate-300 rounded-lg focus:border-amber-500 focus:outline-none">
-                          <option value="">Pilih Kelas</option>
+                        <option value="">Pilih Kelas</option>
                         <option value="X DKV 1">X DKV 1</option>
                         <option value="X DKV 2">X DKV 2</option>
-                        <option value="X PM 1">X PM 1</option>
+                       <option value="X PM 1">X PM 1</option>
                         <option value="X PM 2">X PM 2</option>
                     </select>
                 </div>
                 <div class="bg-amber-50 border-2 border-amber-200 p-3 rounded-xl text-xs text-amber-900 space-y-1">
-                    <p class="font-bold">Mode Pre-Test:</p>
-                    <p>• Selesaikan petualangan dan jawab seluruh soal dari kotak misteri (?).</p>
-                    <p>• Kunci jawaban disembunyikan untuk keperluan evaluasi awal.</p>
+                    <p class="font-bold">Petunjuk Pre-Test:</p>
+                    <p>• Jelajahi map dan lompat ke kotak misteri (?) untuk menjawab soal.</p>
+                    <p>• Tanpa musuh & tanpa item power-up, fokus penuh menjawab soal evaluasi.</p>
                 </div>
                 <button type="submit" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-black py-3 rounded-lg shadow uppercase tracking-wider">
                     Mulai Pre-Test!
@@ -102,7 +101,7 @@
             </div>
         </div>
 
-        <!-- STEP 3: Hasil Akhir Pre-Test (Tanpa Pembahasan) -->
+        <!-- STEP 3: Hasil Akhir Pre-Test -->
         <section id="step-3" class="hidden bg-white border-4 border-amber-500 rounded-2xl shadow-xl p-6 text-center max-w-lg w-full space-y-4 z-30">
             <div class="text-4xl">🎉</div>
             <div>
@@ -126,7 +125,7 @@
 
     <!-- Skrip Game & Kuis -->
     <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwZJ797veQ3iYPKULXhEYDs3Uai3IG1XqDxe45vUzRoWuEwf6oCI54u0EAXQz5ZjjRd/exec";
+          const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwZJ797veQ3iYPKULXhEYDs3Uai3IG1XqDxe45vUzRoWuEwf6oCI54u0EAXQz5ZjjRd/exec";
 
         const quizData = [
             { id: 1, type: "pg", question: "1. Budi mengubah nominal struk pembayaran digital dari Rp150.000 menjadi Rp1.500.000 untuk pamer. Temannya menggunakan itu sebagai bukti utang. Kesimpulan yang paling dapat dipertanggungjawabkan adalah...", options: ["Budi bebas hukum karena bukan dokumen asli.", "Budi pasti melakukan pemalsuan dokumen.", "Perubahan nominal adalah indikasi manipulasi, namun penerapan hukum harus mempertimbangkan unsur pasal, tujuan, dan fakta.", "Persoalan hukum baru muncul jika ada kerugian finansial di pengadilan."], answer: 2 },
@@ -155,10 +154,8 @@
         let studentAnswers = {};
         let score = 0;
         let lives = 3;
-        let powerType = "Normal"; 
         let currentActiveQuestionIdx = 0;
         let answeredQuestionsCount = 0;
-        let invulnerableTimer = 0;
 
         const canvas = document.getElementById("gameCanvas");
         const ctx = canvas.getContext("2d");
@@ -169,18 +166,7 @@
         let gravity = 0.5;
         let keys = { right: false, left: false };
 
-        let powerUps = [
-            { x: 650, y: 280, width: 24, height: 24, type: 'mushroom', collected: false },
-            { x: 1350, y: 280, width: 24, height: 24, type: 'star', collected: false },
-            { x: 2100, y: 280, width: 24, height: 24, type: 'clock', collected: false }
-        ];
-
-        let enemies = [
-            { x: 500, y: 284, width: 32, height: 36, vx: 1.2, minX: 450, maxX: 700, alive: true },
-            { x: 1100, y: 284, width: 32, height: 36, vx: -1.5, minX: 1000, maxX: 1300, alive: true },
-            { x: 1750, y: 284, width: 32, height: 36, vx: 1.5, minX: 1650, maxX: 1950, alive: true }
-        ];
-
+        // Pipa dan Platform Melayang yang Bisa Dinaiki
         let platforms = [
             { x: 600, y: 260, width: 50, height: 60, type: 'pipe' },
             { x: 950, y: 230, width: 100, height: 20, type: 'box' },
@@ -293,8 +279,6 @@
         function loop() {
             if (!gameRunning) return;
 
-            if (invulnerableTimer > 0) invulnerableTimer--;
-
             mario.vx = 0;
             if (keys.right) mario.vx = mario.speed;
             if (keys.left) mario.vx = -mario.speed;
@@ -324,66 +308,6 @@
                     mario.y = plat.y - mario.height;
                     mario.vy = 0;
                     mario.grounded = true;
-                }
-            });
-
-            enemies.forEach(en => {
-                if (!en.alive) return;
-                en.x += en.vx;
-                if (en.x < en.minX || en.x > en.maxX) {
-                    en.vx *= -1;
-                }
-
-                if (mario.x < en.x + en.width &&
-                    mario.x + mario.width > en.x &&
-                    mario.y < en.y + en.height &&
-                    mario.y + mario.height > en.y) {
-                    
-                    if (mario.vy > 0 && mario.y + mario.height - mario.vy <= en.y + 14) {
-                        en.alive = false;
-                        score += 10;
-                        mario.vy = -7;
-                        document.getElementById("hud-score").textContent = score;
-                    } else {
-                        if (powerType === "Star") {
-                            en.alive = false;
-                        } else if (invulnerableTimer === 0) {
-                            lives--;
-                            invulnerableTimer = 90;
-                            document.getElementById("hud-lives").textContent = "♥".repeat(Math.max(0, lives));
-                            mario.x -= 40;
-                            if (lives <= 0) {
-                                gameRunning = false;
-                                finishGame();
-                            }
-                        }
-                    }
-                }
-            });
-
-            powerUps.forEach(p => {
-                if (!p.collected &&
-                    mario.x < p.x + p.width &&
-                    mario.x + mario.width > p.x &&
-                    mario.y < p.y + p.height &&
-                    mario.y + mario.height > p.y) {
-                    
-                    p.collected = true;
-                    if (p.type === 'mushroom') {
-                        powerType = "Super 🍄";
-                        mario.height = 60;
-                        lives++;
-                    } else if (p.type === 'star') {
-                        powerType = "Bintang ⭐";
-                        score += 20;
-                    } else if (p.type === 'clock') {
-                        powerType = "Jam Waktu ⏱️";
-                        score += 15;
-                    }
-
-                    document.getElementById("hud-power").textContent = powerType;
-                    document.getElementById("hud-score").textContent = score;
-                    document.getElementById("hud-lives").textContent = "♥".repeat(Math.max(0, lives));
                 }
             });
 
@@ -430,28 +354,6 @@
                 }
             });
 
-            powerUps.forEach(p => {
-                if (!p.collected) {
-                    ctx.fillStyle = p.type === 'mushroom' ? "#ef4444" : (p.type === 'star' ? "#eab308" : "#3b82f6");
-                    ctx.beginPath();
-                    ctx.arc(p.x + 12, p.y + 12, 12, 0, Math.PI * 2);
-                    ctx.fill();
-                    ctx.fillStyle = "#ffffff";
-                    ctx.font = "bold 12px monospace";
-                    ctx.fillText(p.type === 'mushroom' ? "🍄" : (p.type === 'star' ? "⭐" : "⏱️"), p.x + 2, p.y + 16);
-                }
-            });
-
-            enemies.forEach(en => {
-                if (en.alive) {
-                    ctx.fillStyle = "#9a3412"; 
-                    ctx.fillRect(en.x, en.y, en.width, en.height);
-                    ctx.fillStyle = "#fef08a"; 
-                    ctx.fillRect(en.x + 6, en.y + 8, 6, 6);
-                    ctx.fillRect(en.x + 20, en.y + 8, 6, 6);
-                }
-            });
-
             mysteryBlocks.forEach(block => {
                 ctx.fillStyle = block.hit ? "#94a3b8" : "#f59e0b";
                 ctx.fillRect(block.x, block.y, block.width, block.height);
@@ -473,33 +375,29 @@
             ctx.lineTo(maxMapWidth - 92, 160);
             ctx.fill();
 
-            if (invulnerableTimer === 0 || Math.floor(invulnerableTimer / 4) % 2 === 0) {
-                ctx.save();
-                if (mario.facing === 'left') {
-                    ctx.translate(mario.x + mario.width, mario.y);
-                    ctx.scale(-1, 1);
-                } else {
-                    ctx.translate(mario.x, mario.y);
-                }
-
-                let mHeight = (powerType.includes("Super")) ? 60 : 48;
-                ctx.fillStyle = "#dc2626";
-                ctx.fillRect(8, 0, 22, powerType.includes("Super") ? 14 : 10);
-                ctx.fillStyle = "#fde047"; 
-                ctx.fillRect(12, powerType.includes("Super") ? 12 : 10, 16, 12);
-                ctx.fillStyle = "#78350f"; 
-                ctx.fillRect(16, powerType.includes("Super") ? 20 : 18, 12, 4);
-                ctx.fillStyle = powerType === "Bintang ⭐" ? "#eab308" : "#ef4444";
-                ctx.fillRect(6, powerType.includes("Super") ? 26 : 22, 24, powerType.includes("Super") ? 18 : 12);
-                ctx.fillStyle = "#2563eb";
-                ctx.fillRect(10, powerType.includes("Super") ? 34 : 28, 16, powerType.includes("Super") ? 18 : 14);
-                ctx.fillStyle = "#78350f";
-                ctx.fillRect(2, mHeight - 6, 10, 6);
-                ctx.fillRect(24, mHeight - 6, 10, 6);
-
-                ctx.restore();
+            ctx.save();
+            if (mario.facing === 'left') {
+                ctx.translate(mario.x + mario.width, mario.y);
+                ctx.scale(-1, 1);
+            } else {
+                ctx.translate(mario.x, mario.y);
             }
 
+            ctx.fillStyle = "#dc2626";
+            ctx.fillRect(8, 0, 22, 10);
+            ctx.fillStyle = "#fde047"; 
+            ctx.fillRect(12, 10, 16, 12);
+            ctx.fillStyle = "#78350f"; 
+            ctx.fillRect(16, 18, 12, 4);
+            ctx.fillStyle = "#ef4444";
+            ctx.fillRect(6, 22, 24, 12);
+            ctx.fillStyle = "#2563eb";
+            ctx.fillRect(10, 28, 16, 14);
+            ctx.fillStyle = "#78350f";
+            ctx.fillRect(2, 42, 10, 6);
+            ctx.fillRect(24, 42, 10, 6);
+
+            ctx.restore();
             ctx.restore();
 
             if (mario.x >= maxMapWidth - 110 && answeredQuestionsCount >= quizData.length) {
@@ -549,12 +447,6 @@
             document.getElementById("quiz-modal").classList.add("hidden");
             answeredQuestionsCount++;
 
-            if (lives <= 0) {
-                alert("Pre-Test Berakhir! Nyawa habis.");
-                finishGame();
-                return;
-            }
-
             gameRunning = true;
             loop();
         }
@@ -575,7 +467,7 @@
                 name: studentData.name,
                 className: studentData.className,
                 score: score,
-                catatan: lives <= 0 ? "Pre-Test (Nyawa Habis)" : "Pre-Test Selesai"
+                catatan: "Pre-Test Selesai"
             };
 
             const syncStatus = document.getElementById("sync-status");
