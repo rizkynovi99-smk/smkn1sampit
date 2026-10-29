@@ -1,0 +1,1572 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Lentera Algoritma: Petualangan Bebas Logika 3D</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Three.js Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'gold-warm': '#F59E0B',
+                        'orange-warm': '#EA580C',
+                        'sky-bright': '#0284C7',
+                        'cream-bg': '#FEF3C7',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'Segoe UI', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: none;
+            background-color: #FEF3C7;
+        }
+
+        /* Glassmorphism Styling */
+        .glass-hud {
+            background: rgba(255, 255, 255, 0.88);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(251, 191, 36, 0.4);
+            box-shadow: 0 8px 24px rgba(234, 88, 12, 0.12);
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(251, 191, 36, 0.5);
+            box-shadow: 0 15px 35px rgba(234, 88, 12, 0.18);
+        }
+
+        /* Ergonomic Touch D-Pad & Action Buttons for Mobile Landscape Grip */
+        .touch-btn {
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1.5px solid rgba(245, 158, 11, 0.6);
+            touch-action: none;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .touch-btn:active, .touch-btn.active {
+            background: rgba(245, 158, 11, 0.85);
+            color: #ffffff !important;
+            transform: scale(0.92);
+        }
+
+        /* Radar Minimap Canvas Border */
+        #minimapCanvas {
+            border: 2px solid rgba(245, 158, 11, 0.7);
+            background: rgba(15, 23, 42, 0.8);
+        }
+
+        /* Pulsing beacon highlight */
+        @keyframes pulseGlow {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.06); opacity: 0.88; }
+        }
+        .pulse-beacon {
+            animation: pulseGlow 1.8s infinite ease-in-out;
+        }
+
+        /* Phone Rotation Animation for Portrait Warning Overlay */
+        @keyframes phoneRotate {
+            0%, 15% { transform: rotate(0deg); }
+            50%, 75% { transform: rotate(-90deg); }
+            100% { transform: rotate(0deg); }
+        }
+        .animate-phone-rotate {
+            animation: phoneRotate 3s infinite ease-in-out;
+        }
+
+        /* PORTRAIT ORIENTATION DETECTOR OVERLAY */
+        @media (orientation: portrait) and (max-width: 1023px) {
+            #landscapeOverlay {
+                opacity: 1 !important;
+                pointer-events: auto !important;
+            }
+        }
+    </style>
+</head>
+<body class="font-sans text-slate-800 flex flex-col h-screen w-screen overflow-hidden">
+
+    <!-- LANDSCAPE MODE ENFORCEMENT OVERLAY (PORTRAIT DETECTOR) -->
+    <div id="landscapeOverlay" class="fixed inset-0 z-50 bg-slate-900/95 backdrop-blur-md flex flex-col items-center justify-center p-6 text-center text-white space-y-4 transition-all duration-300 pointer-events-none opacity-0 md:hidden">
+        <div class="relative w-20 h-20 flex items-center justify-center bg-amber-500/20 rounded-3xl border-2 border-amber-400/50 shadow-2xl shadow-amber-500/20">
+            <i class="fa-solid fa-mobile-screen-button text-4xl text-amber-400 animate-phone-rotate"></i>
+        </div>
+        
+        <h2 class="text-xl font-black bg-gradient-to-r from-amber-400 via-orange-400 to-amber-200 bg-clip-text text-transparent">
+            Mode Layar Mendatar (Landscape)
+        </h2>
+        
+        <p class="text-xs text-amber-100/90 max-w-xs leading-relaxed font-medium">
+            Harap putar HP atau Tablet Anda ke posisi <strong>Mendatar (Landscape)</strong> untuk kenyamanan petualangan 3D & kendali jempol ganda yang presisi!
+        </p>
+
+        <div class="px-3 py-1.5 rounded-full bg-amber-500/20 text-amber-300 text-[11px] font-bold border border-amber-400/30 flex items-center gap-1.5">
+            <i class="fa-solid fa-rotate-right text-xs"></i> Otomatis menyesuaikan saat HP diputar
+        </div>
+    </div>
+
+    <!-- 3D WEBGL CANVAS CONTAINER -->
+    <div id="canvas-container" class="absolute inset-0 w-full h-full z-0"></div>
+
+    <!-- TOP HUD OVERLAY -->
+    <header class="absolute top-2.5 left-2.5 right-2.5 z-20 flex items-center justify-between pointer-events-none gap-2">
+        <!-- Logo & Title -->
+        <div class="glass-hud px-2.5 py-1.5 rounded-2xl flex items-center gap-2 pointer-events-auto">
+            <div class="w-7 h-7 rounded-xl bg-gradient-to-tr from-orange-warm to-gold-warm flex items-center justify-center text-white text-xs shadow-md">
+                <i class="fa-solid fa-compass"></i>
+            </div>
+            <div>
+                <h1 class="font-extrabold text-xs sm:text-sm bg-gradient-to-r from-orange-600 to-amber-600 bg-clip-text text-transparent leading-none">
+                    Lentera Algoritma 3D
+                </h1>
+                <p class="text-[9px] font-semibold text-amber-800/80 leading-tight">Petualangan Bebas Logika</p>
+            </div>
+        </div>
+
+        <!-- Center Progress & Points -->
+        <div class="glass-hud px-3 py-1.5 rounded-2xl flex items-center gap-2.5 pointer-events-auto shadow-md">
+            <div class="flex items-center gap-1">
+                <i class="fa-solid fa-gem text-amber-500 text-xs animate-bounce"></i>
+                <span id="scoreText" class="text-xs font-black text-amber-900 bg-amber-100 px-2 py-0.5 rounded-full border border-amber-300">
+                    0 / 10
+                </span>
+            </div>
+            <div class="h-3.5 w-px bg-amber-300/80"></div>
+            <div class="flex items-center gap-1 text-xs font-black text-slate-700">
+                <i class="fa-solid fa-star text-amber-500"></i>
+                <span id="pointsText" class="text-amber-900 font-extrabold">0 Poin</span>
+            </div>
+        </div>
+
+        <!-- Quick Utility Buttons -->
+        <div class="flex items-center gap-1.5 pointer-events-auto">
+            <button onclick="uiManager.openTeacherModal()" class="glass-hud px-2.5 py-1.5 rounded-2xl text-xs font-bold text-amber-900 hover:bg-amber-100 transition flex items-center gap-1 shadow-sm active:scale-95">
+                <i class="fa-solid fa-heart text-rose-500 animate-pulse text-xs"></i>
+                <span class="hidden md:inline">Pesan Guru</span>
+            </button>
+
+            <button id="muteBtn" onclick="soundEngine.toggleMute()" class="glass-hud w-8 h-8 rounded-2xl flex items-center justify-center text-amber-900 hover:bg-amber-100 transition shadow-sm active:scale-95">
+                <i id="muteIcon" class="fa-solid fa-volume-high text-xs"></i>
+            </button>
+
+            <button onclick="uiManager.openHelpModal()" class="glass-hud w-8 h-8 rounded-2xl flex items-center justify-center text-amber-900 hover:bg-amber-100 transition shadow-sm active:scale-95">
+                <i class="fa-solid fa-circle-question text-xs"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- ACTIVE POWER-UP STATUS HUD -->
+    <div id="powerupHud" class="absolute top-14 left-2.5 z-20 pointer-events-none flex flex-col gap-1">
+        <!-- Powerup Badges will spawn dynamically here -->
+    </div>
+
+    <!-- RADAR MINIMAP (Top Right) -->
+    <div class="absolute top-14 right-2.5 z-20 pointer-events-none flex flex-col items-end gap-1">
+        <canvas id="minimapCanvas" width="90" height="90" class="rounded-2xl shadow-lg pointer-events-auto"></canvas>
+        <div class="glass-hud px-1.5 py-0.5 rounded-lg text-[8px] font-bold text-slate-600">
+            <i class="fa-solid fa-location-crosshairs text-amber-500"></i> Radar 2D
+        </div>
+    </div>
+
+    <!-- POWER-UP PICKUP NOTIFICATION TOAST -->
+    <div id="powerupToast" class="absolute top-20 left-1/2 -translate-x-1/2 z-30 opacity-0 pointer-events-none transition-all duration-300 transform -translate-y-4">
+        <div class="glass-card px-4 py-2 rounded-2xl border-2 border-amber-400 text-slate-800 text-xs font-black shadow-2xl flex items-center gap-2">
+            <span id="toastIcon" class="w-6 h-6 rounded-xl bg-amber-500 text-white flex items-center justify-center text-xs shadow">
+                <i class="fa-solid fa-bolt"></i>
+            </span>
+            <span id="toastMessage">Power-Up Diaktifkan!</span>
+        </div>
+    </div>
+
+    <!-- PROXIMITY INTERACTION BANNER (Center Bottom) -->
+    <div id="proximityBanner" class="absolute bottom-20 left-1/2 -translate-x-1/2 z-30 opacity-0 pointer-events-none transition-all duration-300 transform translate-y-4">
+        <button id="interactBtn" onclick="gameEngine.triggerInteraction()" class="pulse-beacon bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 hover:from-amber-600 hover:to-orange-600 text-white font-extrabold px-5 py-2.5 rounded-2xl text-xs sm:text-sm shadow-xl flex items-center gap-2.5 border-2 border-white/80 active:scale-95 pointer-events-auto">
+            <span class="w-6 h-6 rounded-xl bg-white/20 flex items-center justify-center text-xs">
+                <i id="interactIcon" class="fa-solid fa-key"></i>
+            </span>
+            <span id="interactText">Tekan [E] atau Ketuk untuk Buka Soal</span>
+        </button>
+    </div>
+
+    <!-- MOBILE LANDSCAPE CONTROLS OVERLAY (LEFT THUMB: D-PAD, RIGHT THUMB: ACTION & SPRINT) -->
+    <div id="mobileControls" class="absolute inset-0 z-20 pointer-events-none flex justify-between items-end p-3 md:hidden">
+        <!-- Left Side: D-Pad -->
+        <div class="pointer-events-auto flex flex-col gap-1 pb-1 pl-1">
+            <div class="flex justify-center">
+                <button id="btnUp" class="touch-btn w-11 h-11 rounded-xl flex items-center justify-center text-slate-800 font-bold text-base shadow">
+                    <i class="fa-solid fa-chevron-up"></i>
+                </button>
+            </div>
+            <div class="flex gap-1.5">
+                <button id="btnLeft" class="touch-btn w-11 h-11 rounded-xl flex items-center justify-center text-slate-800 font-bold text-base shadow">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </button>
+                <button id="btnDown" class="touch-btn w-11 h-11 rounded-xl flex items-center justify-center text-slate-800 font-bold text-base shadow">
+                    <i class="fa-solid fa-chevron-down"></i>
+                </button>
+                <button id="btnRight" class="touch-btn w-11 h-11 rounded-xl flex items-center justify-center text-slate-800 font-bold text-base shadow">
+                    <i class="fa-solid fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Right Side: Dual Thumb Action & Sprint Buttons -->
+        <div class="pointer-events-auto flex items-center gap-2 pb-1 pr-1">
+            <!-- Sprint Button -->
+            <button id="btnSprint" class="touch-btn w-12 h-12 rounded-2xl bg-amber-500/20 text-amber-900 border-amber-400/80 flex flex-col items-center justify-center font-black text-[10px] shadow active:scale-95">
+                <i class="fa-solid fa-person-running text-sm mb-0.5"></i>
+                <span>LARI</span>
+            </button>
+            
+            <!-- Interact Button -->
+            <button id="btnAction" onclick="gameEngine.triggerInteraction()" class="touch-btn w-14 h-14 rounded-2xl bg-gradient-to-tr from-amber-500 to-orange-500 text-white border-white flex flex-col items-center justify-center font-black text-[10px] shadow-lg active:scale-95">
+                <i class="fa-solid fa-hand text-base mb-0.5"></i>
+                <span>AKSI [E]</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- TRUE / FALSE QUESTION CHALLENGE MODAL -->
+    <div id="questionModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-3 opacity-0 pointer-events-none transition-all duration-300">
+        <div class="glass-card max-w-md w-full rounded-3xl p-4 sm:p-6 shadow-2xl relative transform scale-95 transition-transform duration-300 max-h-[92vh] overflow-y-auto">
+            <!-- Close Button -->
+            <button onclick="uiManager.closeQuestionModal()" class="absolute top-3 right-3 w-7 h-7 rounded-full bg-amber-100 hover:bg-amber-200 text-amber-800 flex items-center justify-center transition">
+                <i class="fa-solid fa-xmark text-xs"></i>
+            </button>
+
+            <!-- Modal Header -->
+            <div class="flex items-center gap-2.5 pb-2.5 border-b border-amber-200/80 mb-2.5">
+                <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-amber-500 to-orange-500 text-white flex items-center justify-center text-sm shadow-md">
+                    <i id="questionCategoryIcon" class="fa-solid fa-code"></i>
+                </div>
+                <div>
+                    <span id="questionBadge" class="text-[9px] font-extrabold uppercase bg-amber-100 text-amber-900 px-2 py-0.5 rounded-full border border-amber-300">
+                        Soal Benar / Salah
+                    </span>
+                    <h3 id="questionTitle" class="text-xs sm:text-sm font-black text-slate-800 leading-tight mt-0.5">
+                        Judul Soal
+                    </h3>
+                </div>
+            </div>
+
+            <!-- Hint Badge -->
+            <div id="hintBadge" class="hidden mb-2.5 p-2 rounded-xl bg-amber-100/90 border border-amber-300 text-amber-900 text-xs font-bold flex items-center gap-2">
+                <i class="fa-solid fa-star text-amber-500 text-sm animate-spin"></i>
+                <span id="hintText">Bintang Berkah Memberi Petunjuk!</span>
+            </div>
+
+            <!-- Question Prompt Body -->
+            <div id="questionText" class="text-xs text-slate-800 bg-amber-50/90 p-3 rounded-2xl border border-amber-200/80 font-semibold mb-3 leading-relaxed shadow-inner">
+                Pernyataan soal...
+            </div>
+
+            <!-- True / False Action Buttons -->
+            <div id="tfButtonsContainer" class="grid grid-cols-2 gap-2.5 mb-2.5">
+                <button id="btnTrue" onclick="uiManager.submitTFAnswer(true)" class="py-2.5 px-3 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white font-extrabold text-xs sm:text-sm shadow-lg transition active:scale-95 flex items-center justify-center gap-1.5 border-2 border-emerald-300">
+                    <i class="fa-solid fa-circle-check text-base"></i> BENAR
+                </button>
+                <button id="btnFalse" onclick="uiManager.submitTFAnswer(false)" class="py-2.5 px-3 rounded-2xl bg-rose-500 hover:bg-rose-600 text-white font-extrabold text-xs sm:text-sm shadow-lg transition active:scale-95 flex items-center justify-center gap-1.5 border-2 border-rose-300">
+                    <i class="fa-solid fa-circle-xmark text-base"></i> SALAH
+                </button>
+            </div>
+
+            <!-- Discussion Alert Box -->
+            <div id="discussionAlert" class="hidden p-3 rounded-2xl text-xs font-medium leading-relaxed border shadow-md space-y-1"></div>
+
+            <!-- Continue Button -->
+            <button id="continueBtn" onclick="uiManager.closeQuestionModal()" class="hidden w-full mt-2.5 py-2.5 rounded-2xl bg-amber-500 hover:bg-amber-600 text-white font-extrabold text-xs shadow-md transition active:scale-95">
+                Lanjutkan Petualangan <i class="fa-solid fa-arrow-right ml-1"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- MODAL: PESAN APRESIASI GURU -->
+    <div id="teacherModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-3 opacity-0 pointer-events-none transition-all duration-300">
+        <div class="glass-card max-w-md w-full rounded-3xl p-5 shadow-2xl relative text-center space-y-3 border-2 border-amber-300 transform scale-95 transition-transform duration-300 max-h-[92vh] overflow-y-auto" id="teacherCard">
+            <button onclick="uiManager.closeTeacherModal()" class="absolute top-3 right-3 w-7 h-7 rounded-full bg-amber-100 hover:bg-amber-200 text-amber-800 flex items-center justify-center transition">
+                <i class="fa-solid fa-xmark text-xs"></i>
+            </button>
+
+            <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-amber-500 to-orange-500 text-white flex items-center justify-center text-2xl mx-auto shadow-md">
+                <i class="fa-solid fa-graduation-cap"></i>
+            </div>
+
+            <span class="inline-block px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-900 text-[10px] font-bold uppercase tracking-wider">
+                Apresiasi & Penghormatan Guru
+            </span>
+
+            <h3 class="text-base sm:text-lg font-black text-slate-800">
+                Lentera Pembimbing Logika
+            </h3>
+
+            <blockquote class="text-xs italic font-semibold text-amber-950 bg-amber-50 p-3 rounded-2xl border-l-4 border-amber-500 leading-relaxed text-left shadow-inner">
+                "Terima kasih kepada para guru yang telah menjadi navigasi terbaik, membimbing setiap langkah logika kami, dan menyalakan semangat belajar sepanjang petualangan ini."
+            </blockquote>
+
+            <p class="text-xs text-slate-600 text-justify leading-relaxed">
+                Seperti halnya algoritma yang menyusun solusi dari masalah kompleks, bimbingan dan kesabaran para guru telah membentuk landasan logika dan karakter generasi penerus bangsa.
+            </p>
+
+            <button onclick="uiManager.closeTeacherModal()" class="w-full py-2.5 rounded-2xl bg-gradient-to-r from-orange-600 to-amber-500 text-white font-extrabold text-xs shadow-md transition active:scale-95">
+                Lanjutkan Petualangan <i class="fa-solid fa-arrow-right ml-1"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- MODAL: HELP & CONTROLS -->
+    <div id="helpModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-3 opacity-0 pointer-events-none transition-all duration-300">
+        <div class="glass-card max-w-sm w-full rounded-3xl p-5 shadow-2xl relative space-y-3 max-h-[92vh] overflow-y-auto">
+            <button onclick="uiManager.closeHelpModal()" class="absolute top-3 right-3 w-7 h-7 rounded-full bg-amber-100 hover:bg-amber-200 text-amber-800 flex items-center justify-center transition">
+                <i class="fa-solid fa-xmark text-xs"></i>
+            </button>
+
+            <h3 class="text-sm font-black text-slate-800 flex items-center gap-2">
+                <i class="fa-solid fa-gamepad text-amber-500"></i> Panduan Kontrol & Power-Up
+            </h3>
+
+            <div class="space-y-1.5 text-xs text-slate-700">
+                <div class="flex items-center justify-between p-2 bg-amber-50 rounded-xl">
+                    <span class="font-bold">Bergerak / Jalan:</span>
+                    <span class="bg-white px-2 py-0.5 rounded font-mono border border-amber-200 font-bold">WASD / Panah / D-Pad Left</span>
+                </div>
+                <div class="flex items-center justify-between p-2 bg-amber-50 rounded-xl">
+                    <span class="font-bold">Interaksi / Buka Soal:</span>
+                    <span class="bg-white px-2 py-0.5 rounded font-mono border border-amber-200 font-bold">Tekan [E] / Tombol AKSI</span>
+                </div>
+            </div>
+
+            <h4 class="text-xs font-black text-slate-800 pt-1 border-t border-amber-200">
+                Item Power-Up Di Pulau:
+            </h4>
+            <div class="space-y-1 text-xs">
+                <div class="flex items-center gap-2 p-1.5 bg-purple-50 rounded-xl border border-purple-200 text-purple-900 font-bold">
+                    <i class="fa-solid fa-bolt text-purple-600"></i>
+                    <span>⚡ Kilat Logika: Lari 80% Lebih Cepat (12s)</span>
+                </div>
+                <div class="flex items-center gap-2 p-1.5 bg-cyan-50 rounded-xl border border-cyan-200 text-cyan-900 font-bold">
+                    <i class="fa-solid fa-magnet text-cyan-600"></i>
+                    <span>🧲 Magnet Kompas: Pancarkan Sinar ke Soal (15s)</span>
+                </div>
+                <div class="flex items-center gap-2 p-1.5 bg-amber-50 rounded-xl border border-amber-200 text-amber-900 font-bold">
+                    <i class="fa-solid fa-star text-amber-500"></i>
+                    <span>🌟 Bintang Berkah: +150 Poin & Bocoran Jawaban</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: VICTORY PORTAL -->
+    <div id="victoryModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-3 opacity-0 pointer-events-none transition-all duration-300">
+        <div class="glass-card max-w-md w-full rounded-3xl p-5 text-center shadow-2xl border-2 border-emerald-400 space-y-3">
+            <div class="w-14 h-14 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-2xl mx-auto animate-bounce shadow-md">
+                <i class="fa-solid fa-trophy"></i>
+            </div>
+
+            <h3 class="text-lg sm:text-xl font-black text-slate-800">
+                Selamat! Petualangan Tuntas
+            </h3>
+
+            <p class="text-xs text-slate-600 leading-relaxed">
+                Semua 10 Kristal Logika telah terpecahkan dengan sempurna! Kamu telah menguasai konsep algoritma dasar, berpikir komputasional, dan struktur flowchart.
+            </p>
+
+            <div class="p-3 bg-amber-50 rounded-2xl border border-amber-200 text-left space-y-1">
+                <p class="text-xs font-bold text-amber-900 flex items-center gap-1">
+                    <i class="fa-solid fa-heart text-rose-500"></i> Pesan Apresiasi Guru:
+                </p>
+                <p class="text-xs italic text-slate-700 leading-relaxed">
+                    "Terima kasih kepada para guru yang telah menjadi navigasi terbaik, membimbing setiap langkah logika kami, dan menyalakan semangat belajar sepanjang petualangan ini."
+                </p>
+            </div>
+
+            <button onclick="location.reload()" class="w-full py-2.5 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-500 text-white font-extrabold text-xs shadow-md transition active:scale-95">
+                Main Lagi Dari Awal <i class="fa-solid fa-rotate-right ml-1"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- WEB AUDIO SYNTHESIZER SOUND ENGINE -->
+    <script>
+        class SoundEngine {
+            constructor() {
+                this.ctx = null;
+                this.isMuted = false;
+                this.bgmOsc = null;
+                this.bgmGain = null;
+            }
+
+            init() {
+                if (!this.ctx) {
+                    this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+                    this.startAmbientBGM();
+                }
+            }
+
+            toggleMute() {
+                this.isMuted = !this.isMuted;
+                const icon = document.getElementById('muteIcon');
+                if (this.isMuted) {
+                    icon.className = "fa-solid fa-volume-xmark text-xs text-rose-600";
+                    if (this.bgmGain) this.bgmGain.gain.setValueAtTime(0, this.ctx.currentTime);
+                } else {
+                    icon.className = "fa-solid fa-volume-high text-xs";
+                    if (this.bgmGain) this.bgmGain.gain.setValueAtTime(0.02, this.ctx.currentTime);
+                }
+            }
+
+            playStep() {
+                if (this.isMuted) return;
+                this.init();
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(160 + Math.random() * 40, this.ctx.currentTime);
+                osc.frequency.linearRampToValueAtTime(80, this.ctx.currentTime + 0.05);
+                gain.gain.setValueAtTime(0.06, this.ctx.currentTime);
+                gain.gain.linearRampToValueAtTime(0.001, this.ctx.currentTime + 0.05);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start();
+                osc.stop(this.ctx.currentTime + 0.05);
+            }
+
+            playChimeNear() {
+                if (this.isMuted) return;
+                this.init();
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(659.25, this.ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(880, this.ctx.currentTime + 0.12);
+                gain.gain.setValueAtTime(0.05, this.ctx.currentTime);
+                gain.gain.linearRampToValueAtTime(0.001, this.ctx.currentTime + 0.12);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start();
+                osc.stop(this.ctx.currentTime + 0.12);
+            }
+
+            playPowerup() {
+                if (this.isMuted) return;
+                this.init();
+                const notes = [440, 554.37, 659.25, 880];
+                notes.forEach((freq, idx) => {
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(freq, this.ctx.currentTime + idx * 0.04);
+                    gain.gain.setValueAtTime(0.1, this.ctx.currentTime + idx * 0.04);
+                    gain.gain.linearRampToValueAtTime(0.001, this.ctx.currentTime + idx * 0.04 + 0.18);
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    osc.start(this.ctx.currentTime + idx * 0.04);
+                    osc.stop(this.ctx.currentTime + idx * 0.04 + 0.18);
+                });
+            }
+
+            playCorrect() {
+                if (this.isMuted) return;
+                this.init();
+                const notes = [523.25, 659.25, 783.99, 1046.50];
+                notes.forEach((freq, idx) => {
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(freq, this.ctx.currentTime + idx * 0.07);
+                    gain.gain.setValueAtTime(0.12, this.ctx.currentTime + idx * 0.07);
+                    gain.gain.linearRampToValueAtTime(0.001, this.ctx.currentTime + idx * 0.07 + 0.22);
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    osc.start(this.ctx.currentTime + idx * 0.07);
+                    osc.stop(this.ctx.currentTime + idx * 0.07 + 0.22);
+                });
+            }
+
+            playWrong() {
+                if (this.isMuted) return;
+                this.init();
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(220, this.ctx.currentTime);
+                osc.frequency.linearRampToValueAtTime(110, this.ctx.currentTime + 0.22);
+                gain.gain.setValueAtTime(0.1, this.ctx.currentTime);
+                gain.gain.linearRampToValueAtTime(0.001, this.ctx.currentTime + 0.22);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start();
+                osc.stop(this.ctx.currentTime + 0.22);
+            }
+
+            startAmbientBGM() {
+                if (this.bgmOsc) return;
+                try {
+                    this.bgmOsc = this.ctx.createOscillator();
+                    this.bgmGain = this.ctx.createGain();
+                    this.bgmOsc.type = 'sine';
+                    this.bgmOsc.frequency.setValueAtTime(220, this.ctx.currentTime);
+                    this.bgmGain.gain.setValueAtTime(this.isMuted ? 0 : 0.02, this.ctx.currentTime);
+                    this.bgmOsc.connect(this.bgmGain);
+                    this.bgmGain.connect(this.ctx.destination);
+                    this.bgmOsc.start();
+                } catch(e){}
+            }
+        }
+        const soundEngine = new SoundEngine();
+    </script>
+
+    <!-- DATASET 10 SOAL BENAR / SALAH LENGKAP -->
+    <script>
+        const tfQuestions = [
+            { 
+                id: 1, 
+                title: "Sejarah Algoritma",
+                category: "Tokoh Penemu",
+                icon: "fa-book-bookmark",
+                x: 14, z: -16,
+                q: "Algoritma berasal dari nama matematikawan dunia Mohammad bin Musa al-Khwarizmi.", 
+                ans: true,
+                discussion: "Pembahasan: Benar. Istilah 'algoritma' diabadikan dari nama Al-Khwarizmi (780–850 M), seorang polimatik Muslim penemu aljabar dan sistem penulisan angka desimal."
+            },
+            { 
+                id: 2, 
+                title: "Simbol Flowchart",
+                category: "Diagram Alir",
+                icon: "fa-diagram-project",
+                x: -16, z: -14,
+                q: "Simbol flowchart berbentuk jajar genjang digunakan untuk menyatakan proses perhitungan matematika.", 
+                ans: false,
+                discussion: "Pembahasan: Salah. Simbol jajar genjang (parallelogram) dalam standar internasional flowchart digunakan untuk menyatakan Input / Output data, sedangkan proses perhitungan matematika menggunakan simbol persegi panjang (rectangle)."
+            },
+            { 
+                id: 3, 
+                title: "Pencarian Biner",
+                category: "Search Algorithm",
+                icon: "fa-magnifying-glass",
+                x: -18, z: 2,
+                q: "Binary Search dapat diterapkan langsung pada data yang belum terurut secara efisien.", 
+                ans: false,
+                discussion: "Pembahasan: Salah. Binary Search (pencarian biner) mensyaratkan data harus berada dalam kondisi terurut terlebih dahulu agar proses pembagian dua (divide and conquer) berjalan valid."
+            },
+            { 
+                id: 4, 
+                title: "Percabangan Flowchart",
+                category: "Struktur Keputusan",
+                icon: "fa-code-branch",
+                x: -12, z: 18,
+                q: "Struktur percabangan (branching) dalam flowchart menggunakan simbol belah ketupat (decision).", 
+                ans: true,
+                discussion: "Pembahasan: Benar. Simbol belah ketupat (diamond) secara universal melambangkan titik keputusan atau percabangan kondisi logis (Ya/Tidak atau Benar/Salah)."
+            },
+            { 
+                id: 5, 
+                title: "Pilar Dekomposisi",
+                category: "Berpikir Komputasional",
+                icon: "fa-puzzle-piece",
+                x: 2, z: 21,
+                q: "Dekomposisi adalah pilar berpikir komputasional yang memecah masalah besar menjadi bagian kecil.", 
+                ans: true,
+                discussion: "Pembahasan: Benar. Dekomposisi adalah pemecahan masalah kompleks menjadi komponen-komponen kecil agar lebih mudah dianalisis dan diselesaikan."
+            },
+            { 
+                id: 6, 
+                title: "Infinite Loop",
+                category: "Struktur Perulangan",
+                icon: "fa-rotate",
+                x: 18, z: 12,
+                q: "Perintah perulangan while akan berjalan terus tanpa henti jika kondisi syarat tidak pernah bernilai salah.", 
+                ans: true,
+                discussion: "Pembahasan: Benar. Fenomena ini disebut infinite loop (perulangan tak berhingga), di mana program terus berjalan karena variabel pengontrol tidak pernah mengubah nilai kondisi menjadi False."
+            },
+            { 
+                id: 7, 
+                title: "Simbol Terminator",
+                category: "Diagram Alir",
+                icon: "fa-stop",
+                x: 21, z: -4,
+                q: "Terminator dalam flowchart digambarkan dengan bentuk persegi panjang.", 
+                ans: false,
+                discussion: "Pembahasan: Salah. Terminator (titik awal/akhir program) digambarkan dengan bentuk kapsul lonjong (rounded rectangle), bukan persegi panjang."
+            },
+            { 
+                id: 8, 
+                title: "Algoritma Bubble Sort",
+                category: "Pengurutan Data",
+                icon: "fa-arrow-down-short-wide",
+                x: 8, z: -21,
+                q: "Bubble sort adalah algoritma pengurutan data dengan membandingkan elemen yang bersebelahan.", 
+                ans: true,
+                discussion: "Pembahasan: Benar. Bubble Sort bekerja dengan membandingkan pasangan elemen yang bersebelahan dan menukar posisinya jika urutannya salah."
+            },
+            { 
+                id: 9, 
+                title: "Prinsip Abstraksi",
+                category: "Berpikir Komputasional",
+                icon: "fa-filter",
+                x: -8, z: -21,
+                q: "Abstraksi berarti menyertakan seluruh detail rumit tanpa membuang informasi apa pun.", 
+                ans: false,
+                discussion: "Pembahasan: Salah. Abstraksi justru kebalikannya: menyaring dan mengabaikan detail yang tidak relevan agar fokus pada informasi inti yang krusial."
+            },
+            { 
+                id: 10, 
+                title: "Garis Alir (Flowlines)",
+                category: "Diagram Alir",
+                icon: "fa-arrow-right-long",
+                x: 0, z: -16,
+                q: "Flowlines (garis alir) berfungsi untuk menghubungkan arah jalannya proses antar simbol flowchart.", 
+                ans: true,
+                discussion: "Pembahasan: Benar. Flowlines berupa garis berpanah yang memandu pembaca memahami alur sekuensial antar instruksi dalam diagram."
+            }
+        ];
+
+        // POWER-UP DEFINITIONS
+        const POWERUPS_CONFIG = [
+            { id: 'SPEED', name: 'Kilat Logika', icon: 'fa-bolt', color: 0xA855F7, desc: 'Lari 80% Lebih Cepat (12s)', x: 10, z: 8 },
+            { id: 'MAGNET', name: 'Magnet Kompas', icon: 'fa-magnet', color: 0x06B6D4, desc: 'Kompas Sinar Ke Soal (15s)', x: -10, z: -8 },
+            { id: 'HINT', name: 'Bintang Berkah', icon: 'fa-star', color: 0xF59E0B, desc: '+150 Poin & Bocoran Jawaban', x: 12, z: -6 },
+            { id: 'SPEED', name: 'Kilat Logika', icon: 'fa-bolt', color: 0xA855F7, desc: 'Lari 80% Lebih Cepat (12s)', x: -14, z: 10 },
+            { id: 'HINT', name: 'Bintang Berkah', icon: 'fa-star', color: 0xF59E0B, desc: '+150 Poin & Bocoran Jawaban', x: -6, z: 16 }
+        ];
+    </script>
+
+    <!-- THREE.JS 3D WORLD & GAMEPLAY CONTROLLER -->
+    <script>
+        class World3D {
+            constructor() {
+                this.container = document.getElementById('canvas-container');
+                this.scene = new THREE.Scene();
+                this.camera = null;
+                this.renderer = null;
+
+                this.player = null;
+                this.playerPos = new THREE.Vector3(0, 0, 8);
+                this.playerRotY = 0;
+                
+                this.crystals = [];
+                this.powerups = [];
+                this.portalMesh = null;
+                this.beaconLine = null;
+                this.cloudsGroup = new THREE.Group();
+
+                this.camOffset = new THREE.Vector3(0, 5.5, 8.5);
+            }
+
+            init() {
+                this.scene.background = new THREE.Color(0xFEF3C7);
+                this.scene.fog = new THREE.FogExp2(0xFEF3C7, 0.016);
+
+                const aspect = window.innerWidth / window.innerHeight;
+                this.camera = new THREE.PerspectiveCamera(45, aspect, 0.1, 1000);
+
+                this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+                this.renderer.setSize(window.innerWidth, window.innerHeight);
+                this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+                this.renderer.shadowMap.enabled = true;
+                this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+                this.container.appendChild(this.renderer.domElement);
+
+                // Lights
+                const ambient = new THREE.AmbientLight(0xFFEDD5, 0.9);
+                this.scene.add(ambient);
+
+                const sun = new THREE.DirectionalLight(0xF59E0B, 1.3);
+                sun.position.set(20, 30, 15);
+                sun.castShadow = true;
+                sun.shadow.mapSize.width = 1024;
+                sun.shadow.mapSize.height = 1024;
+                const d = 30;
+                sun.shadow.camera.left = -d;
+                sun.shadow.camera.right = d;
+                sun.shadow.camera.top = d;
+                sun.shadow.camera.bottom = -d;
+                this.scene.add(sun);
+
+                const skyFill = new THREE.DirectionalLight(0x0284C7, 0.35);
+                skyFill.position.set(-20, 15, -20);
+                this.scene.add(skyFill);
+
+                this.buildIsland();
+                this.buildPlayer();
+                this.buildCrystals();
+                this.buildPowerups();
+                this.buildPortal();
+                this.buildClouds();
+
+                window.addEventListener('resize', () => this.onResize());
+                window.addEventListener('orientationchange', () => {
+                    setTimeout(() => this.onResize(), 200);
+                });
+            }
+
+            buildIsland() {
+                const islandGroup = new THREE.Group();
+
+                // Grass Surface
+                const grassGeo = new THREE.CylinderGeometry(28, 25, 2, 32);
+                const grassMat = new THREE.MeshStandardMaterial({ color: 0x10B981, roughness: 0.8 });
+                const grass = new THREE.Mesh(grassGeo, grassMat);
+                grass.position.y = -1;
+                grass.receiveShadow = true;
+                islandGroup.add(grass);
+
+                // Dirt Base
+                const dirtGeo = new THREE.ConeGeometry(25, 18, 32);
+                const dirtMat = new THREE.MeshStandardMaterial({ color: 0x78350F, roughness: 0.9 });
+                const dirt = new THREE.Mesh(dirtGeo, dirtMat);
+                dirt.rotation.x = Math.PI;
+                dirt.position.y = -11;
+                islandGroup.add(dirt);
+
+                // Center Plaza
+                const plazaGeo = new THREE.CylinderGeometry(5.5, 5.5, 0.1, 16);
+                const plazaMat = new THREE.MeshStandardMaterial({ color: 0xE2E8F0, roughness: 0.5 });
+                const plaza = new THREE.Mesh(plazaGeo, plazaMat);
+                plaza.position.y = 0.02;
+                plaza.receiveShadow = true;
+                islandGroup.add(plaza);
+
+                // Trees and Rocks
+                for (let i = 0; i < 32; i++) {
+                    const angle = Math.random() * Math.PI * 2;
+                    const radius = 9 + Math.random() * 15;
+                    const x = Math.cos(angle) * radius;
+                    const z = Math.sin(angle) * radius;
+
+                    if (radius < 6.5) continue;
+
+                    if (Math.random() > 0.3) {
+                        const tree = this.createTree();
+                        tree.position.set(x, 0, z);
+                        islandGroup.add(tree);
+                    } else {
+                        const rockGeo = new THREE.DodecahedronGeometry(0.4 + Math.random() * 0.4);
+                        const rockMat = new THREE.MeshStandardMaterial({ color: 0x64748B, roughness: 0.9 });
+                        const rock = new THREE.Mesh(rockGeo, rockMat);
+                        rock.position.set(x, 0.2, z);
+                        rock.rotation.set(Math.random(), Math.random(), Math.random());
+                        rock.castShadow = true;
+                        islandGroup.add(rock);
+                    }
+                }
+
+                this.scene.add(islandGroup);
+            }
+
+            createTree() {
+                const tree = new THREE.Group();
+                const trunkGeo = new THREE.CylinderGeometry(0.18, 0.25, 1.2, 8);
+                const trunkMat = new THREE.MeshStandardMaterial({ color: 0x92400E });
+                const trunk = new THREE.Mesh(trunkGeo, trunkMat);
+                trunk.position.y = 0.6;
+                trunk.castShadow = true;
+                tree.add(trunk);
+
+                const leafMat = new THREE.MeshStandardMaterial({ color: 0x047857, roughness: 0.6 });
+                for (let l = 0; l < 3; l++) {
+                    const coneGeo = new THREE.ConeGeometry(1.1 - l * 0.25, 1.1, 8);
+                    const cone = new THREE.Mesh(coneGeo, leafMat);
+                    cone.position.y = 1.2 + l * 0.65;
+                    cone.castShadow = true;
+                    tree.add(cone);
+                }
+                return tree;
+            }
+
+            buildPlayer() {
+                this.player = new THREE.Group();
+
+                const bodyGeo = new THREE.CylinderGeometry(0.35, 0.28, 0.6, 16);
+                const bodyMat = new THREE.MeshStandardMaterial({ color: 0xEA580C, roughness: 0.3 });
+                const body = new THREE.Mesh(bodyGeo, bodyMat);
+                body.position.y = 0.4;
+                body.castShadow = true;
+                this.player.add(body);
+
+                const headGeo = new THREE.BoxGeometry(0.46, 0.38, 0.4);
+                const headMat = new THREE.MeshStandardMaterial({ color: 0xF59E0B, roughness: 0.2 });
+                const head = new THREE.Mesh(headGeo, headMat);
+                head.position.y = 0.88;
+                head.castShadow = true;
+                this.player.add(head);
+
+                const visorGeo = new THREE.PlaneGeometry(0.34, 0.16);
+                const visorMat = new THREE.MeshBasicMaterial({ color: 0x38BDF8 });
+                const visor = new THREE.Mesh(visorGeo, visorMat);
+                visor.position.set(0, 0.9, 0.21);
+                this.player.add(visor);
+
+                const antGeo = new THREE.CylinderGeometry(0.02, 0.02, 0.22);
+                const antMat = new THREE.MeshStandardMaterial({ color: 0x475569 });
+                const ant = new THREE.Mesh(antGeo, antMat);
+                ant.position.y = 1.16;
+                this.player.add(ant);
+
+                const orbGeo = new THREE.SphereGeometry(0.08, 12, 12);
+                const orbMat = new THREE.MeshBasicMaterial({ color: 0x38BDF8 });
+                const orb = new THREE.Mesh(orbGeo, orbMat);
+                orb.position.y = 1.3;
+                this.player.add(orb);
+
+                this.player.position.copy(this.playerPos);
+                this.scene.add(this.player);
+            }
+
+            buildCrystals() {
+                tfQuestions.forEach(q => {
+                    const group = new THREE.Group();
+
+                    const pedGeo = new THREE.CylinderGeometry(0.45, 0.6, 0.35, 8);
+                    const pedMat = new THREE.MeshStandardMaterial({ color: 0x475569 });
+                    const ped = new THREE.Mesh(pedGeo, pedMat);
+                    ped.position.y = 0.18;
+                    ped.receiveShadow = true;
+                    group.add(ped);
+
+                    const cryGeo = new THREE.OctahedronGeometry(0.4, 0);
+                    const cryMat = new THREE.MeshStandardMaterial({
+                        color: 0xF59E0B,
+                        emissive: 0xF59E0B,
+                        emissiveIntensity: 0.8,
+                        roughness: 0.1
+                    });
+                    const cryMesh = new THREE.Mesh(cryGeo, cryMat);
+                    cryMesh.position.y = 1.1;
+                    cryMesh.castShadow = true;
+                    group.add(cryMesh);
+
+                    const light = new THREE.PointLight(0xF59E0B, 1, 4);
+                    light.position.y = 1.1;
+                    group.add(light);
+
+                    group.position.set(q.x, 0, q.z);
+                    this.scene.add(group);
+
+                    this.crystals.push({
+                        id: q.id,
+                        group: group,
+                        mesh: cryMesh,
+                        material: cryMat,
+                        light: light,
+                        solved: false,
+                        x: q.x,
+                        z: q.z
+                    });
+                });
+            }
+
+            buildPowerups() {
+                POWERUPS_CONFIG.forEach((p, idx) => {
+                    const group = new THREE.Group();
+
+                    let itemGeo;
+                    if (p.id === 'SPEED') itemGeo = new THREE.IcosahedronGeometry(0.35, 0);
+                    else if (p.id === 'MAGNET') itemGeo = new THREE.TorusGeometry(0.3, 0.1, 12, 24);
+                    else itemGeo = new THREE.DodecahedronGeometry(0.38, 0);
+
+                    const itemMat = new THREE.MeshStandardMaterial({
+                        color: p.color,
+                        emissive: p.color,
+                        emissiveIntensity: 0.9,
+                        roughness: 0.2
+                    });
+
+                    const itemMesh = new THREE.Mesh(itemGeo, itemMat);
+                    itemMesh.position.y = 0.8;
+                    itemMesh.castShadow = true;
+                    group.add(itemMesh);
+
+                    const pLight = new THREE.PointLight(p.color, 1, 3);
+                    pLight.position.y = 0.8;
+                    group.add(pLight);
+
+                    group.position.set(p.x, 0, p.z);
+                    this.scene.add(group);
+
+                    this.powerups.push({
+                        id: p.id,
+                        index: idx,
+                        config: p,
+                        group: group,
+                        mesh: itemMesh,
+                        active: true,
+                        x: p.x,
+                        z: p.z
+                    });
+                });
+            }
+
+            buildPortal() {
+                const portalGroup = new THREE.Group();
+
+                const ringGeo = new THREE.TorusGeometry(1.6, 0.2, 16, 32);
+                const ringMat = new THREE.MeshStandardMaterial({ color: 0x94A3B8, roughness: 0.3 });
+                const ring = new THREE.Mesh(ringGeo, ringMat);
+                ring.rotation.x = Math.PI / 2;
+                ring.position.y = 0.15;
+                portalGroup.add(ring);
+
+                const beamGeo = new THREE.CylinderGeometry(1.3, 1.3, 6, 24, 1, true);
+                const beamMat = new THREE.MeshBasicMaterial({ color: 0xF59E0B, transparent: true, opacity: 0, side: THREE.DoubleSide });
+                this.portalMesh = new THREE.Mesh(beamGeo, beamMat);
+                this.portalMesh.position.y = 3;
+                portalGroup.add(this.portalMesh);
+
+                portalGroup.position.set(0, 0, 0);
+                this.scene.add(portalGroup);
+            }
+
+            showMagnetBeacon(targetX, targetZ) {
+                this.hideMagnetBeacon();
+                const beamGeo = new THREE.CylinderGeometry(0.15, 0.15, 12, 16, 1, true);
+                const beamMat = new THREE.MeshBasicMaterial({ color: 0x06B6D4, transparent: true, opacity: 0.65 });
+                this.beaconLine = new THREE.Mesh(beamGeo, beamMat);
+                this.beaconLine.position.set(targetX, 6, targetZ);
+                this.scene.add(this.beaconLine);
+            }
+
+            hideMagnetBeacon() {
+                if (this.beaconLine) {
+                    this.scene.remove(this.beaconLine);
+                    this.beaconLine = null;
+                }
+            }
+
+            activatePortal() {
+                if (this.portalMesh) {
+                    this.portalMesh.material.color.setHex(0xF59E0B);
+                    this.portalMesh.material.opacity = 0.65;
+                }
+            }
+
+            buildClouds() {
+                for (let i = 0; i < 12; i++) {
+                    const cloud = new THREE.Group();
+                    const cloudMat = new THREE.MeshBasicMaterial({ color: 0xFFFFFF, transparent: true, opacity: 0.7 });
+                    for (let j = 0; j < 3; j++) {
+                        const pGeo = new THREE.DodecahedronGeometry(1.2 + Math.random() * 0.8);
+                        const pMesh = new THREE.Mesh(pGeo, cloudMat);
+                        pMesh.position.set(j * 0.9, Math.random() * 0.3, Math.random() * 0.4);
+                        cloud.add(pMesh);
+                    }
+                    cloud.position.set((Math.random() - 0.5) * 60, 8 + Math.random() * 6, (Math.random() - 0.5) * 60);
+                    this.cloudsGroup.add(cloud);
+                }
+                this.scene.add(this.cloudsGroup);
+            }
+
+            markCrystalSolved(id) {
+                const cry = this.crystals.find(c => c.id === id);
+                if (cry) {
+                    cry.solved = true;
+                    cry.material.color.setHex(0x10B981);
+                    cry.material.emissive.setHex(0x10B981);
+                    cry.light.color.setHex(0x10B981);
+                }
+            }
+
+            removePowerup(index) {
+                const p = this.powerups.find(pu => pu.index === index);
+                if (p && p.active) {
+                    p.active = false;
+                    this.scene.remove(p.group);
+                }
+            }
+
+            update(dt, isMoving) {
+                const time = Date.now() * 0.003;
+
+                // Animate Crystals
+                this.crystals.forEach(c => {
+                    c.mesh.rotation.y += 0.03;
+                    c.mesh.position.y = 1.1 + Math.sin(time * 2 + c.x) * 0.08;
+                });
+
+                // Animate Powerups
+                this.powerups.forEach(p => {
+                    if (p.active) {
+                        p.mesh.rotation.x += 0.02;
+                        p.mesh.rotation.y += 0.03;
+                        p.mesh.position.y = 0.8 + Math.sin(time * 3 + p.x) * 0.1;
+                    }
+                });
+
+                // Animate Beacon Beam
+                if (this.beaconLine) {
+                    this.beaconLine.rotation.y += 0.02;
+                }
+
+                // Animate Clouds
+                this.cloudsGroup.children.forEach(c => {
+                    c.position.x += 0.01;
+                    if (c.position.x > 35) c.position.x = -35;
+                });
+
+                // Update Player
+                this.player.position.copy(this.playerPos);
+                this.player.rotation.y = this.playerRotY;
+
+                if (isMoving) {
+                    this.player.position.y = Math.abs(Math.sin(time * 7)) * 0.12;
+                } else {
+                    this.player.position.y = 0;
+                }
+
+                // Smooth Camera Follow
+                const targetCamPos = new THREE.Vector3().copy(this.playerPos).add(this.camOffset);
+                this.camera.position.lerp(targetCamPos, 0.08);
+                this.camera.lookAt(this.playerPos.x, this.playerPos.y + 0.8, this.playerPos.z);
+
+                this.renderer.render(this.scene, this.camera);
+            }
+
+            onResize() {
+                this.camera.aspect = window.innerWidth / window.innerHeight;
+                this.camera.updateProjectionMatrix();
+                this.renderer.setSize(window.innerWidth, window.innerHeight);
+            }
+        }
+
+        class GameEngine {
+            constructor() {
+                this.world = new World3D();
+                this.keys = {};
+                this.touchDir = { x: 0, z: 0 };
+                this.isSprintingMobile = false;
+
+                this.solvedCount = 0;
+                this.totalPoints = 0;
+
+                this.activeBeacon = null;
+                this.nearPortal = false;
+                this.isModalOpen = false;
+
+                this.baseMoveSpeed = 0.15;
+                this.moveSpeed = 0.15;
+                this.stepTimer = 0;
+
+                // Power-up Timers
+                this.speedTimer = 0;
+                this.magnetTimer = 0;
+                this.hasStarHint = false;
+            }
+
+            init() {
+                this.world.init();
+                this.setupInputs();
+                this.setupTouchControls();
+                this.gameLoop();
+            }
+
+            setupInputs() {
+                window.addEventListener('keydown', (e) => {
+                    this.keys[e.key.toLowerCase()] = true;
+                    if (e.key.toLowerCase() === 'e') {
+                        this.triggerInteraction();
+                    }
+                });
+
+                window.addEventListener('keyup', (e) => {
+                    this.keys[e.key.toLowerCase()] = false;
+                });
+            }
+
+            setupTouchControls() {
+                const bindTouchBtn = (id, x, z) => {
+                    const btn = document.getElementById(id);
+                    if (!btn) return;
+
+                    const start = (e) => {
+                        e.preventDefault();
+                        btn.classList.add('active');
+                        this.touchDir.x = x;
+                        this.touchDir.z = z;
+                    };
+                    const end = (e) => {
+                        e.preventDefault();
+                        btn.classList.remove('active');
+                        this.touchDir.x = 0;
+                        this.touchDir.z = 0;
+                    };
+
+                    btn.addEventListener('touchstart', start, { passive: false });
+                    btn.addEventListener('touchend', end, { passive: false });
+                    btn.addEventListener('mousedown', start);
+                    btn.addEventListener('mouseup', end);
+                };
+
+                bindTouchBtn('btnUp', 0, -1);
+                bindTouchBtn('btnDown', 0, 1);
+                bindTouchBtn('btnLeft', -1, 0);
+                bindTouchBtn('btnRight', 1, 0);
+
+                // Sprint Button on mobile
+                const sprintBtn = document.getElementById('btnSprint');
+                if (sprintBtn) {
+                    const startSprint = (e) => {
+                        e.preventDefault();
+                        sprintBtn.classList.add('active');
+                        this.isSprintingMobile = true;
+                    };
+                    const endSprint = (e) => {
+                        e.preventDefault();
+                        sprintBtn.classList.remove('active');
+                        this.isSprintingMobile = false;
+                    };
+                    sprintBtn.addEventListener('touchstart', startSprint, { passive: false });
+                    sprintBtn.addEventListener('touchend', endSprint, { passive: false });
+                    sprintBtn.addEventListener('mousedown', startSprint);
+                    sprintBtn.addEventListener('mouseup', endSprint);
+                }
+            }
+
+            gameLoop() {
+                requestAnimationFrame(() => this.gameLoop());
+
+                if (this.isModalOpen) {
+                    this.world.update(0.016, false);
+                    return;
+                }
+
+                this.updatePowerupTimers();
+
+                let dx = 0;
+                let dz = 0;
+
+                if (this.keys['w'] || this.keys['arrowup']) dz -= 1;
+                if (this.keys['s'] || this.keys['arrowdown']) dz += 1;
+                if (this.keys['a'] || this.keys['arrowleft']) dx -= 1;
+                if (this.keys['d'] || this.keys['arrowright']) dx += 1;
+
+                if (this.touchDir.x !== 0 || this.touchDir.z !== 0) {
+                    dx = this.touchDir.x;
+                    dz = this.touchDir.z;
+                }
+
+                const isMoving = (dx !== 0 || dz !== 0);
+
+                if (isMoving) {
+                    const len = Math.sqrt(dx * dx + dz * dz);
+                    dx /= len;
+                    dz /= len;
+
+                    let currentSpeed = this.moveSpeed;
+                    if (this.keys['shift'] || this.isSprintingMobile) {
+                        currentSpeed *= 1.4;
+                    }
+
+                    const nextX = this.world.playerPos.x + dx * currentSpeed;
+                    const nextZ = this.world.playerPos.z + dz * currentSpeed;
+
+                    const distFromCenter = Math.sqrt(nextX * nextX + nextZ * nextZ);
+                    if (distFromCenter < 24) {
+                        this.world.playerPos.x = nextX;
+                        this.world.playerPos.z = nextZ;
+                    }
+
+                    this.world.playerRotY = Math.atan2(dx, dz);
+
+                    this.stepTimer++;
+                    if (this.stepTimer % 15 === 0) {
+                        soundEngine.playStep();
+                    }
+                }
+
+                this.checkProximity();
+                this.checkPowerupCollisions();
+                this.world.update(0.016, isMoving);
+                uiManager.drawMinimap(this.world.playerPos, this.world.crystals, this.world.powerups);
+            }
+
+            checkPowerupCollisions() {
+                const playerPos = this.world.playerPos;
+                this.world.powerups.forEach(p => {
+                    if (p.active) {
+                        const dist = Math.sqrt(Math.pow(playerPos.x - p.x, 2) + Math.pow(playerPos.z - p.z, 2));
+                        if (dist < 1.8) {
+                            this.collectPowerup(p);
+                        }
+                    }
+                });
+            }
+
+            collectPowerup(powerup) {
+                soundEngine.playPowerup();
+                this.world.removePowerup(powerup.index);
+
+                if (powerup.id === 'SPEED') {
+                    this.speedTimer = 12;
+                    this.moveSpeed = this.baseMoveSpeed * 1.8;
+                    uiManager.showToast("⚡ Kilat Logika: Lari 80% Lebih Cepat!", "fa-bolt", "bg-purple-600");
+                } else if (powerup.id === 'MAGNET') {
+                    this.magnetTimer = 15;
+                    this.highlightNearestUnsolved();
+                    uiManager.showToast("🧲 Magnet Kompas: Sinar Diberikan!", "fa-magnet", "bg-cyan-600");
+                } else if (powerup.id === 'HINT') {
+                    this.totalPoints += 150;
+                    this.hasStarHint = true;
+                    document.getElementById('pointsText').innerText = `${this.totalPoints} Poin`;
+                    uiManager.showToast("🌟 Bintang Berkah: +150 Poin & Bocoran Jawaban!", "fa-star", "bg-amber-500");
+                }
+            }
+
+            highlightNearestUnsolved() {
+                const playerPos = this.world.playerPos;
+                let nearest = null;
+                let minDist = 999;
+
+                this.world.crystals.forEach(c => {
+                    if (!c.solved) {
+                        const d = Math.sqrt(Math.pow(playerPos.x - c.x, 2) + Math.pow(playerPos.z - c.z, 2));
+                        if (d < minDist) {
+                            minDist = d;
+                            nearest = c;
+                        }
+                    }
+                });
+
+                if (nearest) {
+                    this.world.showMagnetBeacon(nearest.x, nearest.z);
+                }
+            }
+
+            updatePowerupTimers() {
+                if (this.speedTimer > 0) {
+                    this.speedTimer -= 0.016;
+                    if (this.speedTimer <= 0) {
+                        this.moveSpeed = this.baseMoveSpeed;
+                    }
+                }
+
+                if (this.magnetTimer > 0) {
+                    this.magnetTimer -= 0.016;
+                    if (this.magnetTimer <= 0) {
+                        this.world.hideMagnetBeacon();
+                    }
+                }
+
+                uiManager.updatePowerupHUD(this.speedTimer, this.magnetTimer, this.hasStarHint);
+            }
+
+            checkProximity() {
+                const playerPos = this.world.playerPos;
+                let foundNear = null;
+
+                this.world.crystals.forEach(c => {
+                    const dist = Math.sqrt(Math.pow(playerPos.x - c.x, 2) + Math.pow(playerPos.z - c.z, 2));
+                    if (dist < 2.8 && !c.solved) {
+                        foundNear = c;
+                    }
+                });
+
+                const distPortal = Math.sqrt(playerPos.x * playerPos.x + playerPos.z * playerPos.z);
+                this.nearPortal = (this.solvedCount >= 10 && distPortal < 3.0);
+
+                if (foundNear) {
+                    if (this.activeBeacon !== foundNear) {
+                        soundEngine.playChimeNear();
+                    }
+                    this.activeBeacon = foundNear;
+                    uiManager.showProximityBanner("Tekan [E] / Ketuk untuk Buka Soal", "fa-key");
+                } else if (this.nearPortal) {
+                    this.activeBeacon = null;
+                    uiManager.showProximityBanner("Tekan [E] / Ketuk untuk Masuk Portal!", "fa-door-open");
+                } else {
+                    this.activeBeacon = null;
+                    uiManager.hideProximityBanner();
+                }
+            }
+
+            triggerInteraction() {
+                if (this.isModalOpen) return;
+
+                if (this.activeBeacon) {
+                    const question = tfQuestions.find(q => q.id === this.activeBeacon.id);
+                    if (question) {
+                        uiManager.openQuestionModal(question, this.hasStarHint);
+                    }
+                } else if (this.nearPortal) {
+                    uiManager.openVictoryModal();
+                }
+            }
+
+            solveActiveQuestion(qId) {
+                this.world.markCrystalSolved(qId);
+                this.solvedCount++;
+                this.totalPoints += 100;
+
+                document.getElementById('scoreText').innerText = `${this.solvedCount} / 10`;
+                document.getElementById('pointsText').innerText = `${this.totalPoints} Poin`;
+
+                if (this.hasStarHint) {
+                    this.hasStarHint = false;
+                }
+
+                if (this.solvedCount >= 10) {
+                    this.world.activatePortal();
+                }
+            }
+        }
+
+        // UI MANAGER & MODAL CONTROLLERS
+        class UIManager {
+            constructor() {
+                this.activeQuestion = null;
+                this.minimapCtx = document.getElementById('minimapCanvas').getContext('2d');
+            }
+
+            showProximityBanner(text, iconClass) {
+                const banner = document.getElementById('proximityBanner');
+                document.getElementById('interactText').innerText = text;
+                document.getElementById('interactIcon').className = `fa-solid ${iconClass}`;
+                banner.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-4');
+                banner.classList.add('opacity-100', 'translate-y-0');
+            }
+
+            hideProximityBanner() {
+                const banner = document.getElementById('proximityBanner');
+                banner.classList.add('opacity-0', 'pointer-events-none', 'translate-y-4');
+                banner.classList.remove('opacity-100', 'translate-y-0');
+            }
+
+            showToast(message, iconClass, bgColorClass) {
+                const toast = document.getElementById('powerupToast');
+                document.getElementById('toastMessage').innerText = message;
+                document.getElementById('toastIcon').className = `w-6 h-6 rounded-xl ${bgColorClass} text-white flex items-center justify-center text-xs shadow`;
+                document.getElementById('toastIcon').innerHTML = `<i class="fa-solid ${iconClass}"></i>`;
+
+                toast.classList.remove('opacity-0', 'pointer-events-none', '-translate-y-4');
+                toast.classList.add('opacity-100', 'translate-y-0');
+
+                setTimeout(() => {
+                    toast.classList.add('opacity-0', 'pointer-events-none', '-translate-y-4');
+                    toast.classList.remove('opacity-100', 'translate-y-0');
+                }, 2800);
+            }
+
+            updatePowerupHUD(speedSec, magnetSec, hasStar) {
+                const hud = document.getElementById('powerupHud');
+                hud.innerHTML = '';
+
+                if (speedSec > 0) {
+                    hud.innerHTML += `
+                        <div class="glass-hud px-2.5 py-1 rounded-xl text-[10px] font-black text-purple-900 flex items-center gap-1.5 border border-purple-300">
+                            <i class="fa-solid fa-bolt text-purple-600 animate-pulse"></i>
+                            <span>Kilat: ${Math.ceil(speedSec)}s</span>
+                        </div>
+                    `;
+                }
+                if (magnetSec > 0) {
+                    hud.innerHTML += `
+                        <div class="glass-hud px-2.5 py-1 rounded-xl text-[10px] font-black text-cyan-900 flex items-center gap-1.5 border border-cyan-300">
+                            <i class="fa-solid fa-magnet text-cyan-600 animate-pulse"></i>
+                            <span>Kompas: ${Math.ceil(magnetSec)}s</span>
+                        </div>
+                    `;
+                }
+                if (hasStar) {
+                    hud.innerHTML += `
+                        <div class="glass-hud px-2.5 py-1 rounded-xl text-[10px] font-black text-amber-900 flex items-center gap-1.5 border border-amber-300">
+                            <i class="fa-solid fa-star text-amber-500 animate-spin"></i>
+                            <span>Bocoran Jawaban</span>
+                        </div>
+                    `;
+                }
+            }
+
+            openQuestionModal(question, isHintActive) {
+                soundEngine.playChimeNear();
+                gameEngine.isModalOpen = true;
+                this.activeQuestion = question;
+
+                document.getElementById('questionBadge').innerText = `${question.category} (#${question.id})`;
+                document.getElementById('questionCategoryIcon').className = `fa-solid ${question.icon}`;
+                document.getElementById('questionTitle').innerText = question.title;
+                document.getElementById('questionText').innerText = `"${question.q}"`;
+
+                const hintBadge = document.getElementById('hintBadge');
+                if (isHintActive) {
+                    hintBadge.classList.remove('hidden');
+                    document.getElementById('hintText').innerText = `🌟 Bocoran Jawaban: Soal ini bernilai "${question.ans ? 'BENAR' : 'SALAH'}"!`;
+                } else {
+                    hintBadge.classList.add('hidden');
+                }
+
+                document.getElementById('tfButtonsContainer').classList.remove('hidden');
+                document.getElementById('continueBtn').classList.add('hidden');
+                document.getElementById('discussionAlert').className = "hidden p-3 rounded-2xl text-xs font-medium leading-relaxed border shadow-md space-y-1";
+
+                const modal = document.getElementById('questionModal');
+                modal.classList.remove('opacity-0', 'pointer-events-none');
+                modal.firstElementChild.classList.remove('scale-95');
+                modal.firstElementChild.classList.add('scale-100');
+            }
+
+            submitTFAnswer(userChoice) {
+                const isCorrect = (userChoice === this.activeQuestion.ans);
+                const discBox = document.getElementById('discussionAlert');
+
+                document.getElementById('tfButtonsContainer').classList.add('hidden');
+                document.getElementById('continueBtn').classList.remove('hidden');
+                discBox.classList.remove('hidden');
+
+                if (isCorrect) {
+                    soundEngine.playCorrect();
+                    discBox.className = "p-3 rounded-2xl bg-emerald-50 text-emerald-950 border-2 border-emerald-300 text-xs leading-relaxed shadow-sm";
+                    discBox.innerHTML = `
+                        <div class="font-extrabold text-emerald-700 flex items-center gap-1.5 text-xs sm:text-sm">
+                            <i class="fa-solid fa-circle-check text-base"></i> Jawaban Kamu Benar! (+100 Poin)
+                        </div>
+                        <p class="mt-1 font-medium text-slate-800">${this.activeQuestion.discussion}</p>
+                    `;
+                    gameEngine.solveActiveQuestion(this.activeQuestion.id);
+                } else {
+                    soundEngine.playWrong();
+                    discBox.className = "p-3 rounded-2xl bg-rose-50 text-rose-950 border-2 border-rose-300 text-xs leading-relaxed shadow-sm";
+                    discBox.innerHTML = `
+                        <div class="font-extrabold text-rose-700 flex items-center gap-1.5 text-xs sm:text-sm">
+                            <i class="fa-solid fa-circle-xmark text-base"></i> Jawaban Kurang Tepat!
+                        </div>
+                        <p class="mt-1 font-medium text-slate-800">${this.activeQuestion.discussion}</p>
+                    `;
+                }
+            }
+
+            closeQuestionModal() {
+                gameEngine.isModalOpen = false;
+                const modal = document.getElementById('questionModal');
+                modal.classList.add('opacity-0', 'pointer-events-none');
+                modal.firstElementChild.classList.remove('scale-100');
+                modal.firstElementChild.classList.add('scale-95');
+            }
+
+            openTeacherModal() {
+                soundEngine.playChimeNear();
+                gameEngine.isModalOpen = true;
+                const modal = document.getElementById('teacherModal');
+                modal.classList.remove('opacity-0', 'pointer-events-none');
+                document.getElementById('teacherCard').classList.remove('scale-95');
+                document.getElementById('teacherCard').classList.add('scale-100');
+            }
+
+            closeTeacherModal() {
+                gameEngine.isModalOpen = false;
+                const modal = document.getElementById('teacherModal');
+                modal.classList.add('opacity-0', 'pointer-events-none');
+                document.getElementById('teacherCard').classList.remove('scale-100');
+                document.getElementById('teacherCard').classList.add('scale-95');
+            }
+
+            openHelpModal() {
+                soundEngine.playChimeNear();
+                gameEngine.isModalOpen = true;
+                document.getElementById('helpModal').classList.remove('opacity-0', 'pointer-events-none');
+            }
+
+            closeHelpModal() {
+                gameEngine.isModalOpen = false;
+                document.getElementById('helpModal').classList.add('opacity-0', 'pointer-events-none');
+            }
+
+            openVictoryModal() {
+                soundEngine.playCorrect();
+                confetti({ particleCount: 150, spread: 90, origin: { y: 0.6 } });
+                gameEngine.isModalOpen = true;
+                document.getElementById('victoryModal').classList.remove('opacity-0', 'pointer-events-none');
+            }
+
+            drawMinimap(playerPos, crystals, powerups) {
+                const ctx = this.minimapCtx;
+                ctx.clearRect(0, 0, 90, 90);
+
+                // Island Circle
+                ctx.beginPath();
+                ctx.arc(45, 45, 38, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(16, 185, 129, 0.35)';
+                ctx.fill();
+
+                // Center Portal Dot
+                ctx.beginPath();
+                ctx.arc(45, 45, 3.5, 0, Math.PI * 2);
+                ctx.fillStyle = '#38BDF8';
+                ctx.fill();
+
+                // Draw Crystals
+                crystals.forEach(c => {
+                    const cx = 45 + (c.x / 25) * 35;
+                    const cy = 45 + (c.z / 25) * 35;
+
+                    ctx.beginPath();
+                    ctx.arc(cx, cy, 2.8, 0, Math.PI * 2);
+                    ctx.fillStyle = c.solved ? '#10B981' : '#F59E0B';
+                    ctx.fill();
+                });
+
+                // Draw Power-ups
+                powerups.forEach(p => {
+                    if (p.active) {
+                        const px = 45 + (p.x / 25) * 35;
+                        const pz = 45 + (p.z / 25) * 35;
+
+                        ctx.beginPath();
+                        ctx.arc(px, pz, 3, 0, Math.PI * 2);
+                        if (p.id === 'SPEED') ctx.fillStyle = '#C084FC';
+                        else if (p.id === 'MAGNET') ctx.fillStyle = '#22D3EE';
+                        else ctx.fillStyle = '#FBBF24';
+                        ctx.fill();
+                    }
+                });
+
+                // Draw Lumi Position
+                const lx = 45 + (playerPos.x / 25) * 35;
+                const lz = 45 + (playerPos.z / 25) * 35;
+
+                ctx.beginPath();
+                ctx.arc(lx, lz, 4, 0, Math.PI * 2);
+                ctx.fillStyle = '#EA580C';
+                ctx.fill();
+                ctx.strokeStyle = '#FFFFFF';
+                ctx.lineWidth = 1.2;
+                ctx.stroke();
+            }
+        }
+
+        // INITIALIZE APP
+        let gameEngine;
+        let uiManager;
+
+        window.onload = () => {
+            uiManager = new UIManager();
+            gameEngine = new GameEngine();
+            gameEngine.init();
+        };
+    </script>
+</body>
+</html>
