@@ -697,14 +697,13 @@
                 this.player = null;
                 this.playerPos = new THREE.Vector3(0, 0, 8);
                 this.playerRotY = 0;
+                this.cameraLookTarget = new THREE.Vector3(0, 1.0, 8);
                 
                 this.crystals = [];
                 this.powerups = [];
                 this.portalMesh = null;
                 this.beaconLine = null;
                 this.cloudsGroup = new THREE.Group();
-
-                this.camOffset = new THREE.Vector3(0, 5.5, 8.5);
             }
 
             init() {
@@ -1065,7 +1064,7 @@
                     if (c.position.x > 35) c.position.x = -35;
                 });
 
-                // Update Player
+                // Update Player Position & Rotation
                 this.player.position.copy(this.playerPos);
                 this.player.rotation.y = this.playerRotY;
 
@@ -1075,10 +1074,22 @@
                     this.player.position.y = 0;
                 }
 
-                // Smooth Camera Follow
-                const targetCamPos = new THREE.Vector3().copy(this.playerPos).add(this.camOffset);
+                // DYNAMIC THIRD-PERSON CHASE CAMERA (Follows Lumi's View Direction)
+                const camDistance = 6.5;
+                const camHeight = 3.5;
+                
+                // Calculate position behind Lumi's back based on playerRotY
+                const targetCamX = this.playerPos.x - Math.sin(this.playerRotY) * camDistance;
+                const targetCamZ = this.playerPos.z - Math.cos(this.playerRotY) * camDistance;
+                const targetCamY = this.playerPos.y + camHeight;
+
+                const targetCamPos = new THREE.Vector3(targetCamX, targetCamY, targetCamZ);
                 this.camera.position.lerp(targetCamPos, 0.08);
-                this.camera.lookAt(this.playerPos.x, this.playerPos.y + 0.8, this.playerPos.z);
+
+                // Smoothly focus lookAt point slightly above Lumi's center
+                const targetLookPoint = new THREE.Vector3(this.playerPos.x, this.playerPos.y + 1.0, this.playerPos.z);
+                this.cameraLookTarget.lerp(targetLookPoint, 0.12);
+                this.camera.lookAt(this.cameraLookTarget);
 
                 this.renderer.render(this.scene, this.camera);
             }
@@ -1194,17 +1205,32 @@
 
                 this.updatePowerupTimers();
 
+                // Direction & Turning Controls
+                let isTurningLeft = (this.keys['a'] || this.keys['arrowleft'] || this.touchDir.x === -1);
+                let isTurningRight = (this.keys['d'] || this.keys['arrowright'] || this.touchDir.x === 1);
+                let isMovingForward = (this.keys['w'] || this.keys['arrowup'] || this.touchDir.z === -1);
+                let isMovingBackward = (this.keys['s'] || this.keys['arrowdown'] || this.touchDir.z === 1);
+
+                // Rotate Character and Camera Left / Right
+                const turnSpeed = 0.042;
+                if (isTurningLeft) {
+                    this.world.playerRotY += turnSpeed;
+                }
+                if (isTurningRight) {
+                    this.world.playerRotY -= turnSpeed;
+                }
+
+                // Compute movement vector relative to Lumi's facing direction
                 let dx = 0;
                 let dz = 0;
 
-                if (this.keys['w'] || this.keys['arrowup']) dz -= 1;
-                if (this.keys['s'] || this.keys['arrowdown']) dz += 1;
-                if (this.keys['a'] || this.keys['arrowleft']) dx -= 1;
-                if (this.keys['d'] || this.keys['arrowright']) dx += 1;
-
-                if (this.touchDir.x !== 0 || this.touchDir.z !== 0) {
-                    dx = this.touchDir.x;
-                    dz = this.touchDir.z;
+                if (isMovingForward) {
+                    dx += Math.sin(this.world.playerRotY);
+                    dz += Math.cos(this.world.playerRotY);
+                }
+                if (isMovingBackward) {
+                    dx -= Math.sin(this.world.playerRotY);
+                    dz -= Math.cos(this.world.playerRotY);
                 }
 
                 const isMoving = (dx !== 0 || dz !== 0);
@@ -1216,7 +1242,7 @@
 
                     let currentSpeed = this.moveSpeed;
                     if (this.keys['shift'] || this.isSprintingMobile) {
-                        currentSpeed *= 1.4;
+                        currentSpeed *= 1.45;
                     }
 
                     const nextX = this.world.playerPos.x + dx * currentSpeed;
@@ -1227,8 +1253,6 @@
                         this.world.playerPos.x = nextX;
                         this.world.playerPos.z = nextZ;
                     }
-
-                    this.world.playerRotY = Math.atan2(dx, dz);
 
                     this.stepTimer++;
                     if (this.stepTimer % 15 === 0) {
