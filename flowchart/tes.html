@@ -80,7 +80,7 @@
         /* Radar Minimap Canvas Border */
         #minimapCanvas {
             border: 2px solid rgba(245, 158, 11, 0.7);
-            background: rgba(15, 23, 42, 0.8);
+            background: rgba(15, 23, 42, 0.85);
         }
 
         /* Pulsing beacon highlight */
@@ -152,11 +152,15 @@
 
         <!-- Center Progress & Points -->
         <div class="glass-hud px-3 py-1.5 rounded-2xl flex items-center gap-2.5 pointer-events-auto shadow-md">
-            <div class="flex items-center gap-1">
-                <i class="fa-solid fa-gem text-amber-500 text-xs animate-bounce"></i>
-                <span id="scoreText" class="text-xs font-black text-amber-900 bg-amber-100 px-2 py-0.5 rounded-full border border-amber-300">
-                    0 / 10
+            <!-- Solved Status Badge -->
+            <div class="flex items-center gap-1.5 text-xs font-black">
+                <span id="correctBadge" class="text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full border border-emerald-300 flex items-center gap-1">
+                    <i class="fa-solid fa-check text-[10px]"></i> <span id="correctText">0</span>
                 </span>
+                <span id="wrongBadge" class="text-rose-700 bg-rose-100 px-2 py-0.5 rounded-full border border-rose-300 flex items-center gap-1">
+                    <i class="fa-solid fa-xmark text-[10px]"></i> <span id="wrongText">0</span>
+                </span>
+                <span class="text-slate-500 font-bold text-[10px]">/ 10</span>
             </div>
             <div class="h-3.5 w-px bg-amber-300/80"></div>
             <div class="flex items-center gap-1 text-xs font-black text-slate-700">
@@ -183,15 +187,16 @@
     </header>
 
     <!-- ACTIVE POWER-UP STATUS HUD -->
-    <div id="powerupHud" class="absolute top-14 left-2.5 z-20 pointer-events-none flex flex-col gap-1">
-        <!-- Powerup Badges will spawn dynamically here -->
-    </div>
+    <div id="powerupHud" class="absolute top-14 left-2.5 z-20 pointer-events-none flex flex-col gap-1"></div>
 
     <!-- RADAR MINIMAP (Top Right) -->
     <div class="absolute top-14 right-2.5 z-20 pointer-events-none flex flex-col items-end gap-1">
         <canvas id="minimapCanvas" width="90" height="90" class="rounded-2xl shadow-lg pointer-events-auto"></canvas>
-        <div class="glass-hud px-1.5 py-0.5 rounded-lg text-[8px] font-bold text-slate-600">
-            <i class="fa-solid fa-location-crosshairs text-amber-500"></i> Radar 2D
+        <div class="glass-hud px-1.5 py-0.5 rounded-lg text-[8px] font-bold text-slate-600 flex items-center gap-1">
+            <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+            <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
+            <span>Radar 2D</span>
         </div>
     </div>
 
@@ -215,7 +220,7 @@
         </button>
     </div>
 
-    <!-- MOBILE LANDSCAPE CONTROLS OVERLAY (LEFT THUMB: D-PAD, RIGHT THUMB: ACTION & SPRINT) -->
+    <!-- MOBILE LANDSCAPE CONTROLS OVERLAY -->
     <div id="mobileControls" class="absolute inset-0 z-20 pointer-events-none flex justify-between items-end p-3 md:hidden">
         <!-- Left Side: D-Pad -->
         <div class="pointer-events-auto flex flex-col gap-1 pb-1 pl-1">
@@ -275,6 +280,9 @@
                     </h3>
                 </div>
             </div>
+
+            <!-- Already Answered Banner (Locks Question) -->
+            <div id="alreadyAnsweredBanner" class="hidden mb-2.5 p-2 rounded-xl text-xs font-bold flex items-center gap-2"></div>
 
             <!-- Hint Badge -->
             <div id="hintBadge" class="hidden mb-2.5 p-2 rounded-xl bg-amber-100/90 border border-amber-300 text-amber-900 text-xs font-bold flex items-center gap-2">
@@ -348,53 +356,73 @@
             </button>
 
             <h3 class="text-sm font-black text-slate-800 flex items-center gap-2">
-                <i class="fa-solid fa-gamepad text-amber-500"></i> Panduan Kontrol & Power-Up
+                <i class="fa-solid fa-gamepad text-amber-500"></i> Panduan Kontrol & Aturan Game
             </h3>
 
             <div class="space-y-1.5 text-xs text-slate-700">
+                <div class="flex items-center justify-between p-2 bg-amber-50 rounded-xl">
+                    <span class="font-bold">Aturan Jawab:</span>
+                    <span class="text-rose-600 font-extrabold">1x Kesempatan (Locked)</span>
+                </div>
                 <div class="flex items-center justify-between p-2 bg-amber-50 rounded-xl">
                     <span class="font-bold">Bergerak / Jalan:</span>
                     <span class="bg-white px-2 py-0.5 rounded font-mono border border-amber-200 font-bold">WASD / Panah / D-Pad Left</span>
                 </div>
                 <div class="flex items-center justify-between p-2 bg-amber-50 rounded-xl">
-                    <span class="font-bold">Interaksi / Buka Soal:</span>
+                    <span class="font-bold">Interaksi Soal:</span>
                     <span class="bg-white px-2 py-0.5 rounded font-mono border border-amber-200 font-bold">Tekan [E] / Tombol AKSI</span>
                 </div>
             </div>
 
             <h4 class="text-xs font-black text-slate-800 pt-1 border-t border-amber-200">
-                Item Power-Up Di Pulau:
+                Status Warna Kristal 3D:
             </h4>
             <div class="space-y-1 text-xs">
-                <div class="flex items-center gap-2 p-1.5 bg-purple-50 rounded-xl border border-purple-200 text-purple-900 font-bold">
-                    <i class="fa-solid fa-bolt text-purple-600"></i>
-                    <span>⚡ Kilat Logika: Lari 80% Lebih Cepat (12s)</span>
-                </div>
-                <div class="flex items-center gap-2 p-1.5 bg-cyan-50 rounded-xl border border-cyan-200 text-cyan-900 font-bold">
-                    <i class="fa-solid fa-magnet text-cyan-600"></i>
-                    <span>🧲 Magnet Kompas: Pancarkan Sinar ke Soal (15s)</span>
-                </div>
                 <div class="flex items-center gap-2 p-1.5 bg-amber-50 rounded-xl border border-amber-200 text-amber-900 font-bold">
-                    <i class="fa-solid fa-star text-amber-500"></i>
-                    <span>🌟 Bintang Berkah: +150 Poin & Bocoran Jawaban</span>
+                    <span class="w-3 h-3 rounded-full bg-amber-500"></span>
+                    <span>Kuning Emas: Soal Belum Dijawab</span>
+                </div>
+                <div class="flex items-center gap-2 p-1.5 bg-emerald-50 rounded-xl border border-emerald-200 text-emerald-900 font-bold">
+                    <span class="w-3 h-3 rounded-full bg-emerald-500"></span>
+                    <span>Hijau Neon: Dijawab BENAR (+100 Poin)</span>
+                </div>
+                <div class="flex items-center gap-2 p-1.5 bg-rose-50 rounded-xl border border-rose-200 text-rose-900 font-bold">
+                    <span class="w-3 h-3 rounded-full bg-rose-500"></span>
+                    <span>Merah Crimson: Dijawab SALAH (Terkunci)</span>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- MODAL: VICTORY PORTAL -->
+    <!-- MODAL: VICTORY & SUMMARY PORTAL -->
     <div id="victoryModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-3 opacity-0 pointer-events-none transition-all duration-300">
-        <div class="glass-card max-w-md w-full rounded-3xl p-5 text-center shadow-2xl border-2 border-emerald-400 space-y-3">
-            <div class="w-14 h-14 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-2xl mx-auto animate-bounce shadow-md">
+        <div class="glass-card max-w-md w-full rounded-3xl p-5 text-center shadow-2xl border-2 border-amber-300 space-y-3 max-h-[92vh] overflow-y-auto">
+            <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-amber-500 to-orange-500 text-white flex items-center justify-center text-2xl mx-auto shadow-md">
                 <i class="fa-solid fa-trophy"></i>
             </div>
 
             <h3 class="text-lg sm:text-xl font-black text-slate-800">
-                Selamat! Petualangan Tuntas
+                Rangkuman Hasil Petualangan
             </h3>
 
-            <p class="text-xs text-slate-600 leading-relaxed">
-                Semua 10 Kristal Logika telah terpecahkan dengan sempurna! Kamu telah menguasai konsep algoritma dasar, berpikir komputasional, dan struktur flowchart.
+            <!-- Final Score Cards Grid -->
+            <div class="grid grid-cols-3 gap-2 py-1">
+                <div class="p-2.5 rounded-2xl bg-emerald-50 border border-emerald-300 flex flex-col items-center">
+                    <span class="text-[10px] font-bold text-emerald-800 uppercase">Benar</span>
+                    <span id="finalCorrectText" class="text-lg font-black text-emerald-600">0</span>
+                </div>
+                <div class="p-2.5 rounded-2xl bg-rose-50 border border-rose-300 flex flex-col items-center">
+                    <span class="text-[10px] font-bold text-rose-800 uppercase">Salah</span>
+                    <span id="finalWrongText" class="text-lg font-black text-rose-600">0</span>
+                </div>
+                <div class="p-2.5 rounded-2xl bg-amber-50 border border-amber-300 flex flex-col items-center">
+                    <span class="text-[10px] font-bold text-amber-800 uppercase">Total Poin</span>
+                    <span id="finalPointsText" class="text-lg font-black text-amber-600">0</span>
+                </div>
+            </div>
+
+            <p id="evalText" class="text-xs text-slate-700 font-semibold leading-relaxed bg-amber-50/80 p-2.5 rounded-2xl border border-amber-200">
+                Evaluasi performa...
             </p>
 
             <div class="p-3 bg-amber-50 rounded-2xl border border-amber-200 text-left space-y-1">
@@ -406,7 +434,7 @@
                 </p>
             </div>
 
-            <button onclick="location.reload()" class="w-full py-2.5 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-500 text-white font-extrabold text-xs shadow-md transition active:scale-95">
+            <button onclick="location.reload()" class="w-full py-2.5 rounded-2xl bg-gradient-to-r from-orange-600 to-amber-500 text-white font-extrabold text-xs shadow-md transition active:scale-95">
                 Main Lagi Dari Awal <i class="fa-solid fa-rotate-right ml-1"></i>
             </button>
         </div>
@@ -516,13 +544,13 @@
                 const gain = this.ctx.createGain();
                 osc.type = 'sawtooth';
                 osc.frequency.setValueAtTime(220, this.ctx.currentTime);
-                osc.frequency.linearRampToValueAtTime(110, this.ctx.currentTime + 0.22);
-                gain.gain.setValueAtTime(0.1, this.ctx.currentTime);
-                gain.gain.linearRampToValueAtTime(0.001, this.ctx.currentTime + 0.22);
+                osc.frequency.linearRampToValueAtTime(110, this.ctx.currentTime + 0.25);
+                gain.gain.setValueAtTime(0.12, this.ctx.currentTime);
+                gain.gain.linearRampToValueAtTime(0.001, this.ctx.currentTime + 0.25);
                 osc.connect(gain);
                 gain.connect(this.ctx.destination);
                 osc.start();
-                osc.stop(this.ctx.currentTime + 0.22);
+                osc.stop(this.ctx.currentTime + 0.25);
             }
 
             startAmbientBGM() {
@@ -852,7 +880,7 @@
 
                     const cryGeo = new THREE.OctahedronGeometry(0.4, 0);
                     const cryMat = new THREE.MeshStandardMaterial({
-                        color: 0xF59E0B,
+                        color: 0xF59E0B, // Gold initially
                         emissive: 0xF59E0B,
                         emissiveIntensity: 0.8,
                         roughness: 0.1
@@ -875,7 +903,7 @@
                         mesh: cryMesh,
                         material: cryMat,
                         light: light,
-                        solved: false,
+                        status: 'unanswered', // 'unanswered' | 'correct' | 'incorrect'
                         x: q.x,
                         z: q.z
                     });
@@ -961,8 +989,8 @@
 
             activatePortal() {
                 if (this.portalMesh) {
-                    this.portalMesh.material.color.setHex(0xF59E0B);
-                    this.portalMesh.material.opacity = 0.65;
+                    this.portalMesh.material.color.setHex(0x10B981);
+                    this.portalMesh.material.opacity = 0.75;
                 }
             }
 
@@ -982,13 +1010,21 @@
                 this.scene.add(this.cloudsGroup);
             }
 
-            markCrystalSolved(id) {
+            markCrystalStatus(id, status) {
                 const cry = this.crystals.find(c => c.id === id);
                 if (cry) {
-                    cry.solved = true;
-                    cry.material.color.setHex(0x10B981);
-                    cry.material.emissive.setHex(0x10B981);
-                    cry.light.color.setHex(0x10B981);
+                    cry.status = status;
+                    if (status === 'correct') {
+                        cry.material.color.setHex(0x22C55E); // Neon Green
+                        cry.material.emissive.setHex(0x22C55E);
+                        cry.material.emissiveIntensity = 0.8;
+                        cry.light.color.setHex(0x22C55E);
+                    } else if (status === 'incorrect') {
+                        cry.material.color.setHex(0xEF4444); // Crimson Red
+                        cry.material.emissive.setHex(0xEF4444);
+                        cry.material.emissiveIntensity = 0.3; // Dim light
+                        cry.light.color.setHex(0xEF4444);
+                    }
                 }
             }
 
@@ -1061,7 +1097,8 @@
                 this.touchDir = { x: 0, z: 0 };
                 this.isSprintingMobile = false;
 
-                this.solvedCount = 0;
+                this.correctCount = 0;
+                this.wrongCount = 0;
                 this.totalPoints = 0;
 
                 this.activeBeacon = null;
@@ -1243,7 +1280,7 @@
                 let minDist = 999;
 
                 this.world.crystals.forEach(c => {
-                    if (!c.solved) {
+                    if (c.status === 'unanswered') {
                         const d = Math.sqrt(Math.pow(playerPos.x - c.x, 2) + Math.pow(playerPos.z - c.z, 2));
                         if (d < minDist) {
                             minDist = d;
@@ -1281,20 +1318,25 @@
 
                 this.world.crystals.forEach(c => {
                     const dist = Math.sqrt(Math.pow(playerPos.x - c.x, 2) + Math.pow(playerPos.z - c.z, 2));
-                    if (dist < 2.8 && !c.solved) {
+                    if (dist < 2.8) {
                         foundNear = c;
                     }
                 });
 
+                const totalAnswered = this.correctCount + this.wrongCount;
                 const distPortal = Math.sqrt(playerPos.x * playerPos.x + playerPos.z * playerPos.z);
-                this.nearPortal = (this.solvedCount >= 10 && distPortal < 3.0);
+                this.nearPortal = (totalAnswered >= 10 && distPortal < 3.0);
 
                 if (foundNear) {
                     if (this.activeBeacon !== foundNear) {
                         soundEngine.playChimeNear();
                     }
                     this.activeBeacon = foundNear;
-                    uiManager.showProximityBanner("Tekan [E] / Ketuk untuk Buka Soal", "fa-key");
+                    if (foundNear.status === 'unanswered') {
+                        uiManager.showProximityBanner("Tekan [E] / Ketuk untuk Buka Soal", "fa-key");
+                    } else {
+                        uiManager.showProximityBanner("Tekan [E] / Ketuk untuk Lihat Pembahasan", "fa-book-open");
+                    }
                 } else if (this.nearPortal) {
                     this.activeBeacon = null;
                     uiManager.showProximityBanner("Tekan [E] / Ketuk untuk Masuk Portal!", "fa-door-open");
@@ -1310,26 +1352,33 @@
                 if (this.activeBeacon) {
                     const question = tfQuestions.find(q => q.id === this.activeBeacon.id);
                     if (question) {
-                        uiManager.openQuestionModal(question, this.hasStarHint);
+                        uiManager.openQuestionModal(question, this.activeBeacon.status, this.hasStarHint);
                     }
                 } else if (this.nearPortal) {
                     uiManager.openVictoryModal();
                 }
             }
 
-            solveActiveQuestion(qId) {
-                this.world.markCrystalSolved(qId);
-                this.solvedCount++;
-                this.totalPoints += 100;
+            recordAnswerResult(qId, isCorrect) {
+                if (isCorrect) {
+                    this.correctCount++;
+                    this.totalPoints += 100;
+                    this.world.markCrystalStatus(qId, 'correct');
+                } else {
+                    this.wrongCount++;
+                    this.world.markCrystalStatus(qId, 'incorrect');
+                }
 
-                document.getElementById('scoreText').innerText = `${this.solvedCount} / 10`;
+                document.getElementById('correctText').innerText = this.correctCount;
+                document.getElementById('wrongText').innerText = this.wrongCount;
                 document.getElementById('pointsText').innerText = `${this.totalPoints} Poin`;
 
                 if (this.hasStarHint) {
                     this.hasStarHint = false;
                 }
 
-                if (this.solvedCount >= 10) {
+                const totalAnswered = this.correctCount + this.wrongCount;
+                if (totalAnswered >= 10) {
                     this.world.activatePortal();
                 }
             }
@@ -1401,7 +1450,7 @@
                 }
             }
 
-            openQuestionModal(question, isHintActive) {
+            openQuestionModal(question, currentStatus, isHintActive) {
                 soundEngine.playChimeNear();
                 gameEngine.isModalOpen = true;
                 this.activeQuestion = question;
@@ -1411,17 +1460,59 @@
                 document.getElementById('questionTitle').innerText = question.title;
                 document.getElementById('questionText').innerText = `"${question.q}"`;
 
+                const answeredBanner = document.getElementById('alreadyAnsweredBanner');
                 const hintBadge = document.getElementById('hintBadge');
-                if (isHintActive) {
-                    hintBadge.classList.remove('hidden');
-                    document.getElementById('hintText').innerText = `🌟 Bocoran Jawaban: Soal ini bernilai "${question.ans ? 'BENAR' : 'SALAH'}"!`;
-                } else {
-                    hintBadge.classList.add('hidden');
-                }
+                const tfContainer = document.getElementById('tfButtonsContainer');
+                const continueBtn = document.getElementById('continueBtn');
+                const discBox = document.getElementById('discussionAlert');
 
-                document.getElementById('tfButtonsContainer').classList.remove('hidden');
-                document.getElementById('continueBtn').classList.add('hidden');
-                document.getElementById('discussionAlert').className = "hidden p-3 rounded-2xl text-xs font-medium leading-relaxed border shadow-md space-y-1";
+                // Check status
+                if (currentStatus === 'unanswered') {
+                    // QUESTION UNANSWERED - SHOW BUTTONS
+                    answeredBanner.classList.add('hidden');
+                    
+                    if (isHintActive) {
+                        hintBadge.classList.remove('hidden');
+                        document.getElementById('hintText').innerText = `🌟 Bocoran Jawaban: Soal ini bernilai "${question.ans ? 'BENAR' : 'SALAH'}"!`;
+                    } else {
+                        hintBadge.classList.add('hidden');
+                    }
+
+                    tfContainer.classList.remove('hidden');
+                    continueBtn.classList.add('hidden');
+                    discBox.classList.add('hidden');
+                } else {
+                    // QUESTION ALREADY ANSWERED (LOCKED)
+                    hintBadge.classList.add('hidden');
+                    tfContainer.classList.add('hidden');
+                    continueBtn.classList.remove('hidden');
+                    discBox.classList.remove('hidden');
+
+                    answeredBanner.classList.remove('hidden');
+                    if (currentStatus === 'correct') {
+                        answeredBanner.className = "mb-2.5 p-2 rounded-xl bg-emerald-100/90 border border-emerald-300 text-emerald-900 text-xs font-extrabold flex items-center gap-2";
+                        answeredBanner.innerHTML = `<i class="fa-solid fa-lock text-emerald-600"></i> Soal ini sudah dijawab (BENAR) - Terkunci`;
+
+                        discBox.className = "p-3 rounded-2xl bg-emerald-50 text-emerald-950 border-2 border-emerald-300 text-xs leading-relaxed shadow-sm";
+                        discBox.innerHTML = `
+                            <div class="font-extrabold text-emerald-700 flex items-center gap-1.5 text-xs">
+                                <i class="fa-solid fa-circle-check"></i> Jawaban Kamu Benar (+100 Poin)
+                            </div>
+                            <p class="mt-1 font-medium text-slate-800">${question.discussion}</p>
+                        `;
+                    } else {
+                        answeredBanner.className = "mb-2.5 p-2 rounded-xl bg-rose-100/90 border border-rose-300 text-rose-900 text-xs font-extrabold flex items-center gap-2";
+                        answeredBanner.innerHTML = `<i class="fa-solid fa-lock text-rose-600"></i> Soal ini sudah dijawab (SALAH) - Terkunci`;
+
+                        discBox.className = "p-3 rounded-2xl bg-rose-50 text-rose-950 border-2 border-rose-300 text-xs leading-relaxed shadow-sm";
+                        discBox.innerHTML = `
+                            <div class="font-extrabold text-rose-700 flex items-center gap-1.5 text-xs">
+                                <i class="fa-solid fa-circle-xmark"></i> Jawaban Kamu Salah (0 Poin)
+                            </div>
+                            <p class="mt-1 font-medium text-slate-800">${question.discussion}</p>
+                        `;
+                    }
+                }
 
                 const modal = document.getElementById('questionModal');
                 modal.classList.remove('opacity-0', 'pointer-events-none');
@@ -1446,17 +1537,19 @@
                         </div>
                         <p class="mt-1 font-medium text-slate-800">${this.activeQuestion.discussion}</p>
                     `;
-                    gameEngine.solveActiveQuestion(this.activeQuestion.id);
                 } else {
                     soundEngine.playWrong();
                     discBox.className = "p-3 rounded-2xl bg-rose-50 text-rose-950 border-2 border-rose-300 text-xs leading-relaxed shadow-sm";
                     discBox.innerHTML = `
                         <div class="font-extrabold text-rose-700 flex items-center gap-1.5 text-xs sm:text-sm">
-                            <i class="fa-solid fa-circle-xmark text-base"></i> Jawaban Kurang Tepat!
+                            <i class="fa-solid fa-circle-xmark text-base"></i> Jawaban Kurang Tepat! Soal Terkunci (0 Poin)
                         </div>
                         <p class="mt-1 font-medium text-slate-800">${this.activeQuestion.discussion}</p>
                     `;
                 }
+
+                // Record single attempt result
+                gameEngine.recordAnswerResult(this.activeQuestion.id, isCorrect);
             }
 
             closeQuestionModal() {
@@ -1497,8 +1590,22 @@
 
             openVictoryModal() {
                 soundEngine.playCorrect();
-                confetti({ particleCount: 150, spread: 90, origin: { y: 0.6 } });
+                confetti({ particleCount: 160, spread: 90, origin: { y: 0.6 } });
                 gameEngine.isModalOpen = true;
+
+                document.getElementById('finalCorrectText').innerText = gameEngine.correctCount;
+                document.getElementById('finalWrongText').innerText = gameEngine.wrongCount;
+                document.getElementById('finalPointsText').innerText = gameEngine.totalPoints;
+
+                const evalText = document.getElementById('evalText');
+                if (gameEngine.correctCount >= 8) {
+                    evalText.innerText = "🌟 Luar Biasa! Kamu adalah Pakar Algoritma sejati dengan pemahaman berpikir komputasional yang sangat tajam!";
+                } else if (gameEngine.correctCount >= 5) {
+                    evalText.innerText = "👍 Bagus Sekali! Kamu memiliki dasar logika yang baik, teruslah berlatih untuk menyempurnakannya!";
+                } else {
+                    evalText.innerText = "💪 Semangat Pembelajar! Pelajari kembali pembahasan di tiap soal dan coba petualangan ini lagi!";
+                }
+
                 document.getElementById('victoryModal').classList.remove('opacity-0', 'pointer-events-none');
             }
 
@@ -1525,7 +1632,13 @@
 
                     ctx.beginPath();
                     ctx.arc(cx, cy, 2.8, 0, Math.PI * 2);
-                    ctx.fillStyle = c.solved ? '#10B981' : '#F59E0B';
+                    if (c.status === 'correct') {
+                        ctx.fillStyle = '#22C55E'; // Green
+                    } else if (c.status === 'incorrect') {
+                        ctx.fillStyle = '#EF4444'; // Red
+                    } else {
+                        ctx.fillStyle = '#F59E0B'; // Gold
+                    }
                     ctx.fill();
                 });
 
