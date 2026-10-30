@@ -4,19 +4,22 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Akademi Pixel 2D - Sekolah Multiplayer</title>
-  
-  <!-- Tailwind CSS & Google Pixel Fonts -->
+
+  <!-- Tailwind CSS & Google Retro Pixel Fonts -->
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
 
   <style>
+    * {
+      touch-action: manipulation;
+    }
     body {
       margin: 0;
       padding: 0;
       overflow: hidden;
-      background-color: #0d1117;
+      background-color: #080d1a;
       font-family: 'VT323', monospace;
       user-select: none;
       -webkit-user-select: none;
@@ -30,29 +33,37 @@
       display: block;
       image-rendering: pixelated;
       image-rendering: crisp-edges;
+      -ms-interpolation-mode: nearest-neighbor;
     }
 
-    /* Custom Scrollbar for Chat */
+    /* Custom Retro Scrollbar */
     ::-webkit-scrollbar {
       width: 6px;
     }
     ::-webkit-scrollbar-track {
-      background: rgba(0, 0, 0, 0.2);
+      background: rgba(15, 23, 42, 0.6);
     }
     ::-webkit-scrollbar-thumb {
-      background: #4a5568;
+      background: #4f46e5;
       border-radius: 3px;
     }
 
     /* Touch D-Pad Controls */
     .dpad-btn {
-      background: rgba(30, 41, 59, 0.7);
-      border: 2px solid #3b82f6;
+      background: rgba(15, 23, 42, 0.85);
+      border: 2px solid #6366f1;
       border-radius: 12px;
       touch-action: manipulation;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
     }
     .dpad-btn:active {
-      background: rgba(59, 130, 246, 0.8);
+      background: rgba(99, 102, 241, 0.9);
+      transform: scale(0.95);
+    }
+
+    /* Pulse Glow */
+    .glow-effect {
+      box-shadow: 0 0 20px rgba(99, 102, 241, 0.4);
     }
   </style>
 </head>
@@ -62,113 +73,135 @@
   <canvas id="gameCanvas" class="w-full h-full absolute inset-0 z-0"></canvas>
 
   <!-- LOBBY / JOIN SCREEN OVERLAY -->
-  <div id="lobbyScreen" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/90 backdrop-blur-md p-4">
-    <div class="bg-slate-900 border-4 border-indigo-600 rounded-2xl p-6 max-w-md w-full shadow-2xl relative text-center">
-      <div class="inline-block bg-indigo-600 text-yellow-300 font-pixel text-xs px-3 py-1 rounded-full mb-3 uppercase tracking-wider">
-        🏫 Game Sekolah Multiplayer
+  <div id="lobbyScreen" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/90 backdrop-blur-md p-4 overflow-y-auto">
+    <div class="bg-slate-900 border-4 border-indigo-600 rounded-3xl p-6 max-w-lg w-full shadow-2xl relative text-center my-auto glow-effect">
+      
+      <!-- Header Badge -->
+      <div class="inline-flex items-center gap-2 bg-indigo-600 text-yellow-300 font-pixel text-[10px] sm:text-xs px-3 py-1.5 rounded-full mb-3 uppercase tracking-wider shadow">
+        <span>🏫</span> GAME SEKOLAH MULTIPLAYER 2D
       </div>
-      <h1 class="font-pixel text-2xl text-yellow-400 mb-2 drop-shadow-md">AKADEMI PIXEL</h1>
-      <p class="text-slate-400 text-lg mb-6">Jelajahi sekolah, sapa teman, & berkumpul secara langsung!</p>
+      <h1 class="font-pixel text-2xl sm:text-3xl text-yellow-400 mb-1 drop-shadow-[0_4px_0_rgba(0,0,0,0.8)]">
+        AKADEMI PIXEL
+      </h1>
+      <p class="text-slate-300 text-base sm:text-lg mb-5">Jelajahi sekolah, sapa teman & berkumpul secara live!</p>
 
-      <!-- Input Name -->
-      <div class="mb-5 text-left">
-        <label class="block font-pixel text-xs text-indigo-300 mb-2">NAMA TAMPILAN (DISPLAY NAME):</label>
-        <input type="text" id="playerNameInput" maxlength="14" placeholder="Ketik namamu..." 
-          class="w-full bg-slate-800 border-2 border-slate-600 focus:border-indigo-500 rounded-xl px-4 py-2 text-xl text-yellow-300 focus:outline-none font-bold" />
+      <!-- Player Name Input -->
+      <div class="mb-4 text-left">
+        <label class="block font-pixel text-[11px] text-indigo-300 mb-1.5">NAMA KARAKTER (MAX 14 KARAKTER):</label>
+        <input type="text" id="playerNameInput" maxlength="14" placeholder="Ketik namamu di sini..." 
+          class="w-full bg-slate-800 border-2 border-slate-600 focus:border-indigo-400 rounded-xl px-4 py-2.5 text-xl text-yellow-300 focus:outline-none font-bold placeholder-slate-500 transition" />
       </div>
 
       <!-- Character Customizer -->
-      <div class="bg-slate-800/60 rounded-xl p-4 mb-6 border border-slate-700">
-        <label class="block font-pixel text-xs text-indigo-300 mb-3 text-left">KUSTOMISASI KARAKTER:</label>
+      <div class="bg-slate-800/80 rounded-2xl p-4 mb-4 border border-slate-700/80 shadow-inner">
+        <label class="block font-pixel text-[11px] text-indigo-300 mb-2.5 text-left">KUSTOMISASI KARAKTER:</label>
         
-        <div class="flex items-center justify-around">
-          <!-- Preview Canvas -->
-          <div class="flex flex-col items-center">
-            <canvas id="previewCanvas" width="64" height="64" class="bg-slate-950 rounded-lg border-2 border-indigo-400/50 mb-1"></canvas>
-            <span class="text-xs text-slate-400">Pratinjau</span>
+        <div class="flex flex-col sm:flex-row items-center justify-around gap-4">
+          <!-- Live Preview Box -->
+          <div class="flex flex-col items-center bg-slate-950 p-3 rounded-xl border border-indigo-500/40">
+            <canvas id="previewCanvas" width="72" height="72" class="mb-1"></canvas>
+            <span class="text-xs text-slate-400 font-mono">Pratinjau Avatar</span>
           </div>
 
-          <!-- Selectors -->
-          <div class="space-y-2 text-left">
+          <!-- Color Pickers -->
+          <div class="space-y-2.5 text-left w-full sm:w-auto">
             <div>
-              <span class="text-sm text-slate-300">Warna Rambut:</span>
-              <div class="flex gap-1.5 mt-1" id="hairColors"></div>
+              <span class="text-sm text-slate-300 block mb-1">Rambut:</span>
+              <div class="flex gap-2" id="hairColors"></div>
             </div>
             <div>
-              <span class="text-sm text-slate-300">Warna Baju:</span>
-              <div class="flex gap-1.5 mt-1" id="shirtColors"></div>
+              <span class="text-sm text-slate-300 block mb-1">Baju Uniform:</span>
+              <div class="flex gap-2" id="shirtColors"></div>
             </div>
             <div>
-              <span class="text-sm text-slate-300">Warna Kulit:</span>
-              <div class="flex gap-1.5 mt-1" id="skinColors"></div>
+              <span class="text-sm text-slate-300 block mb-1">Warna Kulit:</span>
+              <div class="flex gap-2" id="skinColors"></div>
             </div>
           </div>
         </div>
       </div>
 
-      <button id="btnJoinGame" class="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 font-pixel text-sm text-white py-3.5 px-6 rounded-xl shadow-lg border-b-4 border-emerald-800 active:border-b-0 active:translate-y-1 transition-all">
+      <!-- Spawn Zone Selector -->
+      <div class="mb-5 text-left">
+        <label class="block font-pixel text-[11px] text-indigo-300 mb-2">PILIH LOKASI MASUK (SPAWN ZONE):</label>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+          <button type="button" class="btn-spawn bg-indigo-900/80 border-2 border-indigo-500 text-yellow-300 font-bold py-2 px-1 rounded-xl" data-zone="random">🎲 ACAK</button>
+          <button type="button" class="btn-spawn bg-slate-800 border border-slate-700 text-slate-300 py-2 px-1 rounded-xl hover:border-indigo-500" data-zone="gate">🚪 GERBANG</button>
+          <button type="button" class="btn-spawn bg-slate-800 border border-slate-700 text-slate-300 py-2 px-1 rounded-xl hover:border-indigo-500" data-zone="courtyard">⚽ LAPANGAN</button>
+          <button type="button" class="btn-spawn bg-slate-800 border border-slate-700 text-slate-300 py-2 px-1 rounded-xl hover:border-indigo-500" data-zone="canteen">🍕 KANTIN</button>
+        </div>
+      </div>
+
+      <!-- Join Button -->
+      <button id="btnJoinGame" class="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 font-pixel text-xs sm:text-sm text-white py-4 px-6 rounded-2xl shadow-xl border-b-4 border-emerald-800 active:border-b-0 active:translate-y-1 transition-all">
         MASUK KE SEKOLAH 🚀
       </button>
+
+      <!-- GitHub Pages / Config Link -->
+      <div class="mt-4 pt-3 border-t border-slate-800 flex justify-between items-center text-xs text-slate-400">
+        <span>Optimized for GitHub Pages</span>
+        <button id="btnOpenConfig" class="underline hover:text-indigo-300">⚙️ Config Firebase</button>
+      </div>
     </div>
   </div>
 
-  <!-- HUD IN-GAME OVERLAYS -->
-  <div id="gameHUD" class="hidden pointer-events-none fixed inset-0 z-10 flex flex-col justify-between p-3 md:p-5">
+  <!-- IN-GAME HUD OVERLAYS -->
+  <div id="gameHUD" class="hidden pointer-events-none fixed inset-0 z-10 flex flex-col justify-between p-3 sm:p-5">
     
-    <!-- Top Bar -->
+    <!-- Top HUD Navigation Bar -->
     <div class="flex justify-between items-start w-full">
-      <!-- Location & Online Player Count -->
+      <!-- Zone Indicator & Online Count -->
       <div class="pointer-events-auto flex flex-col gap-2">
-        <div class="bg-slate-900/80 backdrop-blur border-2 border-indigo-500/50 rounded-xl px-3 py-1.5 flex items-center gap-2 shadow-lg">
+        <div class="bg-slate-900/85 backdrop-blur border-2 border-indigo-500/60 rounded-2xl px-3 py-1.5 flex items-center gap-2 shadow-xl">
           <span class="w-3 h-3 bg-emerald-400 rounded-full animate-pulse"></span>
-          <span class="font-pixel text-xs text-yellow-300" id="locationTag">SEKOLAH UTAMA</span>
+          <span class="font-pixel text-[10px] sm:text-xs text-yellow-300 tracking-wide" id="locationTag">SEKOLAH UTAMA</span>
         </div>
         
-        <button id="btnTogglePlayers" class="bg-slate-900/80 backdrop-blur border border-slate-700 hover:border-slate-500 rounded-xl px-3 py-1.5 text-slate-200 text-sm flex items-center gap-2 transition shadow">
+        <button id="btnTogglePlayers" class="bg-slate-900/85 backdrop-blur border border-slate-700 hover:border-indigo-500 rounded-xl px-3 py-1.5 text-slate-200 text-sm flex items-center gap-2 transition shadow-lg">
           👥 <span id="onlineCount">1 Siswa Online</span>
         </button>
       </div>
 
-      <!-- Settings / Audio Toggle -->
+      <!-- Right HUD Controls -->
       <div class="pointer-events-auto flex gap-2">
-        <button id="btnSound" class="bg-slate-900/80 backdrop-blur border border-slate-700 rounded-xl p-2.5 text-xl hover:bg-slate-800 transition">
+        <button id="btnSound" class="bg-slate-900/85 backdrop-blur border border-slate-700 hover:border-indigo-500 rounded-xl p-2.5 text-xl transition shadow-lg">
           🔊
         </button>
-        <button id="btnHelp" class="bg-slate-900/80 backdrop-blur border border-slate-700 rounded-xl p-2.5 text-xl hover:bg-slate-800 transition">
+        <button id="btnHelp" class="bg-slate-900/85 backdrop-blur border border-slate-700 hover:border-indigo-500 rounded-xl p-2.5 text-xl transition shadow-lg">
           ❓
         </button>
       </div>
     </div>
 
-    <!-- Quick Emotes Floating Bar & Chat Bar Bottom -->
-    <div class="w-full max-w-xl mx-auto flex flex-col gap-2 items-center pointer-events-auto">
+    <!-- Quick Emotes Bar & Chat Input Box -->
+    <div class="w-full max-w-lg mx-auto flex flex-col gap-2 items-center pointer-events-auto mb-2">
       
-      <!-- Emote Bar -->
-      <div class="bg-slate-900/90 backdrop-blur border border-slate-700/80 rounded-full px-3 py-1.5 flex gap-2 shadow-2xl">
-        <button class="btn-emote text-2xl hover:scale-125 transition transform" data-emote="😊">😊</button>
-        <button class="btn-emote text-2xl hover:scale-125 transition transform" data-emote="👋">👋</button>
-        <button class="btn-emote text-2xl hover:scale-125 transition transform" data-emote="❤️">❤️</button>
-        <button class="btn-emote text-2xl hover:scale-125 transition transform" data-emote="⚽">⚽</button>
-        <button class="btn-emote text-2xl hover:scale-125 transition transform" data-emote="📚">📚</button>
-        <button class="btn-emote text-2xl hover:scale-125 transition transform" data-emote="🍕">🍕</button>
-        <button class="btn-emote text-2xl hover:scale-125 transition transform" data-emote="❓">❓</button>
+      <!-- Floating Emote Bar -->
+      <div class="bg-slate-900/90 backdrop-blur border border-indigo-500/40 rounded-full px-4 py-1.5 flex gap-3 shadow-2xl">
+        <button class="btn-emote text-2xl hover:scale-130 active:scale-95 transition transform" data-emote="😊">😊</button>
+        <button class="btn-emote text-2xl hover:scale-130 active:scale-95 transition transform" data-emote="👋">👋</button>
+        <button class="btn-emote text-2xl hover:scale-130 active:scale-95 transition transform" data-emote="❤️">❤️</button>
+        <button class="btn-emote text-2xl hover:scale-130 active:scale-95 transition transform" data-emote="⚽">⚽</button>
+        <button class="btn-emote text-2xl hover:scale-130 active:scale-95 transition transform" data-emote="📚">📚</button>
+        <button class="btn-emote text-2xl hover:scale-130 active:scale-95 transition transform" data-emote="🍕">🍕</button>
+        <button class="btn-emote text-2xl hover:scale-130 active:scale-95 transition transform" data-emote="❓">❓</button>
       </div>
 
-      <!-- Interactive Input Chat Box -->
+      <!-- Chat Bar -->
       <div class="w-full flex gap-2">
-        <input type="text" id="chatInput" placeholder="Ketik pesan lalu tekan Enter..." maxlength="60"
-          class="flex-1 bg-slate-900/90 backdrop-blur border-2 border-indigo-500/60 rounded-xl px-4 py-2 text-lg text-white placeholder-slate-400 focus:outline-none focus:border-indigo-400 shadow-xl" />
-        <button id="btnSendChat" class="bg-indigo-600 hover:bg-indigo-500 text-white font-pixel text-xs px-4 py-2 rounded-xl border-b-2 border-indigo-800 active:translate-y-0.5 transition shadow-lg">
+        <input type="text" id="chatInput" placeholder="Ketik pesan (Enter untuk kirim)..." maxlength="50"
+          class="flex-1 bg-slate-900/90 backdrop-blur border-2 border-indigo-500/70 rounded-xl px-4 py-2.5 text-lg text-white placeholder-slate-400 focus:outline-none focus:border-indigo-400 shadow-2xl" />
+        <button id="btnSendChat" class="bg-indigo-600 hover:bg-indigo-500 text-white font-pixel text-xs px-5 py-2.5 rounded-xl border-b-2 border-indigo-800 active:translate-y-0.5 transition shadow-lg">
           KIRIM
         </button>
       </div>
     </div>
   </div>
 
-  <!-- ONLINE PLAYERS MODAL LIST -->
-  <div id="playersModal" class="hidden fixed inset-0 z-40 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4">
+  <!-- ONLINE PLAYERS MODAL -->
+  <div id="playersModal" class="hidden fixed inset-0 z-40 bg-slate-950/75 backdrop-blur-sm flex items-center justify-center p-4">
     <div class="bg-slate-900 border-2 border-indigo-500 rounded-2xl p-5 max-w-xs w-full shadow-2xl">
-      <div class="flex justify-between items-center mb-4">
+      <div class="flex justify-between items-center mb-4 border-b border-slate-800 pb-2">
         <h3 class="font-pixel text-xs text-yellow-300">SISWA DI SEKOLAH</h3>
         <button id="btnClosePlayers" class="text-slate-400 hover:text-white text-lg font-bold">✕</button>
       </div>
@@ -176,18 +209,37 @@
     </div>
   </div>
 
-  <!-- HELP CONTROLS MODAL -->
-  <div id="helpModal" class="hidden fixed inset-0 z-40 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4">
+  <!-- HELP & CONTROLS MODAL -->
+  <div id="helpModal" class="hidden fixed inset-0 z-40 bg-slate-950/75 backdrop-blur-sm flex items-center justify-center p-4">
     <div class="bg-slate-900 border-2 border-indigo-500 rounded-2xl p-5 max-w-sm w-full shadow-2xl text-slate-300">
-      <div class="flex justify-between items-center mb-3">
+      <div class="flex justify-between items-center mb-3 border-b border-slate-800 pb-2">
         <h3 class="font-pixel text-xs text-yellow-300">KONTROL GAME</h3>
         <button id="btnCloseHelp" class="text-slate-400 hover:text-white text-lg font-bold">✕</button>
       </div>
-      <div class="space-y-2 text-sm">
-        <p><strong class="text-indigo-400">Keyboard:</strong> Gunakan tombol <span class="bg-slate-800 px-1.5 py-0.5 rounded text-yellow-300 font-pixel text-xs">WASD</span> atau <span class="bg-slate-800 px-1.5 py-0.5 rounded text-yellow-300 font-pixel text-xs">PANAH</span> untuk bergerak.</p>
-        <p><strong class="text-indigo-400">Pesan Live:</strong> Tekan <span class="bg-slate-800 px-1.5 py-0.5 rounded text-yellow-300 font-pixel text-xs">ENTER</span> untuk langsung mengetik pesan.</p>
-        <p><strong class="text-indigo-400">Layar Sentuh (Mobile):</strong> Gunakan Joypad Virtual di bagian kiri bawah layar.</p>
-        <p><strong class="text-indigo-400">Ekspresi:</strong> Klik ikon emotikon di bawah untuk memunculkan gelembung emot di atas karakter.</p>
+      <div class="space-y-2.5 text-sm">
+        <p><strong class="text-indigo-400">Keyboard (PC):</strong> Gunakan tombol <span class="bg-slate-800 px-1.5 py-0.5 rounded text-yellow-300 font-pixel text-[10px]">WASD</span> atau <span class="bg-slate-800 px-1.5 py-0.5 rounded text-yellow-300 font-pixel text-[10px]">PANAH</span> untuk jalan.</p>
+        <p><strong class="text-indigo-400">Pesan Live:</strong> Tekan <span class="bg-slate-800 px-1.5 py-0.5 rounded text-yellow-300 font-pixel text-[10px]">ENTER</span> untuk mulai mengetik pesan.</p>
+        <p><strong class="text-indigo-400">Touchscreen (HP):</strong> Gunakan Virtual D-Pad di kiri bawah layar.</p>
+        <p><strong class="text-indigo-400">Spawn Point:</strong> Karakter muncul secara acak di 4 zona sekolah agar tidak menumpuk saat join!</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- FIREBASE CONFIG MODAL (for GitHub Pages / External Hosting) -->
+  <div id="configModal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-slate-900 border-2 border-indigo-500 rounded-2xl p-5 max-w-md w-full shadow-2xl text-slate-300">
+      <div class="flex justify-between items-center mb-3 border-b border-slate-800 pb-2">
+        <h3 class="font-pixel text-xs text-yellow-300">CONFIG FIREBASE (GITHUB PAGES)</h3>
+        <button id="btnCloseConfig" class="text-slate-400 hover:text-white text-lg font-bold">✕</button>
+      </div>
+      <p class="text-xs text-slate-400 mb-3">
+        Jika kamu meng-host file ini langsung di GitHub Pages tanpa backend khusus, kamu bisa memasukkan JSON Firebase Config milikmu di sini agar bisa terhubung dengan teman-temanmu secara online.
+      </p>
+      <textarea id="firebaseConfigText" rows="5" placeholder='{"apiKey": "...", "authDomain": "...", "projectId": "..."}' 
+        class="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 font-mono text-xs text-green-400 focus:outline-none focus:border-indigo-500 mb-3"></textarea>
+      <div class="flex gap-2">
+        <button id="btnSaveConfig" class="flex-1 bg-indigo-600 hover:bg-indigo-500 font-pixel text-xs py-2.5 rounded-xl text-white">SIMPAN & RESET</button>
+        <button id="btnClearConfig" class="bg-slate-800 hover:bg-slate-700 font-pixel text-xs py-2.5 px-4 rounded-xl text-slate-300">CLEAR</button>
       </div>
     </div>
   </div>
@@ -195,18 +247,18 @@
   <!-- VIRTUAL MOBILE DPAD CONTROLS -->
   <div id="virtualDpad" class="hidden md:hidden fixed bottom-20 left-4 z-30 pointer-events-auto">
     <div class="relative w-36 h-36">
-      <button id="dpadUp" class="dpad-btn absolute top-0 left-12 w-12 h-12 flex items-center justify-center text-xl">▲</button>
-      <button id="dpadDown" class="dpad-btn absolute bottom-0 left-12 w-12 h-12 flex items-center justify-center text-xl">▼</button>
-      <button id="dpadLeft" class="dpad-btn absolute top-12 left-0 w-12 h-12 flex items-center justify-center text-xl">◀</button>
-      <button id="dpadRight" class="dpad-btn absolute top-12 right-0 w-12 h-12 flex items-center justify-center text-xl">▶</button>
+      <button id="dpadUp" class="dpad-btn absolute top-0 left-12 w-12 h-12 flex items-center justify-center text-xl text-indigo-300">▲</button>
+      <button id="dpadDown" class="dpad-btn absolute bottom-0 left-12 w-12 h-12 flex items-center justify-center text-xl text-indigo-300">▼</button>
+      <button id="dpadLeft" class="dpad-btn absolute top-12 left-0 w-12 h-12 flex items-center justify-center text-xl text-indigo-300">◀</button>
+      <button id="dpadRight" class="dpad-btn absolute top-12 right-0 w-12 h-12 flex items-center justify-center text-xl text-indigo-300">▶</button>
     </div>
   </div>
 
-  <!-- CHAT LOG SIDE PANEL (Desktop/Collapsible) -->
-  <div id="chatLogBox" class="hidden md:flex fixed top-20 left-5 z-20 w-72 max-h-52 bg-slate-900/75 backdrop-blur-md border border-slate-800 rounded-xl p-3 flex-col pointer-events-auto shadow-xl">
-    <div class="text-xs text-indigo-300 font-pixel mb-1 border-b border-slate-800 pb-1 flex justify-between">
+  <!-- CHAT LOG SIDE PANEL (Desktop) -->
+  <div id="chatLogBox" class="hidden md:flex fixed top-20 left-5 z-20 w-72 max-h-56 bg-slate-900/80 backdrop-blur-md border border-slate-800 rounded-2xl p-3 flex-col pointer-events-auto shadow-2xl">
+    <div class="text-[10px] text-indigo-300 font-pixel mb-1.5 border-b border-slate-800/80 pb-1 flex justify-between items-center">
       <span>OBROLAN SEKOLAH</span>
-      <span class="text-slate-500">LIVE</span>
+      <span class="text-slate-500 font-mono">LIVE</span>
     </div>
     <div id="chatMessages" class="flex-1 overflow-y-auto space-y-1 text-xs text-slate-300 pr-1"></div>
   </div>
@@ -222,11 +274,10 @@
       deleteDoc, 
       onSnapshot, 
       collection, 
-      addDoc, 
-      serverTimestamp 
+      addDoc 
     } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-    // --- AUDIO SYNTHESIZER (Web Audio API) ---
+    // --- RETRO SOUND SYNTHESIZER (Web Audio API) ---
     class RetroSound {
       constructor() {
         this.ctx = null;
@@ -243,13 +294,13 @@
           const osc = this.ctx.createOscillator();
           const gain = this.ctx.createGain();
           osc.type = 'triangle';
-          osc.frequency.setValueAtTime(110 + Math.random() * 40, this.ctx.currentTime);
-          gain.gain.setValueAtTime(0.04, this.ctx.currentTime);
-          gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.08);
+          osc.frequency.setValueAtTime(120 + Math.random() * 50, this.ctx.currentTime);
+          gain.gain.setValueAtTime(0.03, this.ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.07);
           osc.connect(gain);
           gain.connect(this.ctx.destination);
           osc.start();
-          osc.stop(this.ctx.currentTime + 0.08);
+          osc.stop(this.ctx.currentTime + 0.07);
         } catch(e) {}
       }
       playChat() {
@@ -260,12 +311,12 @@
           osc.type = 'sine';
           osc.frequency.setValueAtTime(523.25, this.ctx.currentTime); // C5
           osc.frequency.setValueAtTime(659.25, this.ctx.currentTime + 0.08); // E5
-          gain.gain.setValueAtTime(0.1, this.ctx.currentTime);
-          gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.25);
+          gain.gain.setValueAtTime(0.08, this.ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.22);
           osc.connect(gain);
           gain.connect(this.ctx.destination);
           osc.start();
-          osc.stop(this.ctx.currentTime + 0.25);
+          osc.stop(this.ctx.currentTime + 0.22);
         } catch(e) {}
       }
       playEmote() {
@@ -274,9 +325,9 @@
           const osc = this.ctx.createOscillator();
           const gain = this.ctx.createGain();
           osc.type = 'sine';
-          osc.frequency.setValueAtTime(400, this.ctx.currentTime);
-          osc.frequency.exponentialRampToValueAtTime(800, this.ctx.currentTime + 0.15);
-          gain.gain.setValueAtTime(0.1, this.ctx.currentTime);
+          osc.frequency.setValueAtTime(350, this.ctx.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(700, this.ctx.currentTime + 0.15);
+          gain.gain.setValueAtTime(0.08, this.ctx.currentTime);
           gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.15);
           osc.connect(gain);
           gain.connect(this.ctx.destination);
@@ -287,7 +338,7 @@
     }
     const sound = new RetroSound();
 
-    // --- GAME CONSTANTS & MAP DEFINITION ---
+    // --- GAME MAP & GRID DEFINITIONS ---
     const TILE_SIZE = 32;
     const MAP_COLS = 48;
     const MAP_ROWS = 36;
@@ -295,145 +346,137 @@
     const MAP_HEIGHT = MAP_ROWS * TILE_SIZE; // 1152 px
 
     // Palette Options
-    const HAIR_COLORS = ['#3b2314', '#e6c875', '#a83232', '#327ba8', '#252525'];
+    const HAIR_COLORS = ['#3b2314', '#e6c875', '#a83232', '#327ba8', '#252525', '#9333ea'];
     const SHIRT_COLORS = ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899'];
     const SKIN_COLORS = ['#f8d5c2', '#e0ac69', '#8d5524', '#c68642'];
 
-    // Map Tile Codes
-    // 0: Outdoor Grass, 1: Stone Path, 2: Corridor Floor Tile, 3: Classroom Floor, 4: Cafeteria Floor
-    // 10: Solid Wall, 11: Classroom Desk, 12: Chair, 13: Blackboard, 14: Cafeteria Table, 15: Vending Machine, 16: Tree, 17: Water Fountain/Garden
-    
-    // Construct Map Grid
+    // Map Grid & Collision Data
     const mapGrid = new Array(MAP_ROWS).fill(0).map(() => new Array(MAP_COLS).fill(0));
     const solidGrid = new Array(MAP_ROWS).fill(false).map(() => new Array(MAP_COLS).fill(false));
 
     function generateSchoolMap() {
-      // 1. Fill Outdoor Grass (Bottom Area Y: 18..35)
+      // 1. Outdoor Grass (Y: 20..35)
       for (let r = 0; r < MAP_ROWS; r++) {
         for (let c = 0; c < MAP_COLS; c++) {
-          if (r >= 18) {
+          if (r >= 20) {
             mapGrid[r][c] = 0; // Grass
           } else {
-            mapGrid[r][c] = 2; // Indoor Corridor default
+            mapGrid[r][c] = 2; // Indoor Corridor
           }
         }
       }
 
-      // Perimeter Fences/Trees Outdoor
+      // Perimeter Trees & Fences
       for (let c = 0; c < MAP_COLS; c++) {
         mapGrid[MAP_ROWS-1][c] = 16; solidGrid[MAP_ROWS-1][c] = true;
       }
-      for (let r = 18; r < MAP_ROWS; r++) {
+      for (let r = 20; r < MAP_ROWS; r++) {
         mapGrid[r][0] = 16; solidGrid[r][0] = true;
         mapGrid[r][MAP_COLS-1] = 16; solidGrid[r][MAP_COLS-1] = true;
       }
 
-      // Stone Pathways Outdoor
-      for (let r = 18; r < MAP_ROWS-1; r++) {
-        mapGrid[r][23] = 1; mapGrid[r][24] = 1;
-      }
-      for (let c = 8; c <= 40; c++) {
-        mapGrid[27][c] = 1; mapGrid[28][c] = 1;
+      // School Gate Outdoor Fence at Y=33
+      for (let c = 1; c < MAP_COLS-1; c++) {
+        if (c < 21 || c > 26) {
+          mapGrid[33][c] = 10; solidGrid[33][c] = true;
+        }
       }
 
-      // Garden Trees & Fountain
-      mapGrid[23][14] = 17; solidGrid[23][14] = true;
-      mapGrid[23][15] = 17; solidGrid[23][15] = true;
+      // Stone Pathways Outdoor
+      for (let r = 20; r < MAP_ROWS-1; r++) {
+        mapGrid[r][23] = 1; mapGrid[r][24] = 1;
+      }
+      for (let c = 6; c <= 41; c++) {
+        mapGrid[28][c] = 1; mapGrid[29][c] = 1;
+      }
+
+      // Fountain & Trees in Courtyard
       mapGrid[24][14] = 17; solidGrid[24][14] = true;
       mapGrid[24][15] = 17; solidGrid[24][15] = true;
+      mapGrid[25][14] = 17; solidGrid[25][14] = true;
+      mapGrid[25][15] = 17; solidGrid[25][15] = true;
 
       for (let c of [6, 18, 30, 42]) {
         mapGrid[31][c] = 16; solidGrid[31][c] = true;
       }
 
-      // 2. Indoor Building Layout (Y: 0..17)
-      // Outer Wall Building
+      // 2. Indoor Building Layout (Y: 0..19)
       for (let c = 0; c < MAP_COLS; c++) {
         mapGrid[0][c] = 10; solidGrid[0][c] = true;
-        mapGrid[17][c] = 10; solidGrid[17][c] = true;
+        mapGrid[19][c] = 10; solidGrid[19][c] = true;
       }
-      for (let r = 0; r <= 17; r++) {
+      for (let r = 0; r <= 19; r++) {
         mapGrid[r][0] = 10; solidGrid[r][0] = true;
         mapGrid[r][MAP_COLS-1] = 10; solidGrid[r][MAP_COLS-1] = true;
       }
 
-      // Doors to Outdoor
-      mapGrid[17][23] = 1; solidGrid[17][23] = false;
-      mapGrid[17][24] = 1; solidGrid[17][24] = false;
+      // School Entrance Double Doors
+      mapGrid[19][23] = 1; solidGrid[19][23] = false;
+      mapGrid[19][24] = 1; solidGrid[19][24] = false;
 
-      // Indoor Corridor Divider Line Wall (Y: 10)
+      // Classroom Wall Divider Line (Y: 10)
       for (let c = 1; c < MAP_COLS-1; c++) {
         mapGrid[10][c] = 10; solidGrid[10][c] = true;
       }
 
-      // Classroom A (Left room: X 1..15, Y 1..9)
+      // Classroom 10-A (X 1..15, Y 1..9)
       for (let r = 1; r < 10; r++) {
         for (let c = 1; c <= 15; c++) {
           mapGrid[r][c] = 3;
         }
       }
-      // Classroom A Wall Divider (X: 16)
       for (let r = 1; r < 10; r++) {
         mapGrid[r][16] = 10; solidGrid[r][16] = true;
       }
-      // Classroom A Door
       mapGrid[10][8] = 3; solidGrid[10][8] = false;
       mapGrid[10][9] = 3; solidGrid[10][9] = false;
 
-      // Classroom B (Middle room: X 17..31, Y 1..9)
+      // Classroom 10-B (X 17..31, Y 1..9)
       for (let r = 1; r < 10; r++) {
         for (let c = 17; c <= 31; c++) {
           mapGrid[r][c] = 3;
         }
       }
-      // Divider X: 32
       for (let r = 1; r < 10; r++) {
         mapGrid[r][32] = 10; solidGrid[r][32] = true;
       }
-      // Classroom B Door
       mapGrid[10][24] = 3; solidGrid[10][24] = false;
       mapGrid[10][25] = 3; solidGrid[10][25] = false;
 
-      // Cafeteria / Kantin (Right room: X 33..46, Y 1..9)
+      // Cafeteria (X 33..46, Y 1..9)
       for (let r = 1; r < 10; r++) {
         for (let c = 33; c < MAP_COLS-1; c++) {
           mapGrid[r][c] = 4;
         }
       }
-      // Cafeteria Door
       mapGrid[10][39] = 4; solidGrid[10][39] = false;
       mapGrid[10][40] = 4; solidGrid[10][40] = false;
 
-      // --- Furniture Placement ---
-      // Blackboard Class A & B
+      // Furniture
       for (let c = 5; c <= 11; c++) { mapGrid[1][c] = 13; solidGrid[1][c] = true; }
       for (let c = 21; c <= 27; c++) { mapGrid[1][c] = 13; solidGrid[1][c] = true; }
 
-      // Student Desks Class A
       const deskColsA = [3, 7, 11];
       const deskRows = [4, 7];
       for (let dr of deskRows) {
         for (let dc of deskColsA) {
           mapGrid[dr][dc] = 11; solidGrid[dr][dc] = true;
           mapGrid[dr][dc+1] = 11; solidGrid[dr][dc+1] = true;
-          mapGrid[dr+1][dc] = 12; // Chair
-          mapGrid[dr+1][dc+1] = 12;
+          mapGrid[dr+1][dc] = 12; mapGrid[dr+1][dc+1] = 12;
         }
       }
 
-      // Student Desks Class B
       const deskColsB = [19, 23, 27];
       for (let dr of deskRows) {
         for (let dc of deskColsB) {
           mapGrid[dr][dc] = 11; solidGrid[dr][dc] = true;
           mapGrid[dr][dc+1] = 11; solidGrid[dr][dc+1] = true;
-          mapGrid[dr+1][dc] = 12;
-          mapGrid[dr+1][dc+1] = 12;
+          mapGrid[dr+1][dc] = 12; mapGrid[dr+1][dc+1] = 12;
         }
       }
 
-      // Cafeteria Tables & Vending Machines
-      mapGrid[1][34] = 15; solidGrid[1][34] = true; // Vending Machine
+      // Vending & Cafeteria Tables
+      mapGrid[1][34] = 15; solidGrid[1][34] = true;
       mapGrid[1][36] = 15; solidGrid[1][36] = true;
 
       const cafCols = [35, 41];
@@ -448,23 +491,83 @@
 
     generateSchoolMap();
 
-    // --- FIREBASE INITIALIZATION ---
-    const appId = typeof __app_id !== 'undefined' ? __app_id : 'school-pixel-app';
-    const firebaseConfig = JSON.parse(__firebase_config);
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
+    // --- SPAWN ZONES LOGIC ---
+    const SPAWN_ZONES = {
+      gate: { x: 23.5 * TILE_SIZE, y: 34.5 * TILE_SIZE },
+      courtyard: { x: 23.5 * TILE_SIZE, y: 26 * TILE_SIZE },
+      corridor: { x: 23.5 * TILE_SIZE, y: 15 * TILE_SIZE },
+      canteen: { x: 39.5 * TILE_SIZE, y: 6 * TILE_SIZE }
+    };
 
+    let selectedSpawnZone = 'random';
+
+    function calculateRandomSpawnPoint(zoneKey) {
+      let targetKey = zoneKey;
+      if (targetKey === 'random') {
+        const keys = Object.keys(SPAWN_ZONES);
+        targetKey = keys[Math.floor(Math.random() * keys.length)];
+      }
+
+      const base = SPAWN_ZONES[targetKey] || SPAWN_ZONES.courtyard;
+      
+      // Random spatial offset (+/- 40px)
+      let finalX = base.x + (Math.random() - 0.5) * 80;
+      let finalY = base.y + (Math.random() - 0.5) * 60;
+
+      // Adjust if landing inside solid tile
+      const col = Math.floor(finalX / TILE_SIZE);
+      const row = Math.floor(finalY / TILE_SIZE);
+      if (solidGrid[row] && solidGrid[row][col]) {
+        return { x: base.x, y: base.y };
+      }
+
+      return { x: finalX, y: finalY };
+    }
+
+    // --- FIREBASE / MULTIPLAYER CONFIGURATION ---
+    const appId = typeof __app_id !== 'undefined' ? __app_id : 'school-pixel-app';
+    let firebaseConfig = null;
+
+    if (typeof __firebase_config !== 'undefined') {
+      firebaseConfig = JSON.parse(__firebase_config);
+    } else {
+      const saved = localStorage.getItem('custom_firebase_config');
+      if (saved) {
+        try { firebaseConfig = JSON.parse(saved); } catch(e) {}
+      }
+    }
+
+    // Default fallback demo config for GitHub Pages testing if none set
+    if (!firebaseConfig) {
+      firebaseConfig = {
+        apiKey: "AIzaSyDemoPlaceholderForGitHubPagesOnly",
+        authDomain: "demo-school.firebaseapp.com",
+        projectId: "demo-school",
+        storageBucket: "demo-school.appspot.com"
+      };
+    }
+
+    let db = null;
+    let auth = null;
     let currentUser = null;
+
+    try {
+      const app = initializeApp(firebaseConfig);
+      auth = getAuth(app);
+      db = getFirestore(app);
+    } catch(e) {
+      console.warn("Firebase initialization warning:", e);
+    }
+
     let localPlayer = {
       id: null,
       name: 'Siswa',
       hair: HAIR_COLORS[0],
       shirt: SHIRT_COLORS[0],
       skin: SKIN_COLORS[0],
-      x: 23 * TILE_SIZE,
-      y: 20 * TILE_SIZE,
-      dir: 0, // 0: Down, 1: Up, 2: Left, 3: Right
+      x: 23.5 * TILE_SIZE,
+      y: 26 * TILE_SIZE,
+      dir: 0,
       isMoving: false,
       animFrame: 0,
       speech: '',
@@ -475,11 +578,8 @@
     };
 
     let remotePlayers = {};
-    let unsubscribePlayers = null;
-    let unsubscribeChat = null;
 
-    // --- APP STATE & DOM ELEMENTS ---
-    const lobbyScreen = document.getElementById('lobbyScreen');
+    // --- CANVAS & DOM ELEMENTS ---
     const gameCanvas = document.getElementById('gameCanvas');
     const ctx = gameCanvas.getContext('2d');
     const previewCanvas = document.getElementById('previewCanvas');
@@ -496,14 +596,26 @@
     const playersList = document.getElementById('playersList');
     const playersModal = document.getElementById('playersModal');
 
-    // Setup Color Selection UI
+    // UI Spawn Zone Selection
+    document.querySelectorAll('.btn-spawn').forEach(btn => {
+      btn.onclick = () => {
+        document.querySelectorAll('.btn-spawn').forEach(b => {
+          b.className = 'btn-spawn bg-slate-800 border border-slate-700 text-slate-300 py-2 px-1 rounded-xl hover:border-indigo-500';
+        });
+        btn.className = 'btn-spawn bg-indigo-900/80 border-2 border-indigo-500 text-yellow-300 font-bold py-2 px-1 rounded-xl';
+        selectedSpawnZone = btn.dataset.zone;
+      };
+    });
+
+    // Setup Customizer Pickers
     function createColorPickers() {
       const buildGroup = (containerId, colors, selectedProp) => {
         const container = document.getElementById(containerId);
         container.innerHTML = '';
         colors.forEach(col => {
           const btn = document.createElement('button');
-          btn.className = `w-6 h-6 rounded-full border-2 transition ${localPlayer[selectedProp] === col ? 'border-yellow-400 scale-110' : 'border-slate-600'}`;
+          btn.type = 'button';
+          btn.className = `w-7 h-7 rounded-full border-2 transition ${localPlayer[selectedProp] === col ? 'border-yellow-300 scale-110 shadow-lg' : 'border-slate-600'}`;
           btn.style.backgroundColor = col;
           btn.onclick = () => {
             localPlayer[selectedProp] = col;
@@ -518,24 +630,21 @@
       buildGroup('skinColors', SKIN_COLORS, 'skin');
     }
 
-    // Render Preview Character in Lobby
     function drawPreview() {
-      pCtx.clearRect(0, 0, 64, 64);
-      pCtx.imageRendering = 'pixelated';
-      // Render enlarged character (2x scale centered)
-      drawCharacterSprite(pCtx, 32, 32, {
+      pCtx.clearRect(0, 0, 72, 72);
+      drawCharacterSprite(pCtx, 36, 40, {
         dir: 0,
         animFrame: 0,
         hair: localPlayer.hair,
         shirt: localPlayer.shirt,
         skin: localPlayer.skin
-      }, 2.2);
+      }, 2.4);
     }
 
     createColorPickers();
     drawPreview();
 
-    // --- CANVAS RESIZE & CAMERA ---
+    // Camera viewport
     let camera = { x: 0, y: 0, width: window.innerWidth, height: window.innerHeight };
 
     function resizeCanvas() {
@@ -543,61 +652,62 @@
       gameCanvas.height = window.innerHeight;
       camera.width = window.innerWidth;
       camera.height = window.innerHeight;
+      ctx.imageSmoothingEnabled = false;
     }
     window.addEventListener('resize', resizeCanvas);
     resizeCanvas();
 
-    // --- SPRITE RENDERER (PROCEDURAL 16-BIT PIXEL ART) ---
+    // --- SPRITE RENDERER ---
     function drawCharacterSprite(targetCtx, x, y, p, scale = 1) {
       targetCtx.save();
-      targetCtx.translate(x, y);
+      targetCtx.translate(Math.round(x), Math.round(y));
       targetCtx.scale(scale, scale);
 
       // Shadow
-      targetCtx.fillStyle = 'rgba(0, 0, 0, 0.25)';
+      targetCtx.fillStyle = 'rgba(0, 0, 0, 0.28)';
       targetCtx.beginPath();
-      targetCtx.ellipse(0, 12, 10, 5, 0, 0, Math.PI * 2);
+      targetCtx.ellipse(0, 12, 10, 4.5, 0, 0, Math.PI * 2);
       targetCtx.fill();
 
-      // Anim step offset
+      // Step bounce
       const stepOffset = (p.animFrame === 1) ? 2 : ((p.animFrame === 3) ? -2 : 0);
 
-      // Feet / Pants (Dark Navy)
+      // Legs / Pants
       targetCtx.fillStyle = '#1e293b';
-      if (p.dir === 0 || p.dir === 1) { // Up/Down
+      if (p.dir === 0 || p.dir === 1) {
         targetCtx.fillRect(-6 + stepOffset, 6, 4, 6);
         targetCtx.fillRect(2 - stepOffset, 6, 4, 6);
-      } else { // Left/Right
+      } else {
         targetCtx.fillRect(-4, 6 + Math.abs(stepOffset), 8, 6);
       }
 
-      // Shirt
+      // Shirt Body
       targetCtx.fillStyle = p.shirt;
       targetCtx.fillRect(-7, -2, 14, 9);
 
-      // Head / Skin
+      // Head
       targetCtx.fillStyle = p.skin;
       targetCtx.fillRect(-6, -14, 12, 12);
 
-      // Eyes & Face Details
+      // Eyes
       targetCtx.fillStyle = '#0f172a';
-      if (p.dir === 0) { // Facing Down
+      if (p.dir === 0) {
         targetCtx.fillRect(-4, -9, 2, 3);
         targetCtx.fillRect(2, -9, 2, 3);
-      } else if (p.dir === 2) { // Facing Left
+      } else if (p.dir === 2) {
         targetCtx.fillRect(-5, -9, 2, 3);
-      } else if (p.dir === 3) { // Facing Right
+      } else if (p.dir === 3) {
         targetCtx.fillRect(3, -9, 2, 3);
       }
 
-      // Hair
+      // Hair Style
       targetCtx.fillStyle = p.hair;
-      if (p.dir === 1) { // Back hair
+      if (p.dir === 1) {
         targetCtx.fillRect(-7, -16, 14, 12);
       } else {
-        targetCtx.fillRect(-7, -16, 14, 5); // Hair top
-        targetCtx.fillRect(-7, -12, 3, 6);  // Side hair left
-        targetCtx.fillRect(4, -12, 3, 6);   // Side hair right
+        targetCtx.fillRect(-7, -16, 14, 5);
+        targetCtx.fillRect(-7, -12, 3, 6);
+        targetCtx.fillRect(4, -12, 3, 6);
       }
 
       targetCtx.restore();
@@ -609,7 +719,6 @@
         case 0: // Outdoor Grass
           ctx.fillStyle = (c + r) % 2 === 0 ? '#4ade80' : '#22c55e';
           ctx.fillRect(screenX, screenY, TILE_SIZE, TILE_SIZE);
-          // Grass Blade details
           if ((c * 7 + r * 13) % 5 === 0) {
             ctx.fillStyle = '#16a34a';
             ctx.fillRect(screenX + 8, screenY + 10, 2, 6);
@@ -636,12 +745,12 @@
           ctx.fillRect(screenX, screenY + TILE_SIZE - 2, TILE_SIZE, 2);
           break;
 
-        case 4: // Cafeteria Tile
+        case 4: // Cafeteria Blue Tile
           ctx.fillStyle = (c + r) % 2 === 0 ? '#38bdf8' : '#e0f2fe';
           ctx.fillRect(screenX, screenY, TILE_SIZE, TILE_SIZE);
           break;
 
-        case 10: // Brick Wall
+        case 10: // Brick Wall / Fence
           ctx.fillStyle = '#991b1b';
           ctx.fillRect(screenX, screenY, TILE_SIZE, TILE_SIZE);
           ctx.fillStyle = '#7f1d1d';
@@ -650,9 +759,9 @@
           break;
 
         case 11: // Student Desk
-          ctx.fillStyle = '#e2e8f0'; // Floor under
+          ctx.fillStyle = '#e2e8f0';
           ctx.fillRect(screenX, screenY, TILE_SIZE, TILE_SIZE);
-          ctx.fillStyle = '#b45309'; // Desk Top
+          ctx.fillStyle = '#b45309';
           ctx.fillRect(screenX + 2, screenY + 4, TILE_SIZE - 4, TILE_SIZE - 8);
           ctx.fillStyle = '#78350f';
           ctx.fillRect(screenX + 4, screenY + TILE_SIZE - 4, 4, 4);
@@ -669,9 +778,9 @@
         case 13: // Blackboard
           ctx.fillStyle = '#1e293b';
           ctx.fillRect(screenX, screenY, TILE_SIZE, TILE_SIZE);
-          ctx.fillStyle = '#065f46'; // Chalkboard Green
+          ctx.fillStyle = '#065f46';
           ctx.fillRect(screenX + 1, screenY + 4, TILE_SIZE - 2, TILE_SIZE - 8);
-          ctx.fillStyle = '#f8fafc'; // Chalk lines
+          ctx.fillStyle = '#f8fafc';
           ctx.fillRect(screenX + 4, screenY + 12, 12, 2);
           break;
 
@@ -685,18 +794,18 @@
         case 15: // Vending Machine
           ctx.fillStyle = '#dc2626';
           ctx.fillRect(screenX + 2, screenY + 2, TILE_SIZE - 4, TILE_SIZE - 2);
-          ctx.fillStyle = '#38bdf8'; // Glass window
+          ctx.fillStyle = '#38bdf8';
           ctx.fillRect(screenX + 6, screenY + 6, TILE_SIZE - 12, 12);
           break;
 
         case 16: // Tree
           ctx.fillStyle = '#22c55e';
           ctx.fillRect(screenX, screenY, TILE_SIZE, TILE_SIZE);
-          ctx.fillStyle = '#15803d'; // Canopy
+          ctx.fillStyle = '#15803d';
           ctx.beginPath();
           ctx.arc(screenX + 16, screenY + 14, 14, 0, Math.PI * 2);
           ctx.fill();
-          ctx.fillStyle = '#78350f'; // Trunk
+          ctx.fillStyle = '#78350f';
           ctx.fillRect(screenX + 13, screenY + 20, 6, 12);
           break;
 
@@ -715,11 +824,11 @@
       }
     }
 
-    // --- CONTROLS & INPUT SYSTEM ---
+    // --- CONTROLS & COLLISION ---
     const keys = { Up: false, Down: false, Left: false, Right: false };
 
     window.addEventListener('keydown', (e) => {
-      if (document.activeElement === chatInput || document.activeElement === inputName) return;
+      if (document.activeElement === chatInput || document.activeElement === inputName || document.activeElement.tagName === 'TEXTAREA') return;
       if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') keys.Up = true;
       if (e.key === 'ArrowDown' || e.key === 's' || e.key === 'S') keys.Down = true;
       if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') keys.Left = true;
@@ -738,7 +847,7 @@
       if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') keys.Right = false;
     });
 
-    // Touch Controls
+    // Touch D-Pad Binding
     const bindDpad = (id, key) => {
       const el = document.getElementById(id);
       const start = (e) => { e.preventDefault(); keys[key] = true; };
@@ -753,7 +862,6 @@
     bindDpad('dpadLeft', 'Left');
     bindDpad('dpadRight', 'Right');
 
-    // --- COLLISION DETECTION ---
     function isSolidAt(pixelX, pixelY) {
       const c = Math.floor(pixelX / TILE_SIZE);
       const r = Math.floor(pixelY / TILE_SIZE);
@@ -762,7 +870,7 @@
     }
 
     function checkCollision(nextX, nextY) {
-      const bbox = 10; // Collision box size around feet
+      const bbox = 10;
       return (
         isSolidAt(nextX - bbox, nextY - bbox) ||
         isSolidAt(nextX + bbox, nextY - bbox) ||
@@ -771,7 +879,7 @@
       );
     }
 
-    // --- GAME LOOP & MOVEMENT ---
+    // --- GAME ENGINE LOOP ---
     let lastTime = performance.now();
     let stepSoundTimer = 0;
     let syncTimer = 0;
@@ -779,7 +887,7 @@
     function updateGameLogic(dt) {
       if (!localPlayer.id) return;
 
-      const speed = 140; // Pixels per sec
+      const speed = 145;
       let dx = 0;
       let dy = 0;
 
@@ -788,7 +896,6 @@
       if (keys.Left) dx -= 1;
       if (keys.Right) dx += 1;
 
-      // Normalize diagonal speed
       if (dx !== 0 && dy !== 0) {
         dx *= 0.7071;
         dy *= 0.7071;
@@ -798,33 +905,28 @@
       localPlayer.isMoving = isMoving;
 
       if (isMoving) {
-        if (dy > 0) localPlayer.dir = 0;      // Down
-        else if (dy < 0) localPlayer.dir = 1; // Up
-        else if (dx < 0) localPlayer.dir = 2; // Left
-        else if (dx > 0) localPlayer.dir = 3; // Right
+        if (dy > 0) localPlayer.dir = 0;
+        else if (dy < 0) localPlayer.dir = 1;
+        else if (dx < 0) localPlayer.dir = 2;
+        else if (dx > 0) localPlayer.dir = 3;
 
         const nextX = localPlayer.x + dx * speed * dt;
         const nextY = localPlayer.y + dy * speed * dt;
 
-        // X movement with collision
         if (!checkCollision(nextX, localPlayer.y)) {
           localPlayer.x = nextX;
         }
-        // Y movement with collision
         if (!checkCollision(localPlayer.x, nextY)) {
           localPlayer.y = nextY;
         }
 
-        // Clamp inside map boundaries
         localPlayer.x = Math.max(16, Math.min(MAP_WIDTH - 16, localPlayer.x));
         localPlayer.y = Math.max(16, Math.min(MAP_HEIGHT - 16, localPlayer.y));
 
-        // Walking Anim Frame
         localPlayer.animFrame = Math.floor((performance.now() / 150) % 4);
 
-        // Sound Effects
         stepSoundTimer += dt;
-        if (stepSoundTimer > 0.35) {
+        if (stepSoundTimer > 0.32) {
           sound.playStep();
           stepSoundTimer = 0;
         }
@@ -832,10 +934,12 @@
         localPlayer.animFrame = 0;
       }
 
-      // Update Location Tag UI
+      // Dynamic Location Tag
       const curRow = Math.floor(localPlayer.y / TILE_SIZE);
       const curCol = Math.floor(localPlayer.x / TILE_SIZE);
-      if (curRow >= 18) {
+      if (curRow >= 32) {
+        locationTag.textContent = 'GERBANG SEKOLAH';
+      } else if (curRow >= 20) {
         locationTag.textContent = 'LAPANGAN SEKOLAH';
       } else if (curCol >= 33) {
         locationTag.textContent = 'KANTIN SEKOLAH';
@@ -847,7 +951,6 @@
         locationTag.textContent = 'KORIDOR UTAMA';
       }
 
-      // Speech & Emote Timers
       if (localPlayer.speechTimer > 0) {
         localPlayer.speechTimer -= dt;
         if (localPlayer.speechTimer <= 0) localPlayer.speech = '';
@@ -857,7 +960,7 @@
         if (localPlayer.emoteTimer <= 0) localPlayer.emote = '';
       }
 
-      // Sync position with Firestore (~10 times per second)
+      // Sync position (~10Hz)
       syncTimer += dt;
       if (syncTimer >= 0.1) {
         syncPositionToFirebase();
@@ -865,19 +968,16 @@
       }
     }
 
-    // Render Canvas Frame
     function renderGame() {
       ctx.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
 
-      // Camera Follow Smoothly
+      // Camera Follow
       camera.x = localPlayer.x - camera.width / 2;
       camera.y = localPlayer.y - camera.height / 2;
-
-      // Clamp Camera to Map
       camera.x = Math.max(0, Math.min(MAP_WIDTH - camera.width, camera.x));
       camera.y = Math.max(0, Math.min(MAP_HEIGHT - camera.height, camera.y));
 
-      // 1. Draw Visible Map Tiles
+      // 1. Draw Visible Map
       const startCol = Math.max(0, Math.floor(camera.x / TILE_SIZE));
       const endCol = Math.min(MAP_COLS - 1, Math.ceil((camera.x + camera.width) / TILE_SIZE));
       const startRow = Math.max(0, Math.floor(camera.y / TILE_SIZE));
@@ -891,17 +991,16 @@
         }
       }
 
-      // 2. Gather All Players & Sort by Y for depth sorting
+      // 2. Sort Players by Y for Depth
       const allPlayers = [localPlayer, ...Object.values(remotePlayers)];
       allPlayers.sort((a, b) => a.y - b.y);
 
-      // 3. Render Players & Nametags / Speech Bubbles
+      // 3. Draw Players & Overlays
       allPlayers.forEach(p => {
         const screenX = Math.floor(p.x - camera.x);
         const screenY = Math.floor(p.y - camera.y);
 
-        // Draw Character Sprite
-        drawCharacterSprite(ctx, screenX, screenY, p, 1.3);
+        drawCharacterSprite(ctx, screenX, screenY, p, 1.35);
 
         // Nametag
         ctx.save();
@@ -912,56 +1011,52 @@
         const nameText = isMe ? `${p.name} (Kamu)` : p.name;
         const textWidth = ctx.measureText(nameText).width;
 
-        // Nametag Background Pill
-        ctx.fillStyle = isMe ? 'rgba(30, 58, 138, 0.85)' : 'rgba(15, 23, 42, 0.85)';
+        ctx.fillStyle = isMe ? 'rgba(30, 58, 138, 0.9)' : 'rgba(15, 23, 42, 0.85)';
         ctx.strokeStyle = isMe ? '#60a5fa' : '#475569';
         ctx.lineWidth = 1;
         ctx.beginPath();
-        ctx.roundRect(screenX - textWidth / 2 - 6, screenY - 32, textWidth + 12, 16, 6);
+        ctx.roundRect(screenX - textWidth / 2 - 6, screenY - 33, textWidth + 12, 16, 6);
         ctx.fill();
         ctx.stroke();
 
-        // Nametag Text
         ctx.fillStyle = isMe ? '#fde047' : '#ffffff';
-        ctx.fillText(nameText, screenX, screenY - 20);
+        ctx.fillText(nameText, screenX, screenY - 21);
 
-        // Floating Emote Bubble
+        // Emote Floating Bubble
         if (p.emote) {
           ctx.font = '22px sans-serif';
-          const bob = Math.sin(performance.now() / 150) * 3;
-          ctx.fillText(p.emote, screenX, screenY - 44 + bob);
+          const bob = Math.sin(performance.now() / 140) * 3;
+          ctx.fillText(p.emote, screenX, screenY - 45 + bob);
         }
 
-        // Floating Speech Bubble
+        // Speech Bubble
         if (p.speech) {
           ctx.font = '14px "VT323", monospace';
           const sWidth = ctx.measureText(p.speech).width;
-          const bubbleW = Math.max(40, sWidth + 14);
+          const bubbleW = Math.max(42, sWidth + 14);
 
           ctx.fillStyle = '#ffffff';
           ctx.strokeStyle = '#000000';
           ctx.lineWidth = 2;
           ctx.beginPath();
-          ctx.roundRect(screenX - bubbleW / 2, screenY - 58, bubbleW, 20, 6);
+          ctx.roundRect(screenX - bubbleW / 2, screenY - 60, bubbleW, 20, 6);
           ctx.fill();
           ctx.stroke();
 
-          // Bubble Tail
           ctx.beginPath();
-          ctx.moveTo(screenX - 4, screenY - 38);
-          ctx.lineTo(screenX, screenY - 33);
-          ctx.lineTo(screenX + 4, screenY - 38);
+          ctx.moveTo(screenX - 4, screenY - 40);
+          ctx.lineTo(screenX, screenY - 35);
+          ctx.lineTo(screenX + 4, screenY - 40);
           ctx.fill();
 
           ctx.fillStyle = '#0f172a';
-          ctx.fillText(p.speech, screenX, screenY - 44);
+          ctx.fillText(p.speech, screenX, screenY - 46);
         }
 
         ctx.restore();
       });
     }
 
-    // Main Game Engine Loop
     function mainLoop(timestamp) {
       const dt = Math.min(0.1, (timestamp - lastTime) / 1000);
       lastTime = timestamp;
@@ -972,102 +1067,102 @@
       requestAnimationFrame(mainLoop);
     }
 
-    // --- FIREBASE MULTIPLAYER SYNC ---
+    // --- FIREBASE MULTIPLAYER & BROADCAST FALLBACK ---
     async function initFirebaseAndJoin() {
       sound.init();
 
+      // Compute spawn point based on selection
+      const spawnPt = calculateRandomSpawnPoint(selectedSpawnZone);
+      localPlayer.x = spawnPt.x;
+      localPlayer.y = spawnPt.y;
+
       try {
-        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-          currentUser = (await signInWithCustomToken(auth, __initial_auth_token)).user;
+        if (auth) {
+          if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+            currentUser = (await signInWithCustomToken(auth, __initial_auth_token)).user;
+          } else {
+            currentUser = (await signInAnonymously(auth)).user;
+          }
+          localPlayer.id = currentUser.uid;
         } else {
-          currentUser = (await signInAnonymously(auth)).user;
+          localPlayer.id = 'user_' + Math.random().toString(36).substr(2, 9);
         }
 
-        localPlayer.id = currentUser.uid;
+        if (db) {
+          const playersColl = collection(db, 'artifacts', appId, 'public', 'data', 'players');
+          const playerDocRef = doc(playersColl, localPlayer.id);
 
-        // Path for public players collection
-        const playersColl = collection(db, 'artifacts', appId, 'public', 'data', 'players');
-        const playerDocRef = doc(playersColl, localPlayer.id);
-
-        // Initial write to Firebase
-        await setDoc(playerDocRef, {
-          id: localPlayer.id,
-          name: localPlayer.name,
-          hair: localPlayer.hair,
-          shirt: localPlayer.shirt,
-          skin: localPlayer.skin,
-          x: localPlayer.x,
-          y: localPlayer.y,
-          dir: localPlayer.dir,
-          animFrame: localPlayer.animFrame,
-          speech: '',
-          emote: '',
-          lastSeen: Date.now()
-        });
-
-        // Listen for all players in real-time
-        unsubscribePlayers = onSnapshot(playersColl, (snapshot) => {
-          const updatedRemotes = {};
-          let onlineTotal = 0;
-          const listMarkup = [];
-
-          snapshot.forEach((docSnap) => {
-            const data = docSnap.data();
-            if (data.id && data.id !== localPlayer.id) {
-              // Ignore stale players (>25 seconds)
-              if (Date.now() - (data.lastSeen || 0) < 25000) {
-                updatedRemotes[data.id] = data;
-                onlineTotal++;
-                listMarkup.push(`<li class="flex items-center gap-2 bg-slate-800/80 p-2 rounded-lg">
-                  <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
-                  <span class="font-bold text-white">${data.name}</span>
-                </li>`);
-              }
-            }
+          await setDoc(playerDocRef, {
+            id: localPlayer.id,
+            name: localPlayer.name,
+            hair: localPlayer.hair,
+            shirt: localPlayer.shirt,
+            skin: localPlayer.skin,
+            x: localPlayer.x,
+            y: localPlayer.y,
+            dir: localPlayer.dir,
+            animFrame: localPlayer.animFrame,
+            speech: '',
+            emote: '',
+            lastSeen: Date.now()
           });
 
-          remotePlayers = updatedRemotes;
-          onlineCount.textContent = `${onlineTotal + 1} Siswa Online`;
-          playersList.innerHTML = `<li class="flex items-center gap-2 bg-indigo-900/60 p-2 rounded-lg border border-indigo-500/50">
-            <span class="w-2.5 h-2.5 rounded-full bg-yellow-400"></span>
-            <span class="font-bold text-yellow-300">${localPlayer.name} (Kamu)</span>
-          </li>` + listMarkup.join('');
-        }, (err) => console.error("Player sync error:", err));
+          onSnapshot(playersColl, (snapshot) => {
+            const updatedRemotes = {};
+            let onlineTotal = 0;
+            const listMarkup = [];
 
-        // Listen for live global chat messages
-        const chatColl = collection(db, 'artifacts', appId, 'public', 'data', 'chatMessages');
-        unsubscribeChat = onSnapshot(chatColl, (snapshot) => {
-          const messages = [];
-          snapshot.forEach(docSnap => messages.push(docSnap.data()));
-          
-          // Sort manually in memory (Rule 2: avoid compound index requirements)
-          messages.sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
-          
-          // Render recent 15 messages
-          const recent = messages.slice(-15);
-          chatMessages.innerHTML = recent.map(m => `
-            <div class="leading-tight">
-              <span class="font-bold text-indigo-300">${m.sender}:</span>
-              <span class="text-slate-100">${m.text}</span>
-            </div>
-          `).join('');
-          chatMessages.scrollTop = chatMessages.scrollHeight;
-        }, (err) => console.error("Chat sync error:", err));
+            snapshot.forEach((docSnap) => {
+              const data = docSnap.data();
+              if (data.id && data.id !== localPlayer.id) {
+                if (Date.now() - (data.lastSeen || 0) < 25000) {
+                  updatedRemotes[data.id] = data;
+                  onlineTotal++;
+                  listMarkup.push(`<li class="flex items-center gap-2 bg-slate-800/80 p-2 rounded-lg">
+                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
+                    <span class="font-bold text-white">${data.name}</span>
+                  </li>`);
+                }
+              }
+            });
 
-        // Clean cleanup on window leave
-        window.addEventListener('beforeunload', async () => {
-          if (localPlayer.id) {
-            await deleteDoc(playerDocRef).catch(() => {});
-          }
-        });
+            remotePlayers = updatedRemotes;
+            onlineCount.textContent = `${onlineTotal + 1} Siswa Online`;
+            playersList.innerHTML = `<li class="flex items-center gap-2 bg-indigo-900/60 p-2 rounded-lg border border-indigo-500/50">
+              <span class="w-2.5 h-2.5 rounded-full bg-yellow-400"></span>
+              <span class="font-bold text-yellow-300">${localPlayer.name} (Kamu)</span>
+            </li>` + listMarkup.join('');
+          }, (err) => console.error("Players sync:", err));
 
+          const chatColl = collection(db, 'artifacts', appId, 'public', 'data', 'chatMessages');
+          onSnapshot(chatColl, (snapshot) => {
+            const messages = [];
+            snapshot.forEach(docSnap => messages.push(docSnap.data()));
+            messages.sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
+
+            const recent = messages.slice(-15);
+            chatMessages.innerHTML = recent.map(m => `
+              <div class="leading-tight">
+                <span class="font-bold text-indigo-300">${m.sender}:</span>
+                <span class="text-slate-100">${m.text}</span>
+              </div>
+            `).join('');
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+          }, (err) => console.error("Chat sync:", err));
+
+          window.addEventListener('beforeunload', async () => {
+            if (localPlayer.id) {
+              await deleteDoc(playerDocRef).catch(() => {});
+            }
+          });
+        }
       } catch (err) {
-        console.error("Firebase auth/join failed:", err);
+        console.warn("Multiplayer connection running in standalone mode:", err);
       }
     }
 
     async function syncPositionToFirebase() {
-      if (!localPlayer.id) return;
+      if (!localPlayer.id || !db) return;
       const playerDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'players', localPlayer.id);
       try {
         await setDoc(playerDocRef, {
@@ -1087,7 +1182,7 @@
       } catch (e) {}
     }
 
-    // --- EVENT LISTENERS & UI ACTIONS ---
+    // --- UI EVENT LISTENERS ---
     btnJoin.onclick = () => {
       const name = inputName.value.trim();
       if (!name) {
@@ -1104,28 +1199,28 @@
       requestAnimationFrame(mainLoop);
     };
 
-    // Chat Sending
     async function sendChatMessage() {
       const msg = chatInput.value.trim();
       if (!msg || !localPlayer.id) return;
 
       localPlayer.speech = msg;
-      localPlayer.speechTimer = 5; // 5 seconds display
+      localPlayer.speechTimer = 5;
       chatInput.value = '';
       chatInput.blur();
 
       sound.playChat();
       syncPositionToFirebase();
 
-      // Add to Chat Collection
-      try {
-        const chatColl = collection(db, 'artifacts', appId, 'public', 'data', 'chatMessages');
-        await addDoc(chatColl, {
-          sender: localPlayer.name,
-          text: msg,
-          createdAt: Date.now()
-        });
-      } catch (e) {}
+      if (db) {
+        try {
+          const chatColl = collection(db, 'artifacts', appId, 'public', 'data', 'chatMessages');
+          await addDoc(chatColl, {
+            sender: localPlayer.name,
+            text: msg,
+            createdAt: Date.now()
+          });
+        } catch (e) {}
+      }
     }
 
     btnSendChat.onclick = sendChatMessage;
@@ -1133,24 +1228,42 @@
       if (e.key === 'Enter') sendChatMessage();
     };
 
-    // Quick Emotes
     document.querySelectorAll('.btn-emote').forEach(btn => {
       btn.onclick = () => {
         const emo = btn.dataset.emote;
         localPlayer.emote = emo;
-        localPlayer.emoteTimer = 3; // 3 sec float
+        localPlayer.emoteTimer = 3;
         sound.playEmote();
         syncPositionToFirebase();
       };
     });
 
-    // Modals
     document.getElementById('btnTogglePlayers').onclick = () => playersModal.classList.remove('hidden');
     document.getElementById('btnClosePlayers').onclick = () => playersModal.classList.add('hidden');
     document.getElementById('btnHelp').onclick = () => document.getElementById('helpModal').classList.remove('hidden');
     document.getElementById('btnCloseHelp').onclick = () => document.getElementById('helpModal').classList.add('hidden');
 
-    // Audio Toggle
+    // Config Modal
+    const configModal = document.getElementById('configModal');
+    document.getElementById('btnOpenConfig').onclick = () => configModal.classList.remove('hidden');
+    document.getElementById('btnCloseConfig').onclick = () => configModal.classList.add('hidden');
+    document.getElementById('btnSaveConfig').onclick = () => {
+      const text = document.getElementById('firebaseConfigText').value.trim();
+      if (text) {
+        try {
+          JSON.parse(text);
+          localStorage.setItem('custom_firebase_config', text);
+          window.location.reload();
+        } catch(e) {
+          alert('JSON Config tidak valid!');
+        }
+      }
+    };
+    document.getElementById('btnClearConfig').onclick = () => {
+      localStorage.removeItem('custom_firebase_config');
+      window.location.reload();
+    };
+
     const btnSound = document.getElementById('btnSound');
     btnSound.onclick = () => {
       sound.muted = !sound.muted;
