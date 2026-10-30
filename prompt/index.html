@@ -429,6 +429,260 @@
             </div>
         </div>
 
+        <!-- SECTION PERBEDAAN PGTC VS PARTS FRAMEWORK -->
+<section class="pgtc-parts-section">
+    <style>
+        .pgtc-parts-section {
+            font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+            background-color: #f8fafc;
+            color: #0f172a;
+            padding: 2.5rem 1.5rem;
+            border-radius: 1rem;
+            border: 1px solid #e2e8f0;
+            max-width: 1200px;
+            margin: 2rem auto;
+        }
+
+        .pgtc-parts-header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .pgtc-parts-header h2 {
+            font-size: 1.875rem;
+            font-weight: 800;
+            color: #0b192c;
+            margin-bottom: 0.5rem;
+        }
+
+        .pgtc-parts-header p {
+            color: #64748b;
+            font-size: 0.95rem;
+        }
+
+        /* GRID COMPARISON */
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .framework-card {
+            background-color: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.875rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .framework-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 15px -3px rgba(11, 25, 44, 0.1);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            font-size: 0.75rem;
+            font-weight: 700;
+            border-radius: 9999px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 1rem;
+        }
+
+        .badge-pgtc {
+            background-color: #dbeafe;
+            color: #1e40af;
+        }
+
+        .badge-parts {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+
+        .framework-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #0b192c;
+            margin-bottom: 0.75rem;
+        }
+
+        .element-list {
+            list-style: none;
+            padding: 0;
+            margin: 1rem 0;
+        }
+
+        .element-list li {
+            font-size: 0.875rem;
+            padding: 0.4rem 0;
+            border-bottom: 1px dashed #f1f5f9;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+
+        .element-list li strong {
+            color: #1e293b;
+            min-width: 90px;
+        }
+
+        /* COMPARISON TABLE */
+        .table-container {
+            background-color: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.875rem;
+            overflow: hidden;
+            margin-bottom: 2.5rem;
+        }
+
+        .diff-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.875rem;
+        }
+
+        .diff-table th {
+            background-color: #0b192c;
+            color: #ffffff;
+            padding: 0.875rem 1rem;
+            font-weight: 600;
+        }
+
+        .diff-table td {
+            padding: 0.875rem 1rem;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .diff-table tr:nth-child(even) {
+            background-color: #f8fafc;
+        }
+
+        /* EXAMPLES SECTION */
+        .example-box {
+            background-color: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.875rem;
+            padding: 1.5rem;
+        }
+
+        .example-title {
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: #0b192c;
+            margin-bottom: 1rem;
+        }
+
+        .prompt-code {
+            background-color: #0f172a;
+            color: #f8fafc;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            font-family: monospace;
+            font-size: 0.825rem;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            margin-top: 0.5rem;
+        }
+    </style>
+
+    <!-- HEADER -->
+    <div class="pgtc-parts-header">
+        <h2>Perbandingan Framework Prompting: PGTC vs. PARTS</h2>
+        <p>Memahami struktur penyusunan prompt untuk mengoptimalkan keluaran Kecerdasan Artifisial (KA)</p>
+    </div>
+
+    <!-- CARDS BREAKDOWN -->
+    <div class="comparison-grid">
+        <!-- PGTC CARD -->
+        <div class="framework-card">
+            <span class="badge badge-pgtc">Ringkas & Praktis</span>
+            <h3 class="framework-title">Kerangka Kerja PGTC</h3>
+            <p style="font-size: 0.85rem; color: #64748b;">
+                Kerangka kerja terstruktur yang berfokus pada inti instruksi dan konteks dasar[cite: 6]. Cocok untuk tugas instruksional harian dan pembuatan konten umum.
+            </p>
+            <ul class="element-list">
+                <li><strong>P - Persona:</strong> Peran/profesi yang dijalankan KA[cite: 6].</li>
+                <li><strong>G - Goal:</strong> Hasil/tujuan akhir yang ingin dicapai[cite: 6].</li>
+                <li><strong>T - Task:</strong> Perintah spesifik yang dikerjakan[cite: 6].</li>
+                <li><strong>C - Context:</strong> Latar belakang & batasan[cite: 6].</li>
+            </ul>
+        </div>
+
+        <!-- PARTS CARD -->
+        <div class="framework-card">
+            <span class="badge badge-parts">Detail & Granular</span>
+            <h3 class="framework-title">Framework PARTS</h3>
+            <p style="font-size: 0.85rem; color: #64748b;">
+                Kerangka kerja yang memisahkan elemen format hasil, gaya bahasa, dan skenario secara eksplisit. Cocok untuk proyek kompleks atau teknis.
+            </p>
+            <ul class="element-list">
+                <li><strong>P - Persona:</strong> Identitas/peran spesifik KA.</li>
+                <li><strong>A - Action:</strong> Tindakan/perintah utama yang dijalankan.</li>
+                <li><strong>R - Result:</strong> Format & struktur output yang diharapkan.</li>
+                <li><strong>T - Tone:</strong> Gaya bahasa & nada penyampaian.</li>
+                <li><strong>S - Specifics:</strong> Skenario, kriteria khusus, & batasan.</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- DIFFERENCE TABLE -->
+    <div class="table-container">
+        <table class="diff-table">
+            <thead>
+                <tr>
+                    <th>Aspek Perbandingan</th>
+                    <th>PGTC (Persona, Goal, Task, Context)</th>
+                    <th>PARTS (Persona, Action, Result, Tone, Specifics)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Fokus Utama</strong></td>
+                    <td>Kekuatan inti instruksi dan konteks pembelajaran.</td>
+                    <td>Rincian bentuk luaran (*Result*) dan gaya bahasa (*Tone*).</td>
+                </tr>
+                <tr>
+                    <td><strong>Tingkat Aksesibilitas</strong></td>
+                    <td>Sangat mudah dipahami dan diingat pemula.</td>
+                    <td>Membutuhkan kontrol variabel prompt yang lebih rinci.</td>
+                </tr>
+                <tr>
+                    <td><strong>Pengaturan Format Output</strong></td>
+                    <td>Digabung ke dalam bagian *Context* atau *Task*.</td>
+                    <td>Memiliki komponen tersendiri (*Result/Output Format*).</td>
+                </tr>
+                <tr>
+                    <td><strong>Kasus Penggunaan Terbaik</strong></td>
+                    <td>Rencana pembelajaran, artikel singkat, tugas sekolah.</td>
+                    <td>Draf profesional, Laporan teknis, materi pemasaran berstandar.</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- CONCRETE EXAMPLES SECTION -->
+    <div class="example-box">
+        <h3 class="example-title">Studi Kasus Perbandingan Prompt: Kampanye Keamanan Data Digital</h3>
+        
+        <!-- PGTC EXAMPLE -->
+        <div style="margin-bottom: 1.5rem;">
+            <h4 style="font-size: 0.95rem; font-weight: 700; color: #1e40af; margin-bottom: 0.25rem;">1. Contoh Implementasi PGTC</h4>
+            <div class="prompt-code">"Bertindaklah sebagai Spesialis Keamanan Siber (Persona). Tujuan saya adalah meningkatkan kesadaran remaja tentang keamanan data pribadi di media sosial (Goal). Buatkan 5 tips praktis menjaga data pribadi (Task) yang ditujukan untuk siswa SMP dengan gaya bahasa yang santai dan mudah dipahami, serta hindari istilah yang terlalu teknis (Context)."</div>
+        </div>
+
+        <!-- PARTS EXAMPLE -->
+        <div>
+            <h4 style="font-size: 0.95rem; font-weight: 700; color: #92400e; margin-bottom: 0.25rem;">2. Contoh Implementasi PARTS</h4>
+            <div class="prompt-code">"Bertindaklah sebagai Edukator Keamanan Siber Remaja (Persona). Susun draf materi edukasi tentang keamanan data pribadi (Action). Sajikan hasil dalam bentuk 5 poin terstruktur, di mana tiap poin memiliki judul cetak tebal dan penjelasan maksimal 2 kalimat (Result). Gunakan nada bahasa yang komunikatif, ramah, dan persuasif (Tone). Skenario ini ditujukan untuk siswa SMP pengguna Instagram/TikTok, dan pastikan tidak menyebutkan merk aplikasi tertentu (Specifics)."</div>
+        </div>
+    </div>
+</section>
+        
         <!-- TAB CONTENT 4: SIMULATOR / GENERATOR PROMPT PGTC -->
         <div id="content-generator" class="tab-content hidden space-y-6">
             <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-6">
@@ -516,6 +770,259 @@
                                 <input type="radio" name="q2" value="C" class="accent-midnight-900"> C. Pattern (Pola)
                             </label>
                         </div>
+                        <!-- SECTION PERBEDAAN PGTC VS PARTS FRAMEWORK -->
+<section class="pgtc-parts-section">
+    <style>
+        .pgtc-parts-section {
+            font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+            background-color: #f8fafc;
+            color: #0f172a;
+            padding: 2.5rem 1.5rem;
+            border-radius: 1rem;
+            border: 1px solid #e2e8f0;
+            max-width: 1200px;
+            margin: 2rem auto;
+        }
+
+        .pgtc-parts-header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .pgtc-parts-header h2 {
+            font-size: 1.875rem;
+            font-weight: 800;
+            color: #0b192c;
+            margin-bottom: 0.5rem;
+        }
+
+        .pgtc-parts-header p {
+            color: #64748b;
+            font-size: 0.95rem;
+        }
+
+        /* GRID COMPARISON */
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .framework-card {
+            background-color: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.875rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .framework-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 15px -3px rgba(11, 25, 44, 0.1);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            font-size: 0.75rem;
+            font-weight: 700;
+            border-radius: 9999px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 1rem;
+        }
+
+        .badge-pgtc {
+            background-color: #dbeafe;
+            color: #1e40af;
+        }
+
+        .badge-parts {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+
+        .framework-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #0b192c;
+            margin-bottom: 0.75rem;
+        }
+
+        .element-list {
+            list-style: none;
+            padding: 0;
+            margin: 1rem 0;
+        }
+
+        .element-list li {
+            font-size: 0.875rem;
+            padding: 0.4rem 0;
+            border-bottom: 1px dashed #f1f5f9;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+
+        .element-list li strong {
+            color: #1e293b;
+            min-width: 90px;
+        }
+
+        /* COMPARISON TABLE */
+        .table-container {
+            background-color: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.875rem;
+            overflow: hidden;
+            margin-bottom: 2.5rem;
+        }
+
+        .diff-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.875rem;
+        }
+
+        .diff-table th {
+            background-color: #0b192c;
+            color: #ffffff;
+            padding: 0.875rem 1rem;
+            font-weight: 600;
+        }
+
+        .diff-table td {
+            padding: 0.875rem 1rem;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .diff-table tr:nth-child(even) {
+            background-color: #f8fafc;
+        }
+
+        /* EXAMPLES SECTION */
+        .example-box {
+            background-color: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.875rem;
+            padding: 1.5rem;
+        }
+
+        .example-title {
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: #0b192c;
+            margin-bottom: 1rem;
+        }
+
+        .prompt-code {
+            background-color: #0f172a;
+            color: #f8fafc;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            font-family: monospace;
+            font-size: 0.825rem;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            margin-top: 0.5rem;
+        }
+    </style>
+
+    <!-- HEADER -->
+    <div class="pgtc-parts-header">
+        <h2>Perbandingan Framework Prompting: PGTC vs. PARTS</h2>
+        <p>Memahami struktur penyusunan prompt untuk mengoptimalkan keluaran Kecerdasan Artifisial (KA)</p>
+    </div>
+
+    <!-- CARDS BREAKDOWN -->
+    <div class="comparison-grid">
+        <!-- PGTC CARD -->
+        <div class="framework-card">
+            <span class="badge badge-pgtc">Ringkas & Praktis</span>
+            <h3 class="framework-title">Kerangka Kerja PGTC</h3>
+            <p style="font-size: 0.85rem; color: #64748b;">
+                Kerangka kerja terstruktur yang berfokus pada inti instruksi dan konteks dasar[cite: 6]. Cocok untuk tugas instruksional harian dan pembuatan konten umum.
+            </p>
+            <ul class="element-list">
+                <li><strong>P - Persona:</strong> Peran/profesi yang dijalankan KA[cite: 6].</li>
+                <li><strong>G - Goal:</strong> Hasil/tujuan akhir yang ingin dicapai[cite: 6].</li>
+                <li><strong>T - Task:</strong> Perintah spesifik yang dikerjakan[cite: 6].</li>
+                <li><strong>C - Context:</strong> Latar belakang & batasan[cite: 6].</li>
+            </ul>
+        </div>
+
+        <!-- PARTS CARD -->
+        <div class="framework-card">
+            <span class="badge badge-parts">Detail & Granular</span>
+            <h3 class="framework-title">Framework PARTS</h3>
+            <p style="font-size: 0.85rem; color: #64748b;">
+                Kerangka kerja yang memisahkan elemen format hasil, gaya bahasa, dan skenario secara eksplisit. Cocok untuk proyek kompleks atau teknis.
+            </p>
+            <ul class="element-list">
+                <li><strong>P - Persona:</strong> Identitas/peran spesifik KA.</li>
+                <li><strong>A - Action:</strong> Tindakan/perintah utama yang dijalankan.</li>
+                <li><strong>R - Result:</strong> Format & struktur output yang diharapkan.</li>
+                <li><strong>T - Tone:</strong> Gaya bahasa & nada penyampaian.</li>
+                <li><strong>S - Specifics:</strong> Skenario, kriteria khusus, & batasan.</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- DIFFERENCE TABLE -->
+    <div class="table-container">
+        <table class="diff-table">
+            <thead>
+                <tr>
+                    <th>Aspek Perbandingan</th>
+                    <th>PGTC (Persona, Goal, Task, Context)</th>
+                    <th>PARTS (Persona, Action, Result, Tone, Specifics)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Fokus Utama</strong></td>
+                    <td>Kekuatan inti instruksi dan konteks pembelajaran.</td>
+                    <td>Rincian bentuk luaran (*Result*) dan gaya bahasa (*Tone*).</td>
+                </tr>
+                <tr>
+                    <td><strong>Tingkat Aksesibilitas</strong></td>
+                    <td>Sangat mudah dipahami dan diingat pemula.</td>
+                    <td>Membutuhkan kontrol variabel prompt yang lebih rinci.</td>
+                </tr>
+                <tr>
+                    <td><strong>Pengaturan Format Output</strong></td>
+                    <td>Digabung ke dalam bagian *Context* atau *Task*.</td>
+                    <td>Memiliki komponen tersendiri (*Result/Output Format*).</td>
+                </tr>
+                <tr>
+                    <td><strong>Kasus Penggunaan Terbaik</strong></td>
+                    <td>Rencana pembelajaran, artikel singkat, tugas sekolah.</td>
+                    <td>Draf profesional, Laporan teknis, materi pemasaran berstandar.</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- CONCRETE EXAMPLES SECTION -->
+    <div class="example-box">
+        <h3 class="example-title">Studi Kasus Perbandingan Prompt: Kampanye Keamanan Data Digital</h3>
+        
+        <!-- PGTC EXAMPLE -->
+        <div style="margin-bottom: 1.5rem;">
+            <h4 style="font-size: 0.95rem; font-weight: 700; color: #1e40af; margin-bottom: 0.25rem;">1. Contoh Implementasi PGTC</h4>
+            <div class="prompt-code">"Bertindaklah sebagai Spesialis Keamanan Siber (Persona). Tujuan saya adalah meningkatkan kesadaran remaja tentang keamanan data pribadi di media sosial (Goal). Buatkan 5 tips praktis menjaga data pribadi (Task) yang ditujukan untuk siswa SMP dengan gaya bahasa yang santai dan mudah dipahami, serta hindari istilah yang terlalu teknis (Context)."</div>
+        </div>
+
+        <!-- PARTS EXAMPLE -->
+        <div>
+            <h4 style="font-size: 0.95rem; font-weight: 700; color: #92400e; margin-bottom: 0.25rem;">2. Contoh Implementasi PARTS</h4>
+            <div class="prompt-code">"Bertindaklah sebagai Edukator Keamanan Siber Remaja (Persona). Susun draf materi edukasi tentang keamanan data pribadi (Action). Sajikan hasil dalam bentuk 5 poin terstruktur, di mana tiap poin memiliki judul cetak tebal dan penjelasan maksimal 2 kalimat (Result). Gunakan nada bahasa yang komunikatif, ramah, dan persuasif (Tone). Skenario ini ditujukan untuk siswa SMP pengguna Instagram/TikTok, dan pastikan tidak menyebutkan merk aplikasi tertentu (Specifics)."</div>
+        </div>
+    </div>
+</section>
                     </div>
 
                     <!-- Q3 -->
