@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal Pembelajaran: Rekayasa Prompt & Gamifikasi KKA</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Font: Plus Jakarta Sans -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                    colors: {
+                        midnight: {
+                            50: '#f0f4f9',
+                            100: '#e0e9f3',
+                            700: '#1e3a8a',
+                            800: '#0f265c',
+                            900: '#0b192c', // Warna Utama Biru Malam
+                            950: '#050c17',
+                        },
+                        accent: {
+                            blue: '#2563eb',
+                            sky: '#0284c7',
+                            amber: '#d97706',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #f8fafc;
+            color: #1e293b;
+        }
+        .tab-btn.active {
+            background-color: #0b192c;
+            color: #ffffff;
+            border-color: #0b192c;
+        }
+        .card-hover {
+            transition: all 0.25s ease-in-out;
+        }
+        .card-hover:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 24px -10px rgba(11, 25, 44, 0.15);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col font-sans antialiased">
+
+    <!-- HEADER / NAVBAR -->
+    <header class="bg-midnight-900 text-white sticky top-0 z-50 shadow-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-wrap justify-between items-center gap-4">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-accent-blue flex items-center justify-center text-white font-bold text-xl shadow-inner">
+                    <i class="fa-solid fa-brain"></i>
+                </div>
+                <div>
+                    <h1 class="text-lg font-bold tracking-tight text-white">EduPrompt & Gamifikasi KKA</h1>
+                    <p class="text-xs text-blue-200">Portal Pembelajaran Interaktif AI & Pedagogi</p>
+                </div>
+            </div>
+            
+            <!-- GAMIFICATION STATS (POINTS & BADGES) -->
+            <div class="flex items-center space-x-4 bg-midnight-800/80 px-4 py-2 rounded-xl border border-midnight-700">
+                <div class="flex items-center space-x-2 text-amber-400 font-semibold text-sm">
+                    <i class="fa-solid fa-star"></i>
+                    <span id="user-points">0 XP</span>
+                </div>
+                <div class="h-4 w-[1px] bg-midnight-700"></div>
+                <div class="flex items-center space-x-2 text-blue-300 font-semibold text-sm">
+                    <i class="fa-solid fa-award"></i>
+                    <span id="user-badge">Pemula Prompt</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- HERO SECTION -->
+    <section class="bg-gradient-to-b from-midnight-900 to-midnight-800 text-white py-10 px-4 sm:px-6 lg:px-8 border-b border-midnight-700">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
+            <div class="space-y-3 max-w-2xl">
+                <span class="bg-accent-blue/20 text-blue-300 border border-accent-blue/30 text-xs px-3 py-1 rounded-full font-semibold uppercase tracking-wider">
+                    Kurikulum Koding & KA
+                </span>
+                <h2 class="text-3xl sm:text-4xl font-extrabold text-white leading-tight">
+                    Kuasai Rekayasa Prompt & Sintaks Gamifikasi
+                </h2>
+                <p class="text-slate-300 text-sm sm:text-base">
+                    Eksplorasi unsur-unsur prompt efektif, kerangka PGTC, studi kasus Hari Guru 2026, hingga penerapan alur gamifikasi dalam pembelajaran modern.
+                </p>
+            </div>
+            <!-- Progress Card -->
+            <div class="w-full md:w-80 bg-white/10 backdrop-blur-md rounded-2xl p-5 border border-white/10 text-white space-y-3">
+                <div class="flex justify-between text-xs font-semibold">
+                    <span>Kemajuan Belajar</span>
+                    <span id="progress-percent">0%</span>
+                </div>
+                <div class="w-full bg-midnight-950/60 rounded-full h-2.5 overflow-hidden">
+                    <div id="progress-bar" class="bg-accent-blue h-2.5 rounded-full transition-all duration-500" style="width: 0%"></div>
+                </div>
+                <p class="text-xs text-slate-300 italic">Selesaikan kuis untuk menaikkan level dan badge Anda!</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- MAIN CONTAINER -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <!-- NAVIGATION TABS -->
+        <div class="flex flex-wrap gap-2 mb-8 border-b border-slate-200 pb-4">
+            <button onclick="switchTab('modul1')" id="tab-modul1" class="tab-btn active px-4 py-2.5 rounded-xl text-sm font-semibold border border-slate-300 flex items-center gap-2">
+                <i class="fa-solid fa-list-check"></i> 1. Unsur & Teknik Prompt
+            </button>
+            <button onclick="switchTab('modul2')" id="tab-modul2" class="tab-btn px-4 py-2.5 rounded-xl text-sm font-semibold border border-slate-300 bg-white text-slate-700 hover:bg-slate-100 flex items-center gap-2">
+                <i class="fa-solid fa-bullseye"></i> 2. Kerangka PGTC & Kasus
+            </button>
+            <button onclick="switchTab('modul3')" id="tab-modul3" class="tab-btn px-4 py-2.5 rounded-xl text-sm font-semibold border border-slate-300 bg-white text-slate-700 hover:bg-slate-100 flex items-center gap-2">
+                <i class="fa-solid fa-gamepad"></i> 3. Sintaks Gamifikasi KKA
+            </button>
+            <button onclick="switchTab('generator')" id="tab-generator" class="tab-btn px-4 py-2.5 rounded-xl text-sm font-semibold border border-slate-300 bg-white text-slate-700 hover:bg-slate-100 flex items-center gap-2">
+                <i class="fa-solid fa-wand-magic-sparkles text-amber-600"></i> Generator Prompt PGTC
+            </button>
+            <button onclick="switchTab('kuis')" id="tab-kuis" class="tab-btn px-4 py-2.5 rounded-xl text-sm font-semibold border border-slate-300 bg-white text-slate-700 hover:bg-slate-100 flex items-center gap-2">
+                <i class="fa-solid fa-pen-to-square text-accent-blue"></i> Kuis Interaktif
+            </button>
+        </div>
+
+        <!-- TAB CONTENT 1: UNSUR & TEKNIK PROMPT -->
+        <div id="content-modul1" class="tab-content space-y-6">
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                <h3 class="text-xl font-bold text-midnight-900 mb-2 flex items-center gap-2">
+                    <i class="fa-solid fa-layer-group text-accent-blue"></i> Unsur-Unsur Utama Prompt Efektif
+                </h3>
+                <p class="text-slate-600 text-sm mb-6">Penjelasan lengkap beserta contoh penerapan komponen rekayasa prompt.</p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <!-- Card 1 -->
+                    <div class="p-4 rounded-xl border border-slate-200 bg-slate-50 card-hover space-y-2">
+                        <div class="flex items-center gap-2 font-bold text-midnight-900 text-base">
+                            <span class="w-6 h-6 rounded-full bg-midnight-900 text-white text-xs flex items-center justify-center">1</span>
+                            Instruksi (Task)
+                        </div>
+                        <p class="text-xs text-slate-600">Perintah spesifik utama yang harus dilaksanakan oleh AI.</p>
+                        <div class="bg-white p-2.5 rounded-lg border border-slate-200 text-xs font-mono text-slate-700">
+                            "Tuliskan puisi tentang hujan."
+                        </div>
+                    </div>
+
+                    <!-- Card 2 -->
+                    <div class="p-4 rounded-xl border border-slate-200 bg-slate-50 card-hover space-y-2">
+                        <div class="flex items-center gap-2 font-bold text-midnight-900 text-base">
+                            <span class="w-6 h-6 rounded-full bg-midnight-900 text-white text-xs flex items-center justify-center">2</span>
+                            Konteks (Background)
+                        </div>
+                        <p class="text-xs text-slate-600">Latar belakang situasi, sasaran audiens, atau tujuan umum.</p>
+                        <div class="bg-white p-2.5 rounded-lg border border-slate-200 text-xs font-mono text-slate-700">
+                            "Sebagai guru biologi, jelaskan fotosintesis untuk siswa SMP."
+                        </div>
+                    </div>
+
+                    <!-- Card 3 -->
+                    <div class="p-4 rounded-xl border border-slate-200 bg-slate-50 card-hover space-y-2">
+                        <div class="flex items-center gap-2 font-bold text-midnight-900 text-base">
+                            <span class="w-6 h-6 rounded-full bg-midnight-900 text-white text-xs flex items-center justify-center">3</span>
+                            Data / Input Spesifik
+                        </div>
+                        <p class="text-xs text-slate-600">Informasi atau data mentah yang diberikan untuk diproses.</p>
+                        <div class="bg-white p-2.5 rounded-lg border border-slate-200 text-xs font-mono text-slate-700">
+                            "Ringkas artikel berikut: [sisipkan teks artikel]"
+                        </div>
+                    </div>
+
+                    <!-- Card 4 -->
+                    <div class="p-4 rounded-xl border border-slate-200 bg-slate-50 card-hover space-y-2">
+                        <div class="flex items-center gap-2 font-bold text-midnight-900 text-base">
+                            <span class="w-6 h-6 rounded-full bg-midnight-900 text-white text-xs flex items-center justify-center">4</span>
+                            Contoh (Examples / Few-Shot)
+                        </div>
+                        <p class="text-xs text-slate-600">Sampel pemicu untuk memandu pola atau format output.</p>
+                        <div class="bg-white p-2.5 rounded-lg border border-slate-200 text-xs font-mono text-slate-700">
+                            "Format: User: Apa kabar? | AI: Saya baik!"
+                        </div>
+                    </div>
+
+                    <!-- Card 5 -->
+                    <div class="p-4 rounded-xl border border-slate-200 bg-slate-50 card-hover space-y-2">
+                        <div class="flex items-center gap-2 font-bold text-midnight-900 text-base">
+                            <span class="w-6 h-6 rounded-full bg-midnight-900 text-white text-xs flex items-center justify-center">5</span>
+                            Peran (Role Specification)
+                        </div>
+                        <p class="text-xs text-slate-600">Instruksi meminta AI bertindak sebagai profesi/ahli tertentu.</p>
+                        <div class="bg-white p-2.5 rounded-lg border border-slate-200 text-xs font-mono text-slate-700">
+                            "Berperan sebagai dokter spesialis anak..."
+                        </div>
+                    </div>
+
+                    <!-- Card 6 -->
+                    <div class="p-4 rounded-xl border border-slate-200 bg-slate-50 card-hover space-y-2">
+                        <div class="flex items-center gap-2 font-bold text-midnight-900 text-base">
+                            <span class="w-6 h-6 rounded-full bg-midnight-900 text-white text-xs flex items-center justify-center">6</span>
+                            Gaya & Nada (Tone/Style)
+                        </div>
+                        <p class="text-xs text-slate-600">Pengaturan nuansa bahasa sesuai audiens target.</p>
+                        <div class="bg-white p-2.5 rounded-lg border border-slate-200 text-xs font-mono text-slate-700">
+                            "Gunakan bahasa ramah, santai, namun profesional."
+                        </div>
+                    </div>
+
+                    <!-- Card 7 -->
+                    <div class="p-4 rounded-xl border border-slate-200 bg-slate-50 card-hover space-y-2">
+                        <div class="flex items-center gap-2 font-bold text-midnight-900 text-base">
+                            <span class="w-6 h-6 rounded-full bg-midnight-900 text-white text-xs flex items-center justify-center">7</span>
+                            Batasan (Constraints)
+                        </div>
+                        <p class="text-xs text-slate-600">Aturan atau larangan hal yang tidak boleh disajikan.</p>
+                        <div class="bg-white p-2.5 rounded-lg border border-slate-200 text-xs font-mono text-slate-700">
+                            "Hindari istilah teknis yang terlalu rumit."
+                        </div>
+                    </div>
+
+                    <!-- Card 8 -->
+                    <div class="p-4 rounded-xl border border-slate-200 bg-slate-50 card-hover space-y-2">
+                        <div class="flex items-center gap-2 font-bold text-midnight-900 text-base">
+                            <span class="w-6 h-6 rounded-full bg-midnight-900 text-white text-xs flex items-center justify-center">8</span>
+                            Parameter Teknis
+                        </div>
+                        <p class="text-xs text-slate-600">Batas fisik respon (Max Tokens) & Kreativitas (Temperature 0.0–1.0).</p>
+                        <div class="bg-white p-2.5 rounded-lg border border-slate-200 text-xs font-mono text-slate-700">
+                            "Maksimal 100 kata. Temperature: 0.7"
+                        </div>
+                    </div>
+
+                    <!-- Card 9 -->
+                    <div class="p-4 rounded-xl border border-slate-200 bg-slate-50 card-hover space-y-2">
+                        <div class="flex items-center gap-2 font-bold text-midnight-900 text-base">
+                            <span class="w-6 h-6 rounded-full bg-midnight-900 text-white text-xs flex items-center justify-center">9</span>
+                            Iterative Refinement
+                        </div>
+                        <p class="text-xs text-slate-600">Proses revisi dan penyempurnaan berdasarkan respon sebelumnya.</p>
+                        <div class="bg-white p-2.5 rounded-lg border border-slate-200 text-xs font-mono text-slate-700">
+                            "Revisi poin ke-2 dengan menambahkan contoh nyata."
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Zero-Shot vs Few-Shot -->
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="space-y-3">
+                    <h4 class="font-bold text-midnight-900 flex items-center gap-2">
+                        <i class="fa-solid fa-bolt text-amber-500"></i> Zero-Shot Prompting
+                    </h4>
+                    <p class="text-xs text-slate-600">Instruksi langsung tanpa memberikan sampel/contoh jawaban terlebih dahulu. Cocok untuk tugas umum/sederhana.</p>
+                    <div class="bg-midnight-50 p-3 rounded-xl border border-midnight-100 text-xs font-mono">
+                        <strong>Prompt:</strong> "Tuliskan pengertian Internet of Things (IoT)."
+                    </div>
+                </div>
+
+                <div class="space-y-3">
+                    <h4 class="font-bold text-midnight-900 flex items-center gap-2">
+                        <i class="fa-solid fa-list-ol text-accent-blue"></i> Few-Shot Prompting
+                    </h4>
+                    <p class="text-xs text-slate-600">Menyertakan beberapa contoh (2-5 sampel) agar AI memahami pola dan format ketat yang diinginkan.</p>
+                    <div class="bg-midnight-50 p-3 rounded-xl border border-midnight-100 text-xs font-mono">
+                        1. "Sangat bagus!" -> Positif<br>
+                        2. "Pengiriman lambat." -> Negatif<br>
+                        3. "Kecewa dengan layanan ini." -> ...
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB CONTENT 2: KERANGKA PGTC & STUDI KASUS -->
+        <div id="content-modul2" class="tab-content hidden space-y-6">
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                <h3 class="text-xl font-bold text-midnight-900 mb-2 flex items-center gap-2">
+                    <i class="fa-solid fa-cubes text-accent-blue"></i> Kerangka Kerja PGTC
+                </h3>
+                <p class="text-slate-600 text-sm mb-6">Struktur terpadu untuk membangun prompt yang utuh dan presisi tinggi.</p>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                    <div class="p-4 rounded-xl bg-midnight-900 text-white space-y-1">
+                        <div class="text-amber-400 font-extrabold text-2xl">P</div>
+                        <div class="font-bold text-sm">Persona (Peran)</div>
+                        <p class="text-xs text-slate-300">Siapa AI saat merespons (Ahli, Guru, Desainer).</p>
+                    </div>
+                    <div class="p-4 rounded-xl bg-midnight-900 text-white space-y-1">
+                        <div class="text-amber-400 font-extrabold text-2xl">G</div>
+                        <div class="font-bold text-sm">Goal (Tujuan)</div>
+                        <p class="text-xs text-slate-300">Hasil akhir yang ingin dicapai dari output.</p>
+                    </div>
+                    <div class="p-4 rounded-xl bg-midnight-900 text-white space-y-1">
+                        <div class="text-amber-400 font-extrabold text-2xl">T</div>
+                        <div class="font-bold text-sm">Task (Tugas)</div>
+                        <p class="text-xs text-slate-300">Langkah/instruksi kerja spesifik yang dilakukan.</p>
+                    </div>
+                    <div class="p-4 rounded-xl bg-midnight-900 text-white space-y-1">
+                        <div class="text-amber-400 font-extrabold text-2xl">C</div>
+                        <div class="font-bold text-sm">Context (Konteks)</div>
+                        <p class="text-xs text-slate-300">Audiens, batasan, nada bahasa, & skenario.</p>
+                    </div>
+                </div>
+
+                <!-- STUDI KASUS HARI GURU 2026 -->
+                <div class="border-t border-slate-200 pt-6 space-y-4">
+                    <h4 class="font-bold text-midnight-900 text-base flex items-center gap-2">
+                        <i class="fa-solid fa-graduation-cap text-accent-blue"></i> Studi Kasus: Poster Hari Guru Nasional 2026
+                    </h4>
+
+                    <!-- Prompt Chatbot Text -->
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-2">
+                        <div class="flex justify-between items-center">
+                            <span class="font-bold text-xs uppercase text-midnight-900 bg-blue-100 px-2.5 py-1 rounded-md">Prompt Teks / Konsep Poster</span>
+                            <button onclick="copyText('prompt-poster-text')" class="text-xs text-accent-blue font-semibold hover:underline">
+                                <i class="fa-regular fa-copy"></i> Salin Prompt
+                            </button>
+                        </div>
+                        <p id="prompt-poster-text" class="text-xs font-mono text-slate-700 leading-relaxed bg-white p-3 rounded-lg border border-slate-200">
+"Anda adalah seorang desainer grafis profesional (Persona). Saya ingin membuat poster untuk memperingati Hari Guru Nasional 2026 yang akan diunggah di media sosial sekolah (Goal). Buatkan 3 pilihan Headline inspiratif, sub-headline ucapan terima kasih, deskripsi konsep visual (objek gambar & tata letak), serta rekomendasi palet warna (Task). Gunakan bahasa Indonesia yang santun, hangat, inspiratif, dan tidak terlalu panjang (Context & Batasan)."
+                        </p>
+                    </div>
+
+                    <!-- Prompt Image Generator -->
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-2">
+                        <div class="flex justify-between items-center">
+                            <span class="font-bold text-xs uppercase text-midnight-900 bg-amber-100 text-amber-800 px-2.5 py-1 rounded-md">Prompt Image Generator (Midjourney/DALL-E)</span>
+                            <button onclick="copyText('prompt-poster-img')" class="text-xs text-accent-blue font-semibold hover:underline">
+                                <i class="fa-regular fa-copy"></i> Salin Prompt
+                            </button>
+                        </div>
+                        <p id="prompt-poster-img" class="text-xs font-mono text-slate-700 leading-relaxed bg-white p-3 rounded-lg border border-slate-200">
+"A warm and inspiring vector illustration poster for Indonesian National Teacher's Day 2026. A caring Indonesian teacher standing gracefully, guiding smiling students. In the background, modern school elements and glowing light bulbs symbolizing ideas and knowledge. Warm and bright colors, clean layout, digital art style, highly detailed, high resolution."
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB CONTENT 3: SINTAKS GAMIFIKASI KKA -->
+        <div id="content-modul3" class="tab-content hidden space-y-6">
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-6">
+                <div>
+                    <h3 class="text-xl font-bold text-midnight-900 mb-2 flex items-center gap-2">
+                        <i class="fa-solid fa-gamepad text-accent-blue"></i> Sintaks Pembelajaran Berbasis Gamifikasi (KKA)
+                    </h3>
+                    <p class="text-slate-600 text-sm">Alur sistematis penerapan elemen permainan dalam pembelajaran Koding & Kecerdasan Artifisial agar berkesadaran, bermakna, dan menggembirakan (Joyful Learning).</p>
+                </div>
+
+                <!-- 5 Tahapan Sintaks -->
+                <div class="space-y-3">
+                    <div class="flex items-start gap-4 p-4 rounded-xl border border-slate-200 bg-slate-50">
+                        <div class="w-8 h-8 rounded-full bg-midnight-900 text-white font-bold flex items-center justify-center shrink-0 text-sm">1</div>
+                        <div>
+                            <h4 class="font-bold text-midnight-900 text-sm">Orientasi & Penentuan Tantangan (Goal & Challenge Setting)</h4>
+                            <p class="text-xs text-slate-600 mt-1">Pendidik menyampaikan topik, menjelaskan aturan main (rules of play), tantangan (challenge), batas waktu, serta kriteria poin/badge yang bisa didapatkan.</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-4 p-4 rounded-xl border border-slate-200 bg-slate-50">
+                        <div class="w-8 h-8 rounded-full bg-midnight-900 text-white font-bold flex items-center justify-center shrink-0 text-sm">2</div>
+                        <div>
+                            <h4 class="font-bold text-midnight-900 text-sm">Pembagian Peran & Media Permainan (Setup & Asset Distribution)</h4>
+                            <p class="text-xs text-slate-600 mt-1">Siswa dibagi ke dalam tim kecil. Media dibagikan baik secara <em>Unplugged</em> (kartu flowchart/instruksi acak) maupun <em>Plugged</em> (platform kuis, Scratch, atau KA Generatif).</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-4 p-4 rounded-xl border border-slate-200 bg-slate-50">
+                        <div class="w-8 h-8 rounded-full bg-midnight-900 text-white font-bold flex items-center justify-center shrink-0 text-sm">3</div>
+                        <div>
+                            <h4 class="font-bold text-midnight-900 text-sm">Eksekusi Tantangan Berdurasi Terbatas (Action & Time-Bound Gameplay)</h4>
+                            <p class="text-xs text-slate-600 mt-1">Siswa menyelesaikan tantangan atau peran (role-play) secara kolaboratif bergantian (turn-taking) dengan alokasi waktu ketat (1-2 menit per giliran).</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-4 p-4 rounded-xl border border-slate-200 bg-slate-50">
+                        <div class="w-8 h-8 rounded-full bg-midnight-900 text-white font-bold flex items-center justify-center shrink-0 text-sm">4</div>
+                        <div>
+                            <h4 class="font-bold text-midnight-900 text-sm">Uji Coba, Simulasi & Umpan Balik Instan (Trial & Instant Feedback Loop)</h4>
+                            <p class="text-xs text-slate-600 mt-1">Kelompok mensimulasikan hasil kerja. Jika terjadi kesalahan logika (bug), dilakukan analisis kesalahan dan perbaikan langsung (learning from errors).</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-4 p-4 rounded-xl border border-slate-200 bg-slate-50">
+                        <div class="w-8 h-8 rounded-full bg-midnight-900 text-white font-bold flex items-center justify-center shrink-0 text-sm">5</div>
+                        <div>
+                            <h4 class="font-bold text-midnight-900 text-sm">Penilaian, Apresiasi (Badging/Reward) & Refleksi</h4>
+                            <p class="text-xs text-slate-600 mt-1">Pencatatan skor akhir, pemberian badge/gelar prestasi (misal: "Prompter Terbaik"), serta refleksi metakognisi terhadap dinamika kerja sama tim.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Elemen Utama Gamifikasi -->
+                <div class="border-t border-slate-200 pt-6">
+                    <h4 class="font-bold text-midnight-900 text-sm mb-4">Elemen Utama Gamifikasi Pembelajaran:</h4>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
+                        <div class="p-3 rounded-xl border border-slate-200 bg-blue-50/50">
+                            <i class="fa-solid fa-trophy text-amber-500 text-xl mb-1"></i>
+                            <div class="font-bold text-xs text-midnight-900">Challenges</div>
+                            <div class="text-[10px] text-slate-500">Tugas berjenjang</div>
+                        </div>
+                        <div class="p-3 rounded-xl border border-slate-200 bg-blue-50/50">
+                            <i class="fa-solid fa-certificate text-accent-blue text-xl mb-1"></i>
+                            <div class="font-bold text-xs text-midnight-900">Badges & Titles</div>
+                            <div class="text-[10px] text-slate-500">Gelar & Apresiasi</div>
+                        </div>
+                        <div class="p-3 rounded-xl border border-slate-200 bg-blue-50/50">
+                            <i class="fa-solid fa-users text-emerald-600 text-xl mb-1"></i>
+                            <div class="font-bold text-xs text-midnight-900">Role Playing</div>
+                            <div class="text-[10px] text-slate-500">Simulasi Peran</div>
+                        </div>
+                        <div class="p-3 rounded-xl border border-slate-200 bg-blue-50/50">
+                            <i class="fa-solid fa-stopwatch text-rose-500 text-xl mb-1"></i>
+                            <div class="font-bold text-xs text-midnight-900">Time Tracking</div>
+                            <div class="text-[10px] text-slate-500">Batas Waktu Ketat</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB CONTENT 4: SIMULATOR / GENERATOR PROMPT PGTC -->
+        <div id="content-generator" class="tab-content hidden space-y-6">
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-6">
+                <div>
+                    <h3 class="text-xl font-bold text-midnight-900 mb-1 flex items-center gap-2">
+                        <i class="fa-solid fa-wand-magic-sparkles text-amber-500"></i> Generator Prompt PGTC
+                    </h3>
+                    <p class="text-slate-600 text-sm">Susun elemen PGTC di bawah ini untuk menghasilkan prompt profesional secara otomatis.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-midnight-900 mb-1">Persona (Role / Peran AI)</label>
+                        <input type="text" id="gen-persona" placeholder="Contoh: Desainer Grafis / Guru Informatika" class="w-full text-xs p-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-midnight-900 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-midnight-900 mb-1">Goal (Tujuan Utama)</label>
+                        <input type="text" id="gen-goal" placeholder="Contoh: Membuat modul ajar koding interaktif" class="w-full text-xs p-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-midnight-900 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-midnight-900 mb-1">Task (Instruksi Tugas Spesifik)</label>
+                        <input type="text" id="gen-task" placeholder="Contoh: Buatkan 3 studi kasus beserta kunci jawabannya" class="w-full text-xs p-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-midnight-900 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-midnight-900 mb-1">Context & Constraints (Konteks & Batasan)</label>
+                        <input type="text" id="gen-context" placeholder="Contoh: Untuk siswa SMA kelas 10, bahasa santai, maks 500 kata" class="w-full text-xs p-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-midnight-900 outline-none">
+                    </div>
+                </div>
+
+                <button onclick="generatePGTCPrompt()" class="w-full bg-midnight-900 hover:bg-midnight-800 text-white font-bold py-3 rounded-xl text-xs flex items-center justify-center gap-2 transition-all">
+                    <i class="fa-solid fa-gears"></i> Hasilkan Prompt Otomatis
+                </button>
+
+                <!-- Output Display -->
+                <div id="generator-output-container" class="hidden space-y-2">
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs font-bold text-midnight-900 uppercase">Hasil Prompt Terstruktur (PGTC):</span>
+                        <button onclick="copyText('generated-prompt-text')" class="text-xs text-accent-blue font-semibold hover:underline">
+                            <i class="fa-regular fa-copy"></i> Salin Prompt
+                        </button>
+                    </div>
+                    <div id="generated-prompt-text" class="p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs font-mono text-slate-800 leading-relaxed"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB CONTENT 5: KUIS INTERAKTIF -->
+        <div id="content-kuis" class="tab-content hidden space-y-6">
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-6">
+                <div>
+                    <h3 class="text-xl font-bold text-midnight-900 mb-1 flex items-center gap-2">
+                        <i class="fa-solid fa-pen-to-square text-accent-blue"></i> Kuis Evaluasi Pemahaman
+                    </h3>
+                    <p class="text-slate-600 text-sm">Jawab pertanyaan berikut untuk menguji pemahaman dan raih poin XP!</p>
+                </div>
+
+                <div id="quiz-container" class="space-y-6">
+                    <!-- Q1 -->
+                    <div class="p-4 rounded-xl border border-slate-200 bg-slate-50 space-y-3">
+                        <div class="font-bold text-sm text-midnight-900">1. Unsur prompt yang berfungsi memberikan instruksi spesifik utama yang harus dilakukan oleh AI adalah...</div>
+                        <div class="space-y-2 text-xs">
+                            <label class="flex items-center gap-2 p-2.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-100 cursor-pointer">
+                                <input type="radio" name="q1" value="A" class="accent-midnight-900"> A. Context (Konteks)
+                            </label>
+                            <label class="flex items-center gap-2 p-2.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-100 cursor-pointer">
+                                <input type="radio" name="q1" value="B" class="accent-midnight-900"> B. Task (Instruksi Utama)
+                            </label>
+                            <label class="flex items-center gap-2 p-2.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-100 cursor-pointer">
+                                <input type="radio" name="q1" value="C" class="accent-midnight-900"> C. Constraints (Batasan)
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Q2 -->
+                    <div class="p-4 rounded-xl border border-slate-200 bg-slate-50 space-y-3">
+                        <div class="font-bold text-sm text-midnight-900">2. Dalam kerangka PGTC, huruf "P" mewakili...</div>
+                        <div class="space-y-2 text-xs">
+                            <label class="flex items-center gap-2 p-2.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-100 cursor-pointer">
+                                <input type="radio" name="q2" value="A" class="accent-midnight-900"> A. Purpose (Tujuan)
+                            </label>
+                            <label class="flex items-center gap-2 p-2.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-100 cursor-pointer">
+                                <input type="radio" name="q2" value="B" class="accent-midnight-900"> B. Persona (Peran AI)
+                            </label>
+                            <label class="flex items-center gap-2 p-2.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-100 cursor-pointer">
+                                <input type="radio" name="q2" value="C" class="accent-midnight-900"> C. Pattern (Pola)
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Q3 -->
+                    <div class="p-4 rounded-xl border border-slate-200 bg-slate-50 space-y-3">
+                        <div class="font-bold text-sm text-midnight-900">3. Teknik menyusun prompt dengan menyertakan beberapa contoh sampel jawaban terlebih dahulu disebut...</div>
+                        <div class="space-y-2 text-xs">
+                            <label class="flex items-center gap-2 p-2.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-100 cursor-pointer">
+                                <input type="radio" name="q3" value="A" class="accent-midnight-900"> A. Zero-Shot Prompting
+                            </label>
+                            <label class="flex items-center gap-2 p-2.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-100 cursor-pointer">
+                                <input type="radio" name="q3" value="B" class="accent-midnight-900"> B. Few-Shot Prompting
+                            </label>
+                            <label class="flex items-center gap-2 p-2.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-100 cursor-pointer">
+                                <input type="radio" name="q3" value="C" class="accent-midnight-900"> C. Iterative Refinement
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Q4 -->
+                    <div class="p-4 rounded-xl border border-slate-200 bg-slate-50 space-y-3">
+                        <div class="font-bold text-sm text-midnight-900">4. Tahap analisis kesalahan (bug) dan perbaikan langsung pada alur gamifikasi KKA berada pada sintaks...</div>
+                        <div class="space-y-2 text-xs">
+                            <label class="flex items-center gap-2 p-2.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-100 cursor-pointer">
+                                <input type="radio" name="q4" value="A" class="accent-midnight-900"> A. Orientasi & Penentuan Tantangan
+                            </label>
+                            <label class="flex items-center gap-2 p-2.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-100 cursor-pointer">
+                                <input type="radio" name="q4" value="B" class="accent-midnight-900"> B. Trial & Instant Feedback Loop
+                            </label>
+                            <label class="flex items-center gap-2 p-2.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-100 cursor-pointer">
+                                <input type="radio" name="q4" value="C" class="accent-midnight-900"> C. Pembagian Peran
+                            </label>
+                        </div>
+                    </div>
+
+                    <button onclick="submitQuiz()" class="w-full bg-accent-blue hover:bg-blue-700 text-white font-bold py-3 rounded-xl text-xs flex items-center justify-center gap-2 transition-all">
+                        <i class="fa-solid fa-paper-plane"></i> Kirim Jawaban & Raih Poin
+                    </button>
+                </div>
+
+                <!-- Result Alert -->
+                <div id="quiz-result" class="hidden p-4 rounded-xl border border-slate-200 bg-blue-50 text-center space-y-2">
+                    <div id="quiz-score-text" class="font-extrabold text-midnight-900 text-lg"></div>
+                    <p id="quiz-feedback" class="text-xs text-slate-600"></p>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-midnight-950 text-slate-400 py-6 text-center text-xs border-t border-midnight-900 mt-12">
+        <div class="max-w-7xl mx-auto px-4">
+            <p>© 2026 Portal Pembelajaran Rekayasa Prompt & Gamifikasi KKA. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- JAVASCRIPT INTERACTIVITY -->
+    <script>
+        // Tab Switcher
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+                btn.classList.add('bg-white', 'text-slate-700');
+            });
+
+            document.getElementById('content-' + tabName).classList.remove('hidden');
+            const activeBtn = document.getElementById('tab-' + tabName);
+            activeBtn.classList.add('active');
+            activeBtn.classList.remove('bg-white', 'text-slate-700');
+        }
+
+        // Copy Text Function
+        function copyText(elementId) {
+            const text = document.getElementById(elementId).innerText;
+            navigator.clipboard.writeText(text);
+            alert("Prompt berhasil disalin ke clipboard!");
+        }
+
+        // PGTC Generator
+        function generatePGTCPrompt() {
+            const persona = document.getElementById('gen-persona').value || "Seorang Ahli/Profesional";
+            const goal = document.getElementById('gen-goal').value || "Mencapai tujuan spesifik";
+            const task = document.getElementById('gen-task').value || "Melakukan instruksi kerja";
+            const context = document.getElementById('gen-context').value || "Sesuai audiens dan batasan yang ditentukan";
+
+            const resultPrompt = `Bertindaklah sebagai ${persona} (Persona). Tujuan utama saya adalah ${goal} (Goal). 
+
+Tugas Anda:
+${task} (Task).
+
+Konteks & Batasan Tambahan:
+${context} (Context & Constraints).`;
+
+            document.getElementById('generated-prompt-text').innerText = resultPrompt;
+            document.getElementById('generator-output-container').classList.remove('hidden');
+        }
+
+        // Quiz State & Handler
+        let userPoints = 0;
+
+        function submitQuiz() {
+            const answers = {
+                q1: 'B',
+                q2: 'B',
+                q3: 'B',
+                q4: 'B'
+            };
+
+            let score = 0;
+            if (document.querySelector('input[name="q1"]:checked')?.value === answers.q1) score += 25;
+            if (document.querySelector('input[name="q2"]:checked')?.value === answers.q2) score += 25;
+            if (document.querySelector('input[name="q3"]:checked')?.value === answers.q3) score += 25;
+            if (document.querySelector('input[name="q4"]:checked')?.value === answers.q4) score += 25;
+
+            userPoints = score;
+            document.getElementById('user-points').innerText = `${score} XP`;
+            document.getElementById('progress-bar').style.width = `${score}%`;
+            document.getElementById('progress-percent').innerText = `${score}%`;
+
+            let badge = "Pemula Prompt";
+            if (score >= 50 && score < 100) badge = "Praktisi Prompt";
+            if (score === 100) badge = "Master Prompt & Gamifikasi";
+            document.getElementById('user-badge').innerText = badge;
+
+            const quizResult = document.getElementById('quiz-result');
+            quizResult.classList.remove('hidden');
+            document.getElementById('quiz-score-text').innerText = `Skor Anda: ${score} / 100`;
+            document.getElementById('quiz-feedback').innerText = score === 100 
+                ? "Luar biasa! Anda telah menguasai seluruh konsep rekayasa prompt dan gamifikasi KKA!" 
+                : "Bagus! Pelajari kembali modul yang ada untuk mencapai nilai sempurna 100 XP.";
+        }
+    </script>
+</body>
+</html>
