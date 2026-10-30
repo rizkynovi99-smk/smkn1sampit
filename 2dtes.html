@@ -1,0 +1,1162 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Akademi Pixel 2D - Sekolah Multiplayer</title>
+  
+  <!-- Tailwind CSS & Google Pixel Fonts -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background-color: #0d1117;
+      font-family: 'VT323', monospace;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    .font-pixel {
+      font-family: 'Press Start 2P', cursive;
+    }
+
+    canvas {
+      display: block;
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+    }
+
+    /* Custom Scrollbar for Chat */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.2);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #4a5568;
+      border-radius: 3px;
+    }
+
+    /* Touch D-Pad Controls */
+    .dpad-btn {
+      background: rgba(30, 41, 59, 0.7);
+      border: 2px solid #3b82f6;
+      border-radius: 12px;
+      touch-action: manipulation;
+    }
+    .dpad-btn:active {
+      background: rgba(59, 130, 246, 0.8);
+    }
+  </style>
+</head>
+<body class="w-screen h-screen relative bg-slate-950 text-white overflow-hidden">
+
+  <!-- GAME CANVAS -->
+  <canvas id="gameCanvas" class="w-full h-full absolute inset-0 z-0"></canvas>
+
+  <!-- LOBBY / JOIN SCREEN OVERLAY -->
+  <div id="lobbyScreen" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/90 backdrop-blur-md p-4">
+    <div class="bg-slate-900 border-4 border-indigo-600 rounded-2xl p-6 max-w-md w-full shadow-2xl relative text-center">
+      <div class="inline-block bg-indigo-600 text-yellow-300 font-pixel text-xs px-3 py-1 rounded-full mb-3 uppercase tracking-wider">
+        🏫 Game Sekolah Multiplayer
+      </div>
+      <h1 class="font-pixel text-2xl text-yellow-400 mb-2 drop-shadow-md">AKADEMI PIXEL</h1>
+      <p class="text-slate-400 text-lg mb-6">Jelajahi sekolah, sapa teman, & berkumpul secara langsung!</p>
+
+      <!-- Input Name -->
+      <div class="mb-5 text-left">
+        <label class="block font-pixel text-xs text-indigo-300 mb-2">NAMA TAMPILAN (DISPLAY NAME):</label>
+        <input type="text" id="playerNameInput" maxlength="14" placeholder="Ketik namamu..." 
+          class="w-full bg-slate-800 border-2 border-slate-600 focus:border-indigo-500 rounded-xl px-4 py-2 text-xl text-yellow-300 focus:outline-none font-bold" />
+      </div>
+
+      <!-- Character Customizer -->
+      <div class="bg-slate-800/60 rounded-xl p-4 mb-6 border border-slate-700">
+        <label class="block font-pixel text-xs text-indigo-300 mb-3 text-left">KUSTOMISASI KARAKTER:</label>
+        
+        <div class="flex items-center justify-around">
+          <!-- Preview Canvas -->
+          <div class="flex flex-col items-center">
+            <canvas id="previewCanvas" width="64" height="64" class="bg-slate-950 rounded-lg border-2 border-indigo-400/50 mb-1"></canvas>
+            <span class="text-xs text-slate-400">Pratinjau</span>
+          </div>
+
+          <!-- Selectors -->
+          <div class="space-y-2 text-left">
+            <div>
+              <span class="text-sm text-slate-300">Warna Rambut:</span>
+              <div class="flex gap-1.5 mt-1" id="hairColors"></div>
+            </div>
+            <div>
+              <span class="text-sm text-slate-300">Warna Baju:</span>
+              <div class="flex gap-1.5 mt-1" id="shirtColors"></div>
+            </div>
+            <div>
+              <span class="text-sm text-slate-300">Warna Kulit:</span>
+              <div class="flex gap-1.5 mt-1" id="skinColors"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <button id="btnJoinGame" class="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 font-pixel text-sm text-white py-3.5 px-6 rounded-xl shadow-lg border-b-4 border-emerald-800 active:border-b-0 active:translate-y-1 transition-all">
+        MASUK KE SEKOLAH 🚀
+      </button>
+    </div>
+  </div>
+
+  <!-- HUD IN-GAME OVERLAYS -->
+  <div id="gameHUD" class="hidden pointer-events-none fixed inset-0 z-10 flex flex-col justify-between p-3 md:p-5">
+    
+    <!-- Top Bar -->
+    <div class="flex justify-between items-start w-full">
+      <!-- Location & Online Player Count -->
+      <div class="pointer-events-auto flex flex-col gap-2">
+        <div class="bg-slate-900/80 backdrop-blur border-2 border-indigo-500/50 rounded-xl px-3 py-1.5 flex items-center gap-2 shadow-lg">
+          <span class="w-3 h-3 bg-emerald-400 rounded-full animate-pulse"></span>
+          <span class="font-pixel text-xs text-yellow-300" id="locationTag">SEKOLAH UTAMA</span>
+        </div>
+        
+        <button id="btnTogglePlayers" class="bg-slate-900/80 backdrop-blur border border-slate-700 hover:border-slate-500 rounded-xl px-3 py-1.5 text-slate-200 text-sm flex items-center gap-2 transition shadow">
+          👥 <span id="onlineCount">1 Siswa Online</span>
+        </button>
+      </div>
+
+      <!-- Settings / Audio Toggle -->
+      <div class="pointer-events-auto flex gap-2">
+        <button id="btnSound" class="bg-slate-900/80 backdrop-blur border border-slate-700 rounded-xl p-2.5 text-xl hover:bg-slate-800 transition">
+          🔊
+        </button>
+        <button id="btnHelp" class="bg-slate-900/80 backdrop-blur border border-slate-700 rounded-xl p-2.5 text-xl hover:bg-slate-800 transition">
+          ❓
+        </button>
+      </div>
+    </div>
+
+    <!-- Quick Emotes Floating Bar & Chat Bar Bottom -->
+    <div class="w-full max-w-xl mx-auto flex flex-col gap-2 items-center pointer-events-auto">
+      
+      <!-- Emote Bar -->
+      <div class="bg-slate-900/90 backdrop-blur border border-slate-700/80 rounded-full px-3 py-1.5 flex gap-2 shadow-2xl">
+        <button class="btn-emote text-2xl hover:scale-125 transition transform" data-emote="😊">😊</button>
+        <button class="btn-emote text-2xl hover:scale-125 transition transform" data-emote="👋">👋</button>
+        <button class="btn-emote text-2xl hover:scale-125 transition transform" data-emote="❤️">❤️</button>
+        <button class="btn-emote text-2xl hover:scale-125 transition transform" data-emote="⚽">⚽</button>
+        <button class="btn-emote text-2xl hover:scale-125 transition transform" data-emote="📚">📚</button>
+        <button class="btn-emote text-2xl hover:scale-125 transition transform" data-emote="🍕">🍕</button>
+        <button class="btn-emote text-2xl hover:scale-125 transition transform" data-emote="❓">❓</button>
+      </div>
+
+      <!-- Interactive Input Chat Box -->
+      <div class="w-full flex gap-2">
+        <input type="text" id="chatInput" placeholder="Ketik pesan lalu tekan Enter..." maxlength="60"
+          class="flex-1 bg-slate-900/90 backdrop-blur border-2 border-indigo-500/60 rounded-xl px-4 py-2 text-lg text-white placeholder-slate-400 focus:outline-none focus:border-indigo-400 shadow-xl" />
+        <button id="btnSendChat" class="bg-indigo-600 hover:bg-indigo-500 text-white font-pixel text-xs px-4 py-2 rounded-xl border-b-2 border-indigo-800 active:translate-y-0.5 transition shadow-lg">
+          KIRIM
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ONLINE PLAYERS MODAL LIST -->
+  <div id="playersModal" class="hidden fixed inset-0 z-40 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-slate-900 border-2 border-indigo-500 rounded-2xl p-5 max-w-xs w-full shadow-2xl">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="font-pixel text-xs text-yellow-300">SISWA DI SEKOLAH</h3>
+        <button id="btnClosePlayers" class="text-slate-400 hover:text-white text-lg font-bold">✕</button>
+      </div>
+      <ul id="playersList" class="space-y-2 max-h-60 overflow-y-auto text-sm text-slate-200 pr-1"></ul>
+    </div>
+  </div>
+
+  <!-- HELP CONTROLS MODAL -->
+  <div id="helpModal" class="hidden fixed inset-0 z-40 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-slate-900 border-2 border-indigo-500 rounded-2xl p-5 max-w-sm w-full shadow-2xl text-slate-300">
+      <div class="flex justify-between items-center mb-3">
+        <h3 class="font-pixel text-xs text-yellow-300">KONTROL GAME</h3>
+        <button id="btnCloseHelp" class="text-slate-400 hover:text-white text-lg font-bold">✕</button>
+      </div>
+      <div class="space-y-2 text-sm">
+        <p><strong class="text-indigo-400">Keyboard:</strong> Gunakan tombol <span class="bg-slate-800 px-1.5 py-0.5 rounded text-yellow-300 font-pixel text-xs">WASD</span> atau <span class="bg-slate-800 px-1.5 py-0.5 rounded text-yellow-300 font-pixel text-xs">PANAH</span> untuk bergerak.</p>
+        <p><strong class="text-indigo-400">Pesan Live:</strong> Tekan <span class="bg-slate-800 px-1.5 py-0.5 rounded text-yellow-300 font-pixel text-xs">ENTER</span> untuk langsung mengetik pesan.</p>
+        <p><strong class="text-indigo-400">Layar Sentuh (Mobile):</strong> Gunakan Joypad Virtual di bagian kiri bawah layar.</p>
+        <p><strong class="text-indigo-400">Ekspresi:</strong> Klik ikon emotikon di bawah untuk memunculkan gelembung emot di atas karakter.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- VIRTUAL MOBILE DPAD CONTROLS -->
+  <div id="virtualDpad" class="hidden md:hidden fixed bottom-20 left-4 z-30 pointer-events-auto">
+    <div class="relative w-36 h-36">
+      <button id="dpadUp" class="dpad-btn absolute top-0 left-12 w-12 h-12 flex items-center justify-center text-xl">▲</button>
+      <button id="dpadDown" class="dpad-btn absolute bottom-0 left-12 w-12 h-12 flex items-center justify-center text-xl">▼</button>
+      <button id="dpadLeft" class="dpad-btn absolute top-12 left-0 w-12 h-12 flex items-center justify-center text-xl">◀</button>
+      <button id="dpadRight" class="dpad-btn absolute top-12 right-0 w-12 h-12 flex items-center justify-center text-xl">▶</button>
+    </div>
+  </div>
+
+  <!-- CHAT LOG SIDE PANEL (Desktop/Collapsible) -->
+  <div id="chatLogBox" class="hidden md:flex fixed top-20 left-5 z-20 w-72 max-h-52 bg-slate-900/75 backdrop-blur-md border border-slate-800 rounded-xl p-3 flex-col pointer-events-auto shadow-xl">
+    <div class="text-xs text-indigo-300 font-pixel mb-1 border-b border-slate-800 pb-1 flex justify-between">
+      <span>OBROLAN SEKOLAH</span>
+      <span class="text-slate-500">LIVE</span>
+    </div>
+    <div id="chatMessages" class="flex-1 overflow-y-auto space-y-1 text-xs text-slate-300 pr-1"></div>
+  </div>
+
+  <!-- FIREBASE MODULAR SDK IMPORTS -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { 
+      getFirestore, 
+      doc, 
+      setDoc, 
+      deleteDoc, 
+      onSnapshot, 
+      collection, 
+      addDoc, 
+      serverTimestamp 
+    } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+    // --- AUDIO SYNTHESIZER (Web Audio API) ---
+    class RetroSound {
+      constructor() {
+        this.ctx = null;
+        this.muted = false;
+      }
+      init() {
+        if (!this.ctx) {
+          this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+      }
+      playStep() {
+        if (this.muted || !this.ctx) return;
+        try {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(110 + Math.random() * 40, this.ctx.currentTime);
+          gain.gain.setValueAtTime(0.04, this.ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.08);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start();
+          osc.stop(this.ctx.currentTime + 0.08);
+        } catch(e) {}
+      }
+      playChat() {
+        if (this.muted || !this.ctx) return;
+        try {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(523.25, this.ctx.currentTime); // C5
+          osc.frequency.setValueAtTime(659.25, this.ctx.currentTime + 0.08); // E5
+          gain.gain.setValueAtTime(0.1, this.ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.25);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start();
+          osc.stop(this.ctx.currentTime + 0.25);
+        } catch(e) {}
+      }
+      playEmote() {
+        if (this.muted || !this.ctx) return;
+        try {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(400, this.ctx.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(800, this.ctx.currentTime + 0.15);
+          gain.gain.setValueAtTime(0.1, this.ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.15);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start();
+          osc.stop(this.ctx.currentTime + 0.15);
+        } catch(e) {}
+      }
+    }
+    const sound = new RetroSound();
+
+    // --- GAME CONSTANTS & MAP DEFINITION ---
+    const TILE_SIZE = 32;
+    const MAP_COLS = 48;
+    const MAP_ROWS = 36;
+    const MAP_WIDTH = MAP_COLS * TILE_SIZE;  // 1536 px
+    const MAP_HEIGHT = MAP_ROWS * TILE_SIZE; // 1152 px
+
+    // Palette Options
+    const HAIR_COLORS = ['#3b2314', '#e6c875', '#a83232', '#327ba8', '#252525'];
+    const SHIRT_COLORS = ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899'];
+    const SKIN_COLORS = ['#f8d5c2', '#e0ac69', '#8d5524', '#c68642'];
+
+    // Map Tile Codes
+    // 0: Outdoor Grass, 1: Stone Path, 2: Corridor Floor Tile, 3: Classroom Floor, 4: Cafeteria Floor
+    // 10: Solid Wall, 11: Classroom Desk, 12: Chair, 13: Blackboard, 14: Cafeteria Table, 15: Vending Machine, 16: Tree, 17: Water Fountain/Garden
+    
+    // Construct Map Grid
+    const mapGrid = new Array(MAP_ROWS).fill(0).map(() => new Array(MAP_COLS).fill(0));
+    const solidGrid = new Array(MAP_ROWS).fill(false).map(() => new Array(MAP_COLS).fill(false));
+
+    function generateSchoolMap() {
+      // 1. Fill Outdoor Grass (Bottom Area Y: 18..35)
+      for (let r = 0; r < MAP_ROWS; r++) {
+        for (let c = 0; c < MAP_COLS; c++) {
+          if (r >= 18) {
+            mapGrid[r][c] = 0; // Grass
+          } else {
+            mapGrid[r][c] = 2; // Indoor Corridor default
+          }
+        }
+      }
+
+      // Perimeter Fences/Trees Outdoor
+      for (let c = 0; c < MAP_COLS; c++) {
+        mapGrid[MAP_ROWS-1][c] = 16; solidGrid[MAP_ROWS-1][c] = true;
+      }
+      for (let r = 18; r < MAP_ROWS; r++) {
+        mapGrid[r][0] = 16; solidGrid[r][0] = true;
+        mapGrid[r][MAP_COLS-1] = 16; solidGrid[r][MAP_COLS-1] = true;
+      }
+
+      // Stone Pathways Outdoor
+      for (let r = 18; r < MAP_ROWS-1; r++) {
+        mapGrid[r][23] = 1; mapGrid[r][24] = 1;
+      }
+      for (let c = 8; c <= 40; c++) {
+        mapGrid[27][c] = 1; mapGrid[28][c] = 1;
+      }
+
+      // Garden Trees & Fountain
+      mapGrid[23][14] = 17; solidGrid[23][14] = true;
+      mapGrid[23][15] = 17; solidGrid[23][15] = true;
+      mapGrid[24][14] = 17; solidGrid[24][14] = true;
+      mapGrid[24][15] = 17; solidGrid[24][15] = true;
+
+      for (let c of [6, 18, 30, 42]) {
+        mapGrid[31][c] = 16; solidGrid[31][c] = true;
+      }
+
+      // 2. Indoor Building Layout (Y: 0..17)
+      // Outer Wall Building
+      for (let c = 0; c < MAP_COLS; c++) {
+        mapGrid[0][c] = 10; solidGrid[0][c] = true;
+        mapGrid[17][c] = 10; solidGrid[17][c] = true;
+      }
+      for (let r = 0; r <= 17; r++) {
+        mapGrid[r][0] = 10; solidGrid[r][0] = true;
+        mapGrid[r][MAP_COLS-1] = 10; solidGrid[r][MAP_COLS-1] = true;
+      }
+
+      // Doors to Outdoor
+      mapGrid[17][23] = 1; solidGrid[17][23] = false;
+      mapGrid[17][24] = 1; solidGrid[17][24] = false;
+
+      // Indoor Corridor Divider Line Wall (Y: 10)
+      for (let c = 1; c < MAP_COLS-1; c++) {
+        mapGrid[10][c] = 10; solidGrid[10][c] = true;
+      }
+
+      // Classroom A (Left room: X 1..15, Y 1..9)
+      for (let r = 1; r < 10; r++) {
+        for (let c = 1; c <= 15; c++) {
+          mapGrid[r][c] = 3;
+        }
+      }
+      // Classroom A Wall Divider (X: 16)
+      for (let r = 1; r < 10; r++) {
+        mapGrid[r][16] = 10; solidGrid[r][16] = true;
+      }
+      // Classroom A Door
+      mapGrid[10][8] = 3; solidGrid[10][8] = false;
+      mapGrid[10][9] = 3; solidGrid[10][9] = false;
+
+      // Classroom B (Middle room: X 17..31, Y 1..9)
+      for (let r = 1; r < 10; r++) {
+        for (let c = 17; c <= 31; c++) {
+          mapGrid[r][c] = 3;
+        }
+      }
+      // Divider X: 32
+      for (let r = 1; r < 10; r++) {
+        mapGrid[r][32] = 10; solidGrid[r][32] = true;
+      }
+      // Classroom B Door
+      mapGrid[10][24] = 3; solidGrid[10][24] = false;
+      mapGrid[10][25] = 3; solidGrid[10][25] = false;
+
+      // Cafeteria / Kantin (Right room: X 33..46, Y 1..9)
+      for (let r = 1; r < 10; r++) {
+        for (let c = 33; c < MAP_COLS-1; c++) {
+          mapGrid[r][c] = 4;
+        }
+      }
+      // Cafeteria Door
+      mapGrid[10][39] = 4; solidGrid[10][39] = false;
+      mapGrid[10][40] = 4; solidGrid[10][40] = false;
+
+      // --- Furniture Placement ---
+      // Blackboard Class A & B
+      for (let c = 5; c <= 11; c++) { mapGrid[1][c] = 13; solidGrid[1][c] = true; }
+      for (let c = 21; c <= 27; c++) { mapGrid[1][c] = 13; solidGrid[1][c] = true; }
+
+      // Student Desks Class A
+      const deskColsA = [3, 7, 11];
+      const deskRows = [4, 7];
+      for (let dr of deskRows) {
+        for (let dc of deskColsA) {
+          mapGrid[dr][dc] = 11; solidGrid[dr][dc] = true;
+          mapGrid[dr][dc+1] = 11; solidGrid[dr][dc+1] = true;
+          mapGrid[dr+1][dc] = 12; // Chair
+          mapGrid[dr+1][dc+1] = 12;
+        }
+      }
+
+      // Student Desks Class B
+      const deskColsB = [19, 23, 27];
+      for (let dr of deskRows) {
+        for (let dc of deskColsB) {
+          mapGrid[dr][dc] = 11; solidGrid[dr][dc] = true;
+          mapGrid[dr][dc+1] = 11; solidGrid[dr][dc+1] = true;
+          mapGrid[dr+1][dc] = 12;
+          mapGrid[dr+1][dc+1] = 12;
+        }
+      }
+
+      // Cafeteria Tables & Vending Machines
+      mapGrid[1][34] = 15; solidGrid[1][34] = true; // Vending Machine
+      mapGrid[1][36] = 15; solidGrid[1][36] = true;
+
+      const cafCols = [35, 41];
+      const cafRows = [4, 7];
+      for (let cr of cafRows) {
+        for (let cc of cafCols) {
+          mapGrid[cr][cc] = 14; solidGrid[cr][cc] = true;
+          mapGrid[cr][cc+1] = 14; solidGrid[cr][cc+1] = true;
+        }
+      }
+    }
+
+    generateSchoolMap();
+
+    // --- FIREBASE INITIALIZATION ---
+    const appId = typeof __app_id !== 'undefined' ? __app_id : 'school-pixel-app';
+    const firebaseConfig = JSON.parse(__firebase_config);
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    let currentUser = null;
+    let localPlayer = {
+      id: null,
+      name: 'Siswa',
+      hair: HAIR_COLORS[0],
+      shirt: SHIRT_COLORS[0],
+      skin: SKIN_COLORS[0],
+      x: 23 * TILE_SIZE,
+      y: 20 * TILE_SIZE,
+      dir: 0, // 0: Down, 1: Up, 2: Left, 3: Right
+      isMoving: false,
+      animFrame: 0,
+      speech: '',
+      speechTimer: 0,
+      emote: '',
+      emoteTimer: 0,
+      lastSeen: Date.now()
+    };
+
+    let remotePlayers = {};
+    let unsubscribePlayers = null;
+    let unsubscribeChat = null;
+
+    // --- APP STATE & DOM ELEMENTS ---
+    const lobbyScreen = document.getElementById('lobbyScreen');
+    const gameCanvas = document.getElementById('gameCanvas');
+    const ctx = gameCanvas.getContext('2d');
+    const previewCanvas = document.getElementById('previewCanvas');
+    const pCtx = previewCanvas.getContext('2d');
+
+    const inputName = document.getElementById('playerNameInput');
+    const btnJoin = document.getElementById('btnJoinGame');
+    const gameHUD = document.getElementById('gameHUD');
+    const chatInput = document.getElementById('chatInput');
+    const btnSendChat = document.getElementById('btnSendChat');
+    const chatMessages = document.getElementById('chatMessages');
+    const onlineCount = document.getElementById('onlineCount');
+    const locationTag = document.getElementById('locationTag');
+    const playersList = document.getElementById('playersList');
+    const playersModal = document.getElementById('playersModal');
+
+    // Setup Color Selection UI
+    function createColorPickers() {
+      const buildGroup = (containerId, colors, selectedProp) => {
+        const container = document.getElementById(containerId);
+        container.innerHTML = '';
+        colors.forEach(col => {
+          const btn = document.createElement('button');
+          btn.className = `w-6 h-6 rounded-full border-2 transition ${localPlayer[selectedProp] === col ? 'border-yellow-400 scale-110' : 'border-slate-600'}`;
+          btn.style.backgroundColor = col;
+          btn.onclick = () => {
+            localPlayer[selectedProp] = col;
+            buildGroup(containerId, colors, selectedProp);
+            drawPreview();
+          };
+          container.appendChild(btn);
+        });
+      };
+      buildGroup('hairColors', HAIR_COLORS, 'hair');
+      buildGroup('shirtColors', SHIRT_COLORS, 'shirt');
+      buildGroup('skinColors', SKIN_COLORS, 'skin');
+    }
+
+    // Render Preview Character in Lobby
+    function drawPreview() {
+      pCtx.clearRect(0, 0, 64, 64);
+      pCtx.imageRendering = 'pixelated';
+      // Render enlarged character (2x scale centered)
+      drawCharacterSprite(pCtx, 32, 32, {
+        dir: 0,
+        animFrame: 0,
+        hair: localPlayer.hair,
+        shirt: localPlayer.shirt,
+        skin: localPlayer.skin
+      }, 2.2);
+    }
+
+    createColorPickers();
+    drawPreview();
+
+    // --- CANVAS RESIZE & CAMERA ---
+    let camera = { x: 0, y: 0, width: window.innerWidth, height: window.innerHeight };
+
+    function resizeCanvas() {
+      gameCanvas.width = window.innerWidth;
+      gameCanvas.height = window.innerHeight;
+      camera.width = window.innerWidth;
+      camera.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    // --- SPRITE RENDERER (PROCEDURAL 16-BIT PIXEL ART) ---
+    function drawCharacterSprite(targetCtx, x, y, p, scale = 1) {
+      targetCtx.save();
+      targetCtx.translate(x, y);
+      targetCtx.scale(scale, scale);
+
+      // Shadow
+      targetCtx.fillStyle = 'rgba(0, 0, 0, 0.25)';
+      targetCtx.beginPath();
+      targetCtx.ellipse(0, 12, 10, 5, 0, 0, Math.PI * 2);
+      targetCtx.fill();
+
+      // Anim step offset
+      const stepOffset = (p.animFrame === 1) ? 2 : ((p.animFrame === 3) ? -2 : 0);
+
+      // Feet / Pants (Dark Navy)
+      targetCtx.fillStyle = '#1e293b';
+      if (p.dir === 0 || p.dir === 1) { // Up/Down
+        targetCtx.fillRect(-6 + stepOffset, 6, 4, 6);
+        targetCtx.fillRect(2 - stepOffset, 6, 4, 6);
+      } else { // Left/Right
+        targetCtx.fillRect(-4, 6 + Math.abs(stepOffset), 8, 6);
+      }
+
+      // Shirt
+      targetCtx.fillStyle = p.shirt;
+      targetCtx.fillRect(-7, -2, 14, 9);
+
+      // Head / Skin
+      targetCtx.fillStyle = p.skin;
+      targetCtx.fillRect(-6, -14, 12, 12);
+
+      // Eyes & Face Details
+      targetCtx.fillStyle = '#0f172a';
+      if (p.dir === 0) { // Facing Down
+        targetCtx.fillRect(-4, -9, 2, 3);
+        targetCtx.fillRect(2, -9, 2, 3);
+      } else if (p.dir === 2) { // Facing Left
+        targetCtx.fillRect(-5, -9, 2, 3);
+      } else if (p.dir === 3) { // Facing Right
+        targetCtx.fillRect(3, -9, 2, 3);
+      }
+
+      // Hair
+      targetCtx.fillStyle = p.hair;
+      if (p.dir === 1) { // Back hair
+        targetCtx.fillRect(-7, -16, 14, 12);
+      } else {
+        targetCtx.fillRect(-7, -16, 14, 5); // Hair top
+        targetCtx.fillRect(-7, -12, 3, 6);  // Side hair left
+        targetCtx.fillRect(4, -12, 3, 6);   // Side hair right
+      }
+
+      targetCtx.restore();
+    }
+
+    // --- MAP GRAPHICS RENDERER ---
+    function renderTile(c, r, tileType, screenX, screenY) {
+      switch (tileType) {
+        case 0: // Outdoor Grass
+          ctx.fillStyle = (c + r) % 2 === 0 ? '#4ade80' : '#22c55e';
+          ctx.fillRect(screenX, screenY, TILE_SIZE, TILE_SIZE);
+          // Grass Blade details
+          if ((c * 7 + r * 13) % 5 === 0) {
+            ctx.fillStyle = '#16a34a';
+            ctx.fillRect(screenX + 8, screenY + 10, 2, 6);
+            ctx.fillRect(screenX + 18, screenY + 20, 2, 5);
+          }
+          break;
+
+        case 1: // Stone Path
+          ctx.fillStyle = '#cbd5e1';
+          ctx.fillRect(screenX, screenY, TILE_SIZE, TILE_SIZE);
+          ctx.strokeStyle = '#94a3b8';
+          ctx.strokeRect(screenX + 1, screenY + 1, TILE_SIZE - 2, TILE_SIZE - 2);
+          break;
+
+        case 2: // Corridor Tile
+          ctx.fillStyle = (c + r) % 2 === 0 ? '#e2e8f0' : '#cbd5e1';
+          ctx.fillRect(screenX, screenY, TILE_SIZE, TILE_SIZE);
+          break;
+
+        case 3: // Classroom Wooden Floor
+          ctx.fillStyle = '#fde047';
+          ctx.fillRect(screenX, screenY, TILE_SIZE, TILE_SIZE);
+          ctx.fillStyle = '#eab308';
+          ctx.fillRect(screenX, screenY + TILE_SIZE - 2, TILE_SIZE, 2);
+          break;
+
+        case 4: // Cafeteria Tile
+          ctx.fillStyle = (c + r) % 2 === 0 ? '#38bdf8' : '#e0f2fe';
+          ctx.fillRect(screenX, screenY, TILE_SIZE, TILE_SIZE);
+          break;
+
+        case 10: // Brick Wall
+          ctx.fillStyle = '#991b1b';
+          ctx.fillRect(screenX, screenY, TILE_SIZE, TILE_SIZE);
+          ctx.fillStyle = '#7f1d1d';
+          ctx.fillRect(screenX, screenY + 14, TILE_SIZE, 3);
+          ctx.fillRect(screenX, screenY + 28, TILE_SIZE, 3);
+          break;
+
+        case 11: // Student Desk
+          ctx.fillStyle = '#e2e8f0'; // Floor under
+          ctx.fillRect(screenX, screenY, TILE_SIZE, TILE_SIZE);
+          ctx.fillStyle = '#b45309'; // Desk Top
+          ctx.fillRect(screenX + 2, screenY + 4, TILE_SIZE - 4, TILE_SIZE - 8);
+          ctx.fillStyle = '#78350f';
+          ctx.fillRect(screenX + 4, screenY + TILE_SIZE - 4, 4, 4);
+          ctx.fillRect(screenX + TILE_SIZE - 8, screenY + TILE_SIZE - 4, 4, 4);
+          break;
+
+        case 12: // Chair
+          ctx.fillStyle = '#fde047';
+          ctx.fillRect(screenX, screenY, TILE_SIZE, TILE_SIZE);
+          ctx.fillStyle = '#d97706';
+          ctx.fillRect(screenX + 6, screenY + 6, TILE_SIZE - 12, TILE_SIZE - 12);
+          break;
+
+        case 13: // Blackboard
+          ctx.fillStyle = '#1e293b';
+          ctx.fillRect(screenX, screenY, TILE_SIZE, TILE_SIZE);
+          ctx.fillStyle = '#065f46'; // Chalkboard Green
+          ctx.fillRect(screenX + 1, screenY + 4, TILE_SIZE - 2, TILE_SIZE - 8);
+          ctx.fillStyle = '#f8fafc'; // Chalk lines
+          ctx.fillRect(screenX + 4, screenY + 12, 12, 2);
+          break;
+
+        case 14: // Cafeteria Table
+          ctx.fillStyle = '#e0f2fe';
+          ctx.fillRect(screenX, screenY, TILE_SIZE, TILE_SIZE);
+          ctx.fillStyle = '#0284c7';
+          ctx.fillRect(screenX + 2, screenY + 2, TILE_SIZE - 4, TILE_SIZE - 4);
+          break;
+
+        case 15: // Vending Machine
+          ctx.fillStyle = '#dc2626';
+          ctx.fillRect(screenX + 2, screenY + 2, TILE_SIZE - 4, TILE_SIZE - 2);
+          ctx.fillStyle = '#38bdf8'; // Glass window
+          ctx.fillRect(screenX + 6, screenY + 6, TILE_SIZE - 12, 12);
+          break;
+
+        case 16: // Tree
+          ctx.fillStyle = '#22c55e';
+          ctx.fillRect(screenX, screenY, TILE_SIZE, TILE_SIZE);
+          ctx.fillStyle = '#15803d'; // Canopy
+          ctx.beginPath();
+          ctx.arc(screenX + 16, screenY + 14, 14, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.fillStyle = '#78350f'; // Trunk
+          ctx.fillRect(screenX + 13, screenY + 20, 6, 12);
+          break;
+
+        case 17: // Fountain
+          ctx.fillStyle = '#0284c7';
+          ctx.fillRect(screenX, screenY, TILE_SIZE, TILE_SIZE);
+          ctx.fillStyle = '#38bdf8';
+          ctx.beginPath();
+          ctx.arc(screenX + 16, screenY + 16, 10, 0, Math.PI * 2);
+          ctx.fill();
+          break;
+
+        default:
+          ctx.fillStyle = '#0f172a';
+          ctx.fillRect(screenX, screenY, TILE_SIZE, TILE_SIZE);
+      }
+    }
+
+    // --- CONTROLS & INPUT SYSTEM ---
+    const keys = { Up: false, Down: false, Left: false, Right: false };
+
+    window.addEventListener('keydown', (e) => {
+      if (document.activeElement === chatInput || document.activeElement === inputName) return;
+      if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') keys.Up = true;
+      if (e.key === 'ArrowDown' || e.key === 's' || e.key === 'S') keys.Down = true;
+      if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') keys.Left = true;
+      if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') keys.Right = true;
+
+      if (e.key === 'Enter') {
+        chatInput.focus();
+        e.preventDefault();
+      }
+    });
+
+    window.addEventListener('keyup', (e) => {
+      if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') keys.Up = false;
+      if (e.key === 'ArrowDown' || e.key === 's' || e.key === 'S') keys.Down = false;
+      if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') keys.Left = false;
+      if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') keys.Right = false;
+    });
+
+    // Touch Controls
+    const bindDpad = (id, key) => {
+      const el = document.getElementById(id);
+      const start = (e) => { e.preventDefault(); keys[key] = true; };
+      const end = (e) => { e.preventDefault(); keys[key] = false; };
+      el.addEventListener('touchstart', start);
+      el.addEventListener('touchend', end);
+      el.addEventListener('mousedown', start);
+      el.addEventListener('mouseup', end);
+    };
+    bindDpad('dpadUp', 'Up');
+    bindDpad('dpadDown', 'Down');
+    bindDpad('dpadLeft', 'Left');
+    bindDpad('dpadRight', 'Right');
+
+    // --- COLLISION DETECTION ---
+    function isSolidAt(pixelX, pixelY) {
+      const c = Math.floor(pixelX / TILE_SIZE);
+      const r = Math.floor(pixelY / TILE_SIZE);
+      if (r < 0 || r >= MAP_ROWS || c < 0 || c >= MAP_COLS) return true;
+      return solidGrid[r][c];
+    }
+
+    function checkCollision(nextX, nextY) {
+      const bbox = 10; // Collision box size around feet
+      return (
+        isSolidAt(nextX - bbox, nextY - bbox) ||
+        isSolidAt(nextX + bbox, nextY - bbox) ||
+        isSolidAt(nextX - bbox, nextY + bbox) ||
+        isSolidAt(nextX + bbox, nextY + bbox)
+      );
+    }
+
+    // --- GAME LOOP & MOVEMENT ---
+    let lastTime = performance.now();
+    let stepSoundTimer = 0;
+    let syncTimer = 0;
+
+    function updateGameLogic(dt) {
+      if (!localPlayer.id) return;
+
+      const speed = 140; // Pixels per sec
+      let dx = 0;
+      let dy = 0;
+
+      if (keys.Up) dy -= 1;
+      if (keys.Down) dy += 1;
+      if (keys.Left) dx -= 1;
+      if (keys.Right) dx += 1;
+
+      // Normalize diagonal speed
+      if (dx !== 0 && dy !== 0) {
+        dx *= 0.7071;
+        dy *= 0.7071;
+      }
+
+      const isMoving = dx !== 0 || dy !== 0;
+      localPlayer.isMoving = isMoving;
+
+      if (isMoving) {
+        if (dy > 0) localPlayer.dir = 0;      // Down
+        else if (dy < 0) localPlayer.dir = 1; // Up
+        else if (dx < 0) localPlayer.dir = 2; // Left
+        else if (dx > 0) localPlayer.dir = 3; // Right
+
+        const nextX = localPlayer.x + dx * speed * dt;
+        const nextY = localPlayer.y + dy * speed * dt;
+
+        // X movement with collision
+        if (!checkCollision(nextX, localPlayer.y)) {
+          localPlayer.x = nextX;
+        }
+        // Y movement with collision
+        if (!checkCollision(localPlayer.x, nextY)) {
+          localPlayer.y = nextY;
+        }
+
+        // Clamp inside map boundaries
+        localPlayer.x = Math.max(16, Math.min(MAP_WIDTH - 16, localPlayer.x));
+        localPlayer.y = Math.max(16, Math.min(MAP_HEIGHT - 16, localPlayer.y));
+
+        // Walking Anim Frame
+        localPlayer.animFrame = Math.floor((performance.now() / 150) % 4);
+
+        // Sound Effects
+        stepSoundTimer += dt;
+        if (stepSoundTimer > 0.35) {
+          sound.playStep();
+          stepSoundTimer = 0;
+        }
+      } else {
+        localPlayer.animFrame = 0;
+      }
+
+      // Update Location Tag UI
+      const curRow = Math.floor(localPlayer.y / TILE_SIZE);
+      const curCol = Math.floor(localPlayer.x / TILE_SIZE);
+      if (curRow >= 18) {
+        locationTag.textContent = 'LAPANGAN SEKOLAH';
+      } else if (curCol >= 33) {
+        locationTag.textContent = 'KANTIN SEKOLAH';
+      } else if (curCol <= 16) {
+        locationTag.textContent = 'RUANG KELAS 10-A';
+      } else if (curCol <= 32) {
+        locationTag.textContent = 'RUANG KELAS 10-B';
+      } else {
+        locationTag.textContent = 'KORIDOR UTAMA';
+      }
+
+      // Speech & Emote Timers
+      if (localPlayer.speechTimer > 0) {
+        localPlayer.speechTimer -= dt;
+        if (localPlayer.speechTimer <= 0) localPlayer.speech = '';
+      }
+      if (localPlayer.emoteTimer > 0) {
+        localPlayer.emoteTimer -= dt;
+        if (localPlayer.emoteTimer <= 0) localPlayer.emote = '';
+      }
+
+      // Sync position with Firestore (~10 times per second)
+      syncTimer += dt;
+      if (syncTimer >= 0.1) {
+        syncPositionToFirebase();
+        syncTimer = 0;
+      }
+    }
+
+    // Render Canvas Frame
+    function renderGame() {
+      ctx.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
+
+      // Camera Follow Smoothly
+      camera.x = localPlayer.x - camera.width / 2;
+      camera.y = localPlayer.y - camera.height / 2;
+
+      // Clamp Camera to Map
+      camera.x = Math.max(0, Math.min(MAP_WIDTH - camera.width, camera.x));
+      camera.y = Math.max(0, Math.min(MAP_HEIGHT - camera.height, camera.y));
+
+      // 1. Draw Visible Map Tiles
+      const startCol = Math.max(0, Math.floor(camera.x / TILE_SIZE));
+      const endCol = Math.min(MAP_COLS - 1, Math.ceil((camera.x + camera.width) / TILE_SIZE));
+      const startRow = Math.max(0, Math.floor(camera.y / TILE_SIZE));
+      const endRow = Math.min(MAP_ROWS - 1, Math.ceil((camera.y + camera.height) / TILE_SIZE));
+
+      for (let r = startRow; r <= endRow; r++) {
+        for (let c = startCol; c <= endCol; c++) {
+          const screenX = Math.floor(c * TILE_SIZE - camera.x);
+          const screenY = Math.floor(r * TILE_SIZE - camera.y);
+          renderTile(c, r, mapGrid[r][c], screenX, screenY);
+        }
+      }
+
+      // 2. Gather All Players & Sort by Y for depth sorting
+      const allPlayers = [localPlayer, ...Object.values(remotePlayers)];
+      allPlayers.sort((a, b) => a.y - b.y);
+
+      // 3. Render Players & Nametags / Speech Bubbles
+      allPlayers.forEach(p => {
+        const screenX = Math.floor(p.x - camera.x);
+        const screenY = Math.floor(p.y - camera.y);
+
+        // Draw Character Sprite
+        drawCharacterSprite(ctx, screenX, screenY, p, 1.3);
+
+        // Nametag
+        ctx.save();
+        ctx.font = '10px "Press Start 2P", cursive';
+        ctx.textAlign = 'center';
+
+        const isMe = p.id === localPlayer.id;
+        const nameText = isMe ? `${p.name} (Kamu)` : p.name;
+        const textWidth = ctx.measureText(nameText).width;
+
+        // Nametag Background Pill
+        ctx.fillStyle = isMe ? 'rgba(30, 58, 138, 0.85)' : 'rgba(15, 23, 42, 0.85)';
+        ctx.strokeStyle = isMe ? '#60a5fa' : '#475569';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.roundRect(screenX - textWidth / 2 - 6, screenY - 32, textWidth + 12, 16, 6);
+        ctx.fill();
+        ctx.stroke();
+
+        // Nametag Text
+        ctx.fillStyle = isMe ? '#fde047' : '#ffffff';
+        ctx.fillText(nameText, screenX, screenY - 20);
+
+        // Floating Emote Bubble
+        if (p.emote) {
+          ctx.font = '22px sans-serif';
+          const bob = Math.sin(performance.now() / 150) * 3;
+          ctx.fillText(p.emote, screenX, screenY - 44 + bob);
+        }
+
+        // Floating Speech Bubble
+        if (p.speech) {
+          ctx.font = '14px "VT323", monospace';
+          const sWidth = ctx.measureText(p.speech).width;
+          const bubbleW = Math.max(40, sWidth + 14);
+
+          ctx.fillStyle = '#ffffff';
+          ctx.strokeStyle = '#000000';
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.roundRect(screenX - bubbleW / 2, screenY - 58, bubbleW, 20, 6);
+          ctx.fill();
+          ctx.stroke();
+
+          // Bubble Tail
+          ctx.beginPath();
+          ctx.moveTo(screenX - 4, screenY - 38);
+          ctx.lineTo(screenX, screenY - 33);
+          ctx.lineTo(screenX + 4, screenY - 38);
+          ctx.fill();
+
+          ctx.fillStyle = '#0f172a';
+          ctx.fillText(p.speech, screenX, screenY - 44);
+        }
+
+        ctx.restore();
+      });
+    }
+
+    // Main Game Engine Loop
+    function mainLoop(timestamp) {
+      const dt = Math.min(0.1, (timestamp - lastTime) / 1000);
+      lastTime = timestamp;
+
+      updateGameLogic(dt);
+      renderGame();
+
+      requestAnimationFrame(mainLoop);
+    }
+
+    // --- FIREBASE MULTIPLAYER SYNC ---
+    async function initFirebaseAndJoin() {
+      sound.init();
+
+      try {
+        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+          currentUser = (await signInWithCustomToken(auth, __initial_auth_token)).user;
+        } else {
+          currentUser = (await signInAnonymously(auth)).user;
+        }
+
+        localPlayer.id = currentUser.uid;
+
+        // Path for public players collection
+        const playersColl = collection(db, 'artifacts', appId, 'public', 'data', 'players');
+        const playerDocRef = doc(playersColl, localPlayer.id);
+
+        // Initial write to Firebase
+        await setDoc(playerDocRef, {
+          id: localPlayer.id,
+          name: localPlayer.name,
+          hair: localPlayer.hair,
+          shirt: localPlayer.shirt,
+          skin: localPlayer.skin,
+          x: localPlayer.x,
+          y: localPlayer.y,
+          dir: localPlayer.dir,
+          animFrame: localPlayer.animFrame,
+          speech: '',
+          emote: '',
+          lastSeen: Date.now()
+        });
+
+        // Listen for all players in real-time
+        unsubscribePlayers = onSnapshot(playersColl, (snapshot) => {
+          const updatedRemotes = {};
+          let onlineTotal = 0;
+          const listMarkup = [];
+
+          snapshot.forEach((docSnap) => {
+            const data = docSnap.data();
+            if (data.id && data.id !== localPlayer.id) {
+              // Ignore stale players (>25 seconds)
+              if (Date.now() - (data.lastSeen || 0) < 25000) {
+                updatedRemotes[data.id] = data;
+                onlineTotal++;
+                listMarkup.push(`<li class="flex items-center gap-2 bg-slate-800/80 p-2 rounded-lg">
+                  <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
+                  <span class="font-bold text-white">${data.name}</span>
+                </li>`);
+              }
+            }
+          });
+
+          remotePlayers = updatedRemotes;
+          onlineCount.textContent = `${onlineTotal + 1} Siswa Online`;
+          playersList.innerHTML = `<li class="flex items-center gap-2 bg-indigo-900/60 p-2 rounded-lg border border-indigo-500/50">
+            <span class="w-2.5 h-2.5 rounded-full bg-yellow-400"></span>
+            <span class="font-bold text-yellow-300">${localPlayer.name} (Kamu)</span>
+          </li>` + listMarkup.join('');
+        }, (err) => console.error("Player sync error:", err));
+
+        // Listen for live global chat messages
+        const chatColl = collection(db, 'artifacts', appId, 'public', 'data', 'chatMessages');
+        unsubscribeChat = onSnapshot(chatColl, (snapshot) => {
+          const messages = [];
+          snapshot.forEach(docSnap => messages.push(docSnap.data()));
+          
+          // Sort manually in memory (Rule 2: avoid compound index requirements)
+          messages.sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
+          
+          // Render recent 15 messages
+          const recent = messages.slice(-15);
+          chatMessages.innerHTML = recent.map(m => `
+            <div class="leading-tight">
+              <span class="font-bold text-indigo-300">${m.sender}:</span>
+              <span class="text-slate-100">${m.text}</span>
+            </div>
+          `).join('');
+          chatMessages.scrollTop = chatMessages.scrollHeight;
+        }, (err) => console.error("Chat sync error:", err));
+
+        // Clean cleanup on window leave
+        window.addEventListener('beforeunload', async () => {
+          if (localPlayer.id) {
+            await deleteDoc(playerDocRef).catch(() => {});
+          }
+        });
+
+      } catch (err) {
+        console.error("Firebase auth/join failed:", err);
+      }
+    }
+
+    async function syncPositionToFirebase() {
+      if (!localPlayer.id) return;
+      const playerDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'players', localPlayer.id);
+      try {
+        await setDoc(playerDocRef, {
+          id: localPlayer.id,
+          name: localPlayer.name,
+          hair: localPlayer.hair,
+          shirt: localPlayer.shirt,
+          skin: localPlayer.skin,
+          x: Math.round(localPlayer.x),
+          y: Math.round(localPlayer.y),
+          dir: localPlayer.dir,
+          animFrame: localPlayer.animFrame,
+          speech: localPlayer.speech,
+          emote: localPlayer.emote,
+          lastSeen: Date.now()
+        }, { merge: true });
+      } catch (e) {}
+    }
+
+    // --- EVENT LISTENERS & UI ACTIONS ---
+    btnJoin.onclick = () => {
+      const name = inputName.value.trim();
+      if (!name) {
+        inputName.classList.add('border-red-500');
+        return;
+      }
+
+      localPlayer.name = name;
+      lobbyScreen.classList.add('hidden');
+      gameHUD.classList.remove('hidden');
+      document.getElementById('virtualDpad').classList.remove('hidden');
+
+      initFirebaseAndJoin();
+      requestAnimationFrame(mainLoop);
+    };
+
+    // Chat Sending
+    async function sendChatMessage() {
+      const msg = chatInput.value.trim();
+      if (!msg || !localPlayer.id) return;
+
+      localPlayer.speech = msg;
+      localPlayer.speechTimer = 5; // 5 seconds display
+      chatInput.value = '';
+      chatInput.blur();
+
+      sound.playChat();
+      syncPositionToFirebase();
+
+      // Add to Chat Collection
+      try {
+        const chatColl = collection(db, 'artifacts', appId, 'public', 'data', 'chatMessages');
+        await addDoc(chatColl, {
+          sender: localPlayer.name,
+          text: msg,
+          createdAt: Date.now()
+        });
+      } catch (e) {}
+    }
+
+    btnSendChat.onclick = sendChatMessage;
+    chatInput.onkeydown = (e) => {
+      if (e.key === 'Enter') sendChatMessage();
+    };
+
+    // Quick Emotes
+    document.querySelectorAll('.btn-emote').forEach(btn => {
+      btn.onclick = () => {
+        const emo = btn.dataset.emote;
+        localPlayer.emote = emo;
+        localPlayer.emoteTimer = 3; // 3 sec float
+        sound.playEmote();
+        syncPositionToFirebase();
+      };
+    });
+
+    // Modals
+    document.getElementById('btnTogglePlayers').onclick = () => playersModal.classList.remove('hidden');
+    document.getElementById('btnClosePlayers').onclick = () => playersModal.classList.add('hidden');
+    document.getElementById('btnHelp').onclick = () => document.getElementById('helpModal').classList.remove('hidden');
+    document.getElementById('btnCloseHelp').onclick = () => document.getElementById('helpModal').classList.add('hidden');
+
+    // Audio Toggle
+    const btnSound = document.getElementById('btnSound');
+    btnSound.onclick = () => {
+      sound.muted = !sound.muted;
+      btnSound.textContent = sound.muted ? '🔇' : '🔊';
+    };
+
+  </script>
+</body>
+</html>
