@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mini Game Interaktif Kelas</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Canvas Confetti CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        /* Mirroring kamera agar gerakan fisik terasa natural seperti cermin */
+        .mirror-video {
+            transform: scaleX(-1);
+        }
+    </style>
+</head>
+<body class="bg-slate-900 text-white font-sans h-screen w-screen overflow-hidden flex flex-col">
+
+    <!-- HEADER / TOP BAR -->
+    <header class="h-20 bg-slate-800/90 backdrop-blur border-b border-slate-700 px-8 flex justify-between items-center z-10">
+        <div class="flex items-center gap-4">
+            <span id="question-number" class="bg-indigo-600 text-white px-4 py-2 rounded-xl text-xl font-bold tracking-wide shadow-lg">
+                Soal 1/5
+            </span>
+            <div class="text-xs text-slate-400">
+                <p>Status Kamera: <span id="camera-status" class="text-amber-400 font-semibold">Memuat...</span></p>
+            </div>
+        </div>
+        
+        <!-- Timer -->
+        <div class="flex items-center gap-3 bg-slate-950/60 px-6 py-2 rounded-2xl border border-slate-700">
+            <svg class="w-7 h-7 text-amber-400 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <span id="timer-display" class="text-3xl font-black text-amber-400 tracking-wider">30</span>
+            <span class="text-sm font-semibold text-slate-400">detik</span>
+        </div>
+
+        <!-- Tombol Aksi Kontrol Guru -->
+        <div class="flex items-center gap-3">
+            <button id="btn-submit" onclick="finishAnswer()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-6 py-3 rounded-xl shadow-lg transition-all transform hover:scale-105 active:scale-95 flex items-center gap-2 text-lg">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+                Selesai Menjawab
+            </button>
+            <button id="btn-next" onclick="nextQuestion()" class="hidden bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-6 py-3 rounded-xl shadow-lg transition-all transform hover:scale-105 active:scale-95 flex items-center gap-2 text-lg animate-bounce">
+                Soal Berikutnya
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <!-- TEKS SOAL UTAMA -->
+    <section class="bg-slate-800/60 border-b border-slate-700/50 py-4 px-8 text-center z-10 shadow-md">
+        <h1 id="question-text" class="text-2xl md:text-3xl font-extrabold text-slate-100 leading-snug">
+            Memuat pertanyaan...
+        </h1>
+    </section>
+
+    <!-- AREA KAMERA LIVE & ZONA JAWABAN (3 KOLOM) -->
+    <main class="flex-1 relative overflow-hidden bg-black flex">
+        <!-- Live Camera Stream -->
+        <video id="webcam" autoplay playsinline class="absolute inset-0 w-full h-full object-cover mirror-video opacity-75"></video>
+
+        <!-- Overlay Grid 3 Zona (A, B, C) -->
+        <div class="relative z-10 w-full h-full grid grid-cols-3 gap-4 p-4 pointer-events-none">
+            
+            <!-- ZONA A (KIRI) -->
+            <div id="card-A" class="bg-slate-900/40 backdrop-blur-sm border-4 border-indigo-500/50 rounded-3xl p-6 flex flex-col justify-between transition-all duration-500">
+                <div class="text-center">
+                    <span class="text-sm font-semibold tracking-wider text-slate-300 uppercase block mb-1">Pilihan A</span>
+                    <p id="text-A" class="text-lg md:text-xl font-bold text-white drop-shadow-md">Teks Pilihan A</p>
+                </div>
+                <div class="text-center my-auto">
+                    <span class="inline-block bg-indigo-600/90 text-white text-6xl font-black px-8 py-4 rounded-2xl shadow-2xl border-2 border-indigo-300/40">
+                        A
+                    </span>
+                </div>
+                <div class="text-center">
+                    <span id="badge-A" class="hidden text-xl font-bold px-4 py-2 rounded-xl"></span>
+                </div>
+            </div>
+
+            <!-- ZONA B (TENGAH) -->
+            <div id="card-B" class="bg-slate-900/40 backdrop-blur-sm border-4 border-amber-500/50 rounded-3xl p-6 flex flex-col justify-between transition-all duration-500">
+                <div class="text-center">
+                    <span class="text-sm font-semibold tracking-wider text-slate-300 uppercase block mb-1">Pilihan B</span>
+                    <p id="text-B" class="text-lg md:text-xl font-bold text-white drop-shadow-md">Teks Pilihan B</p>
+                </div>
+                <div class="text-center my-auto">
+                    <span class="inline-block bg-amber-600/90 text-white text-6xl font-black px-8 py-4 rounded-2xl shadow-2xl border-2 border-amber-300/40">
+                        B
+                    </span>
+                </div>
+                <div class="text-center">
+                    <span id="badge-B" class="hidden text-xl font-bold px-4 py-2 rounded-xl"></span>
+                </div>
+            </div>
+
+            <!-- ZONA C (KANAN) -->
+            <div id="card-C" class="bg-slate-900/40 backdrop-blur-sm border-4 border-emerald-500/50 rounded-3xl p-6 flex flex-col justify-between transition-all duration-500">
+                <div class="text-center">
+                    <span class="text-sm font-semibold tracking-wider text-slate-300 uppercase block mb-1">Pilihan C</span>
+                    <p id="text-C" class="text-lg md:text-xl font-bold text-white drop-shadow-md">Teks Pilihan C</p>
+                </div>
+                <div class="text-center my-auto">
+                    <span class="inline-block bg-emerald-600/90 text-white text-6xl font-black px-8 py-4 rounded-2xl shadow-2xl border-2 border-emerald-300/40">
+                        C
+                    </span>
+                </div>
+                <div class="text-center">
+                    <span id="badge-C" class="hidden text-xl font-bold px-4 py-2 rounded-xl"></span>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- SCRIPT LOGIKA GAME -->
+    <script>
+        // -------------------------------------------------------------
+        // DATA SOAL (Silakan edit/tambah soal langsung di dalam array ini)
+        // -------------------------------------------------------------
+       const quizData = [
+    {
+        question: "1. Apakah dasar awal terbentuknya hukum adat Dayak?",
+        options: { A: "Undang-Undang Negara", B: "Kesepakatan para tokoh/tua-tua adat", C: "Perintah penguasa kolonial" },
+        correct: "B"
+    },
+    {
+        question: "2. Pelanggar hukum adat Dayak tidak dipenjara, namun membayar denda yang disebut...",
+        options: { A: "Jipén", B: "Singér", C: "Palaku" },
+        correct: "B"
+    },
+    {
+        question: "3. Berapa jumlah pasal singér yang disepakati pada Rapat Damai Tumbang Anoi 1894?",
+        options: { A: "45 Pasal", B: "75 Pasal", C: "96 Pasal" },
+        correct: "C"
+    },
+    {
+        question: "4. Sanksi adat atas pelanggaran merampas istri orang lain diatur dalam...",
+        options: { A: "Pasal 1 (Singér Tungkun)", B: "Pasal 5 (Singér Palékak Pisék)", C: "Pasal 10 (Singér Marusak Balu)" },
+        correct: "A"
+    },
+    {
+        question: "5. Denda pembatalan janji pertunangan atau calon tunangan (Pasal 5) disebut...",
+        options: { A: "Singér Tungkun Paisék", B: "Singér Palékak Pisék / Panggul Pupuh", C: "Singér Hatulang Bélom" },
+        correct: "B"
+    },
+    {
+        question: "6. Zinah tidak sejenjang silsilah darah ke atas atau ke bawah (anak/akén/ésu) disebut...",
+        options: { A: "Sarau", B: "Sumbang", C: "Tulah" },
+        correct: "C"
+    },
+    {
+        question: "7. Denda utama atas kasus pembunuhan sengaja (Pasal 16) adalah sebesar...",
+        options: { A: "15-30 kati ramu", B: "90-180 kati ramu", C: "375-750 kati ramu" },
+        correct: "C"
+    },
+    {
+        question: "8. Denda adat memotong leher orang yang sudah mati dibunuh (Pasal 19) dinamakan...",
+        options: { A: "Singér Timbal-Timbalan", B: "Singér Tétéks Uyat", C: "Singér Selém Balai" },
+        correct: "B"
+    },
+    {
+        question: "9. Ritual membasuh kaki antara pelaku dan keluarga korban (Pasal 22) dinamakan...",
+        options: { A: "Singér Tipuk Danum", B: "Singér Biat Himang", C: "Singér Puséh Panguman" },
+        correct: "A"
+    },
+    {
+        question: "10. Ritual mengakhiri permusuhan/dendam antar kelompok atau karena alam (Pasal 27) adalah...",
+        options: { A: "Singér Tétés Hinting Bunu", B: "Singér Ulés Tulak Haluan", C: "Singér Pényau Léwu" },
+        correct: "A"
+    },
+    {
+        question: "11. Pelanggaran berupa merampas atau mencuri barang di luar rumah diatur pada...",
+        options: { A: "Pasal 28", B: "Pasal 29", C: "Pasal 34" },
+        correct: "B"
+    },
+    {
+        question: "12. Denda adat mencuri atau merampas perahu dan timba (Pasal 32) sebesar...",
+        options: { A: "5-10 kati ramu", B: "15-30 kati ramu", C: "60-90 kati ramu" },
+        correct: "B"
+    },
+    {
+        question: "13. Denda bagi orang yang memperdaya anak di bawah umur (Pasal 40) adalah...",
+        options: { A: "Singér Pikir Tipu Anak Oloh", B: "Singér Sala Basa Bawi Bujang", C: "Singér Karusak Bawi Tabéla" },
+        correct: "A"
+    },
+    {
+        question: "14. Denda membiarkan orang yang tenggelam atau rumah kebakaran (Pasal 44) dinamakan...",
+        options: { A: "Singér Térén Katulas Huang", B: "Singér Tandahan Randah", C: "Singér Naranjur Kulae" },
+        correct: "A"
+    },
+    {
+        question: "15. Sanksi adat menuduh orang lain sebagai hantuén (kuyang) tanpa bukti (Pasal 51) sebesar...",
+        options: { A: "15-30 kati ramu", B: "45-90 kati ramu", C: "120-150 kati ramu" },
+        correct: "B"
+    },
+    {
+        question: "16. Tanda penangkal hama atau tanda ritual kematian yang dipasang tali/janur disebut...",
+        options: { A: "Panggutin Pétak", B: "Hinting Pali", C: "Tajahan" },
+        correct: "B"
+    },
+    {
+        question: "17. Denda perantara (luang) yang salah menyampaikan pesan penting (Pasal 56) dinamakan...",
+        options: { A: "Singér Sulé Kasalan Luang", B: "Singér Kabalangan Jaon Janji", C: "Singér Pahaliman" },
+        correct: "A"
+    },
+    {
+        question: "18. Denda pria yang tertangkap basah tidur di kamar perempuan (Pasal 65) disebut...",
+        options: { A: "Singér Kahanjéan Balai", B: "Singér Suruk Jangkut Amak", C: "Singér Lungkun Tapang" },
+        correct: "B"
+    },
+    {
+        question: "19. Menyentuh/mencicipi makanan yang ditawarkan orang agar tidak celaka dinamakan...",
+        options: { A: "Hasapa", B: "Minjuk (mencegah Pahuni)", C: "Manawur Béhas" },
+        correct: "B"
+    },
+    {
+        question: "20. Prinsip tata kelola kehidupan beradat dan bermoral tinggi suku Dayak disebut...",
+        options: { A: "Bélum Bahadat", B: "Hambai Masak", C: "Pangaun Léwu" },
+        correct: "A"
+    }
+];
+
+        // VARIABEL STATE GAME
+        let currentQuestionIndex = 0;
+        let timeLeft = 30;
+        let timerInterval = null;
+        let isAnswered = false;
+
+        // ELEMENT REF
+        const videoElement = document.getElementById('webcam');
+        const cameraStatusText = document.getElementById('camera-status');
+        const questionNumberEl = document.getElementById('question-number');
+        const questionTextEl = document.getElementById('question-text');
+        const timerDisplayEl = document.getElementById('timer-display');
+        const btnSubmit = document.getElementById('btn-submit');
+        const btnNext = document.getElementById('btn-next');
+
+        const optionCards = {
+            A: document.getElementById('card-A'),
+            B: document.getElementById('card-B'),
+            C: document.getElementById('card-C')
+        };
+        const optionTexts = {
+            A: document.getElementById('text-A'),
+            B: document.getElementById('text-B'),
+            C: document.getElementById('text-C')
+        };
+        const optionBadges = {
+            A: document.getElementById('badge-A'),
+            B: document.getElementById('badge-B'),
+            C: document.getElementById('badge-C')
+        };
+
+        // INSIALISASI KAMERA WEB
+        async function initCamera() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    video: { width: { ideal: 1920 }, height: { ideal: 1080 } },
+                    audio: false
+                });
+                videoElement.srcObject = stream;
+                cameraStatusText.textContent = "Aktif (Terhubung)";
+                cameraStatusText.className = "text-emerald-400 font-semibold";
+            } catch (error) {
+                console.error("Gagal mengakses kamera:", error);
+                cameraStatusText.textContent = "Gagal Terhubung / Izin Ditolak";
+                cameraStatusText.className = "text-rose-500 font-semibold";
+            }
+        }
+
+        // LOAD SOAL BERDASARKAN INDEX
+        function loadQuestion() {
+            isAnswered = false;
+            clearInterval(timerInterval);
+            timeLeft = 30;
+            timerDisplayEl.textContent = timeLeft;
+
+            const data = quizData[currentQuestionIndex];
+            questionNumberEl.textContent = `Soal ${currentQuestionIndex + 1}/${quizData.length}`;
+            questionTextEl.textContent = data.question;
+
+            // Update Opsi Jawaban
+            optionTexts.A.textContent = data.options.A;
+            optionTexts.B.textContent = data.options.B;
+            optionTexts.C.textContent = data.options.C;
+
+            // Reset Tampilan Kartu Jawaban
+            ['A', 'B', 'C'].forEach(opt => {
+                optionCards[opt].className = "bg-slate-900/40 backdrop-blur-sm border-4 border-indigo-500/50 rounded-3xl p-6 flex flex-col justify-between transition-all duration-500";
+                optionBadges[opt].className = "hidden text-xl font-bold px-4 py-2 rounded-xl";
+                optionBadges[opt].textContent = "";
+            });
+
+            // Adjust warna border default masing-masing kartu
+            optionCards.A.classList.replace('border-indigo-500/50', 'border-indigo-500/50');
+            optionCards.B.classList.replace('border-indigo-500/50', 'border-amber-500/50');
+            optionCards.C.classList.replace('border-indigo-500/50', 'border-emerald-500/50');
+
+            // Kontrol Tombol
+            btnSubmit.classList.remove('hidden');
+            btnNext.classList.add('hidden');
+
+            // Mulai Timer Waktu Mundur
+            startTimer();
+        }
+
+        // FUNGSI TIMER
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                timerDisplayEl.textContent = timeLeft;
+
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    finishAnswer(); // Otomatis selesaikan jika waktu habis
+                }
+            }, 1000);
+        }
+
+        // FUNGSI SAAT GURU KLIK "SELESAI MENJAWAB"
+        function finishAnswer() {
+            if (isAnswered) return;
+            isAnswered = true;
+            clearInterval(timerInterval);
+
+            const data = quizData[currentQuestionIndex];
+            const correctKey = data.correct;
+
+            // Highlight Jawaban Benar & Salah
+            ['A', 'B', 'C'].forEach(opt => {
+                if (opt === correctKey) {
+                    // Tampilan Jawaban Benar
+                    optionCards[opt].className = "bg-emerald-950/80 backdrop-blur-md border-8 border-emerald-400 rounded-3xl p-6 flex flex-col justify-between transition-all duration-500 transform scale-105 shadow-[0_0_50px_rgba(52,211,153,0.5)]";
+                    optionBadges[opt].textContent = "BENAR! 🎉";
+                    optionBadges[opt].className = "inline-block bg-emerald-500 text-slate-950 text-xl font-black px-6 py-2 rounded-xl shadow-lg border border-emerald-300 animate-pulse";
+                } else {
+                    // Tampilan Jawaban Salah
+                    optionCards[opt].className = "bg-slate-950/80 backdrop-blur-sm border-4 border-rose-900/40 opacity-40 rounded-3xl p-6 flex flex-col justify-between transition-all duration-500";
+                    optionBadges[opt].textContent = "SALAH";
+                    optionBadges[opt].className = "inline-block bg-rose-950 text-rose-300 text-base font-bold px-4 py-1 rounded-xl border border-rose-800";
+                }
+            });
+
+            // Efek Konfeti Perayaan jika Jawaban Diungkapkan
+            triggerConfetti();
+
+            // Sembunyikan Tombol Selesai, Tampilkan Tombol Next
+            btnSubmit.classList.add('hidden');
+            if (currentQuestionIndex < quizData.length - 1) {
+                btnNext.classList.remove('hidden');
+            } else {
+                btnNext.textContent = "Selesai (Akhir Game)";
+                btnNext.classList.remove('hidden');
+            }
+        }
+
+        // FUNGSI PINDAH SOAL NEXT
+        function nextQuestion() {
+            if (currentQuestionIndex < quizData.length - 1) {
+                currentQuestionIndex++;
+                loadQuestion();
+            } else {
+                alert("Game telah selesai! Terima kasih atas partisipasi seluruh murid.");
+            }
+        }
+
+        // FUNGSI EFEK KONFETI CELEBRATION
+        function triggerConfetti() {
+            const duration = 2.5 * 1000;
+            const animationEnd = Date.now() + duration;
+            const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 1000 };
+
+            function randomInRange(min, max) {
+                return Math.random() * (max - min) + min;
+            }
+
+            const interval = setInterval(function() {
+                const timeLeft = animationEnd - Date.now();
+
+                if (timeLeft <= 0) {
+                    return clearInterval(interval);
+                }
+
+                const particleCount = 50 * (timeLeft / duration);
+                
+                // Konfeti dari Sisi Kiri dan Kanan Layar TV
+                confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } }));
+                confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } }));
+            }, 250);
+        }
+
+        // JALANKAN SAAT HALAMAN DIMUAT
+        window.addEventListener('DOMContentLoaded', () => {
+            initCamera();
+            loadQuestion();
+        });
+    </script>
+</body>
+</html>
