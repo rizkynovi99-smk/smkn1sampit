@@ -1,0 +1,1312 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Museum Virtual Kebudayaan Dayak Kalimantan Tengah</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Three.js CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <!-- Font & Icon -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            overflow: hidden;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: none;
+            background-color: #120a05;
+        }
+
+        .font-cinzel {
+            font-family: 'Cinzel', serif;
+        }
+
+        /* Custom Scrollbar for Modal */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(69, 26, 3, 0.5);
+            border-radius: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: linear-gradient(to bottom, #f59e0b, #b45309);
+            border-radius: 8px;
+        }
+
+        /* Canvas Container */
+        #webgl-container {
+            width: 100vw;
+            height: 100vh;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+
+        /* Floating Joystick Controls */
+        .joystick-base {
+            width: 130px;
+            height: 130px;
+            background: radial-gradient(circle, rgba(217, 119, 6, 0.25) 0%, rgba(120, 53, 15, 0.4) 100%);
+            border: 2px solid rgba(251, 191, 36, 0.6);
+            border-radius: 50%;
+            position: absolute;
+            bottom: 24px;
+            left: 24px;
+            z-index: 30;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(8px);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.6), inset 0 0 15px rgba(245, 158, 11, 0.3);
+            touch-action: none;
+        }
+
+        .joystick-thumb {
+            width: 55px;
+            height: 55px;
+            background: radial-gradient(circle, #fcd34d 0%, #d97706 60%, #78350f 100%);
+            border-radius: 50%;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.7);
+            position: absolute;
+            transition: transform 0.05s ease-out;
+            border: 2px solid rgba(255, 255, 255, 0.7);
+            pointer-events: none;
+        }
+
+        /* Touch Look Area */
+        #touch-look-zone {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 55vw;
+            height: calc(100vh - 120px);
+            z-index: 10;
+            touch-action: none;
+        }
+
+        /* Dayak Pattern Motif Border */
+        .dayak-border {
+            border-image: linear-gradient(to right, #dc2626, #f59e0b, #10b981, #f59e0b, #dc2626) 1;
+        }
+
+        /* Pulsing Glow Animation */
+        @keyframes pulseGlow {
+            0%, 100% { opacity: 0.6; transform: scale(1); box-shadow: 0 0 10px rgba(245, 158, 11, 0.4); }
+            50% { opacity: 1; transform: scale(1.08); box-shadow: 0 0 25px rgba(245, 158, 11, 0.9); }
+        }
+        .pulse-glow {
+            animation: pulseGlow 1.8s infinite ease-in-out;
+        }
+    </style>
+</head>
+<body class="text-amber-50">
+
+    <!-- 3D Canvas Container -->
+    <div id="webgl-container"></div>
+    
+    <!-- Transparent Touch Zone for Camera Pan -->
+    <div id="touch-look-zone"></div>
+
+    <!-- START SCREEN OVERLAY -->
+    <div id="start-screen" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-stone-950/95 p-6 backdrop-blur-md transition-opacity duration-700">
+        <div class="max-w-2xl text-center space-y-6">
+            <div class="inline-block p-4 rounded-full bg-gradient-to-br from-amber-600/40 via-red-900/40 to-stone-900 border-2 border-amber-500/60 mb-1 shadow-xl">
+                <svg class="w-12 h-12 text-amber-400 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                </svg>
+            </div>
+            <h1 class="font-cinzel text-3xl sm:text-5xl font-extrabold tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 via-amber-400 to-red-500 drop-shadow-md">
+                MUSEUM HUKUM ADAT DAYAK NGAJU
+            </h1>
+            <p class="text-amber-200/90 text-sm sm:text-base font-medium tracking-wide leading-relaxed">
+                Modul Pembelajaran Muatan Lokal Kalimantan Tengah (SMA Class XI). Jelajahi 96 Pasal Hukum Adat Tumbang Anoi 1894 dari halaman eksterior hingga interior Rumah Betang.
+            </p>
+
+            <div class="bg-gradient-to-r from-stone-900/90 via-amber-950/80 to-stone-900/90 border-2 border-amber-600/50 rounded-xl p-4 text-xs sm:text-sm text-left text-amber-200 space-y-2 shadow-2xl">
+                <p class="font-bold text-amber-300 flex items-center gap-2">
+                    <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    Panduan Navigasi & Kontrol:
+                </p>
+                <ul class="list-disc list-inside space-y-1 text-amber-200/80">
+                    <li><strong class="text-amber-300">HP / Tablet:</strong> Gunakan Virtual Joystick di kiri bawah untuk berjalan & usap layar sebelah kanan untuk memutar kamera.</li>
+                    <li><strong class="text-amber-300">Desktop:</strong> Gunakan tombol <code class="bg-amber-900/80 px-1.5 py-0.5 rounded text-amber-200">WASD</code> atau <code class="bg-amber-900/80 px-1.5 py-0.5 rounded text-amber-200">Panah</code>. Klik & Drag mouse untuk mengarahkan pandangan.</li>
+                    <li>Mendekati pos materi di dalam museum lalu tekan tombol <strong class="text-amber-300 font-bold">"E"</strong> atau sentuh tombol mengambang <strong class="text-amber-300 font-bold font-cinzel">"LIHAT DETAIL"</strong>.</li>
+                </ul>
+            </div>
+
+            <button id="btn-start" class="w-full sm:w-auto px-10 py-4 bg-gradient-to-r from-red-700 via-amber-600 to-yellow-500 hover:from-red-600 hover:to-yellow-400 text-stone-950 font-extrabold text-lg rounded-xl shadow-xl shadow-amber-900/60 transition-all transform hover:-translate-y-0.5 cursor-pointer border border-amber-300">
+                Mulai Penjelajahan Museum
+            </button>
+        </div>
+    </div>
+
+    <!-- UI HUD / CONTROLS OVERLAY -->
+    <div id="ui-hud" class="fixed inset-0 pointer-events-none z-20 flex flex-col justify-between p-4 sm:p-6 opacity-0 transition-opacity duration-500">
+        <!-- Header Info Bar -->
+        <div class="flex items-center justify-between pointer-events-auto">
+            <div class="bg-stone-900/90 border-2 border-amber-500/70 backdrop-blur-md px-4 py-2.5 rounded-xl flex items-center space-x-3 shadow-xl">
+                <div class="w-3.5 h-3.5 rounded-full bg-emerald-500 animate-pulse shadow-lg shadow-emerald-500/50"></div>
+                <div>
+                    <h2 class="font-cinzel text-xs sm:text-sm font-bold text-amber-300 tracking-wider">MUSEUM HUKUM ADAT DAYAK</h2>
+                    <p id="location-tag" class="text-[10px] sm:text-xs text-amber-100/80 font-semibold">Area: Halaman Luar Rumah Betang</p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2">
+                <button id="btn-audio" class="p-2.5 bg-stone-900/90 border-2 border-amber-500/70 rounded-xl text-amber-300 hover:text-amber-100 backdrop-blur-md transition shadow-lg">
+                    <svg id="icon-audio" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Floating Interaction Prompt (Desktop & Mobile) -->
+        <div id="interaction-prompt" class="self-center bg-gradient-to-r from-stone-950 via-amber-950 to-stone-950 border-2 border-amber-400 px-5 py-3 rounded-2xl shadow-2xl backdrop-blur-md transition-all duration-300 opacity-0 transform translate-y-4 pointer-events-auto flex items-center space-x-4">
+            <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 text-stone-950 hidden sm:flex items-center justify-center font-bold text-base font-cinzel shadow-inner border border-amber-200">
+                E
+            </div>
+            <div>
+                <p id="prompt-artifact-name" class="text-xs text-amber-300 font-extrabold uppercase tracking-wider">Materi Adat Ditemukan</p>
+                <p class="text-xs sm:text-sm text-amber-100/90">Tekan 'E' / Ketuk Tombol Mengambang</p>
+            </div>
+            <button id="btn-interact-action" class="px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-stone-950 font-bold text-xs rounded-xl transition shadow-lg border border-amber-200">
+                Pelajari Materi
+            </button>
+        </div>
+
+        <!-- On-Screen Floating Touch Controls (For Mobile & Touch Devices) -->
+        <div class="pointer-events-auto flex justify-between items-end w-full">
+            <!-- Left Side: Floating Virtual Joystick -->
+            <div id="joystick-base" class="joystick-base">
+                <div id="joystick-thumb" class="joystick-thumb"></div>
+            </div>
+
+            <!-- Right Side: Floating Action Button (Detail Interaksi Artefak) -->
+            <button id="btn-floating-interact" class="w-16 h-16 sm:w-20 sm:h-20 mb-2 rounded-full bg-gradient-to-tr from-red-600 via-amber-500 to-yellow-400 border-2 border-amber-200 text-stone-950 font-bold shadow-2xl flex flex-col items-center justify-center active:scale-95 transition-transform pulse-glow opacity-70 cursor-pointer">
+                <svg class="w-6 h-6 sm:w-8 sm:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                </svg>
+                <span class="text-[9px] font-black uppercase tracking-tighter mt-0.5">DETAIL</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- ARTIFACT MATERIAL MODAL POPUP -->
+    <div id="artifact-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-950/90 backdrop-blur-md opacity-0 pointer-events-none transition-opacity duration-300">
+        <div class="relative w-full max-w-2xl max-h-[90vh] bg-stone-900 border-2 border-amber-500/80 rounded-2xl shadow-2xl overflow-hidden flex flex-col">
+            
+            <!-- Modal Header (Accent Dayak Colors) -->
+            <div class="p-4 sm:p-5 border-b-2 border-amber-600/60 flex items-center justify-between bg-gradient-to-r from-red-950 via-stone-900 to-amber-950">
+                <div class="flex items-center space-x-3">
+                    <span id="modal-category" class="px-2.5 py-1 text-[10px] sm:text-xs font-black tracking-wider uppercase bg-amber-500 text-stone-950 rounded-md shadow">
+                        Kategori Materi
+                    </span>
+                    <h3 id="modal-title" class="font-cinzel text-base sm:text-xl font-bold text-amber-200">
+                        Judul Modul Adat
+                    </h3>
+                </div>
+                <button id="btn-close-modal" class="p-2 text-amber-400 hover:text-amber-100 rounded-lg transition">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="p-5 sm:p-6 overflow-y-auto custom-scrollbar space-y-5 text-amber-100 text-sm leading-relaxed flex-1">
+                <!-- Relevantly Generated Dynamic SVG Illustration Header -->
+                <div id="modal-illustration-box" class="w-full h-40 sm:h-48 rounded-xl bg-gradient-to-br from-amber-950/80 via-stone-950 to-red-950/60 border-2 border-amber-500/40 flex flex-col items-center justify-center relative overflow-hidden p-4 text-center shadow-inner">
+                    <div class="absolute inset-0 bg-[radial-gradient(#d97706_1px,transparent_1px)] [background-size:16px_16px] opacity-20"></div>
+                    <div id="illustration-svg-container" class="relative z-10 flex items-center justify-center">
+                        <!-- Dynamic SVG Icon inserted via JS -->
+                    </div>
+                    <span id="illustration-caption" class="relative z-10 text-[11px] sm:text-xs font-bold text-amber-300 font-cinzel tracking-wider mt-2 bg-stone-950/70 px-3 py-1 rounded-full border border-amber-500/30">
+                        HUKUM ADAT DAYAK NGAJU
+                    </span>
+                </div>
+
+                <div class="space-y-2">
+                    <h4 class="font-cinzel text-base font-bold text-amber-300 border-b border-amber-700/50 pb-1 flex items-center gap-2">
+                        <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                        Uraian Penjelasan Adat
+                    </h4>
+                    <p id="modal-description" class="text-amber-100/90 leading-relaxed text-xs sm:text-sm whitespace-pre-line">
+                        Deskripsi materi modul...
+                    </p>
+                </div>
+
+                <div class="bg-gradient-to-r from-amber-950/60 to-stone-900 border-l-4 border-amber-500 rounded-r-xl p-4 space-y-1 shadow">
+                    <h4 class="font-cinzel text-xs font-extrabold text-amber-400 uppercase tracking-wide">Ketentuan Sanksi Adat & Nilai Edukasi</h4>
+                    <p id="modal-significance" class="text-xs sm:text-sm text-amber-200/90 italic">
+                        Ketentuan denda / sanksi adat...
+                    </p>
+                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="p-4 border-t border-amber-900/60 bg-stone-950 flex justify-end">
+                <button id="btn-modal-ok" class="px-6 py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-stone-950 font-bold text-xs sm:text-sm rounded-xl transition shadow-lg border border-amber-300">
+                    Lanjutkan Eksplorasi
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN THREE.JS & APPLICATION SCRIPT -->
+    <script>
+        /* ----------------------------------------------------
+         * DATA 15 MATERI HUKUM ADAT DAYAK NGAJU (MODUL SMA XI)
+         * ---------------------------------------------------- */
+        const ARTIFACTS_DATA = [
+            { 
+                id: 1, 
+                title: "Hukum Adat Proteksi & Peradilan", 
+                category: "Pengantar Hukum", 
+                desc: "Hukum adat Dayak Ngaju dibentuk oleh tua-tua adat sebagai proteksi masyarakat di Rumah Betang agar terhindar dari perpecahan. Persidangan digelar di Balai Adat / rumah Damang oleh perangkat resmi: Damang Kepala Adat, Sekretaris Damang, Mantir Adat, Pelapor (Pandawa), dan Terlapor (Tandawa).", 
+                significance: "Meminimalisir kesalahan dan menjamin perlindungan keadilan bagi setiap warga adat.", 
+                color: 0xd97706,
+                iconType: "justice" 
+            },
+            { 
+                id: 2, 
+                title: "Konsep Singér & Penghapusan Jipén", 
+                category: "Sistem Sanksi", 
+                desc: "Hukum adat Dayak tidak menerapkan sanksi fisik / penjara, melainkan denda yang disebut Singér (berupa uang/barang/kati ramu). Pada masa lampau sanksi denda berupa Jipén (perbudakan), namun rapat Tumbang Anoi 1894 melarang Jipén dan menggantinya dengan Singér yang disesuaikan dengan kesanggupan.", 
+                significance: "96 Pasal Singér Rapat Damai Tumbang Anoi 1894 menjadi panduan peradilan adat hingga kini.", 
+                color: 0xdc2626,
+                iconType: "coins"
+            },
+            { 
+                id: 3, 
+                title: "Pasal 1-4: Perkawinan & Perceraian", 
+                category: "Hukum Perkeluargaan", 
+                desc: "Pasal 1 (Singér Tungkun) mengatur denda perampasan istri orang (2x palaku adat, 15 kati tékap bau maté, pakaian sindé méndéng, ganti rugi pesta, dan potong 2 babi untuk ritual hasaki). Pasal 3 & 4 mengatur perceraian sepihak maupun perceraian kehendak bersama (harta rupa tangan dibagi dua/tiga atau diserahkan ke anak).", 
+                significance: "Menjaga keutuhan rumah tangga dan perlindungan hak anak serta warisan.", 
+                color: 0xb45309,
+                iconType: "family"
+            },
+            { 
+                id: 4, 
+                title: "Pasal 5-6: Tunangan & Batal Janji", 
+                category: "Hukum Perikatan", 
+                desc: "Pasal 5 (Singér Palékak Pisék) mengatur pembatalan janji pertunangan. Jika wanita membatalkan, wajib mengembalikan barang titipan 2x lipat + pisék. Jika pria membatalkan, tidak boleh menuntut pengembalian dan didenda singér kalékét. Pasal 6 mengatur Singér Tungkun Paisék (merebut tunangan orang).", 
+                significance: "Menghormati kesepakatan adat pertunangan antar dua keluarga besar.", 
+                color: 0xd97706,
+                iconType: "ring"
+            },
+            { 
+                id: 5, 
+                title: "Pasal 7: Hamil Gelap (Sumbang & Tulah)", 
+                category: "Hukum Kesusilaan", 
+                desc: "Perzinahan (Sarau) dibagi 3 kategori: sejenjang silsilah, tidak sejenjang (Sumbang), dan silsilah darah ke atas/bawah (Tulah). Sanksi Tulah amat berat: potong sapi/kerbau untuk palas bumi, ritual makan di dulang babi tanpa tangan langsung mulut, denda 120-210 kati ramu, dan KEDUA PELAKU HARAM DINIKAHKAN.", 
+                significance: "Menjaga kesucian kosmik alam dan silsilah pertalian darah suku Dayak.", 
+                color: 0x991b1b,
+                iconType: "taboo"
+            },
+            { 
+                id: 6, 
+                title: "Pasal 11-13: Singér Sala Basa & Tékap Bau Maté", 
+                category: "Etika Kesopanan", 
+                desc: "Mengatur sanksi salah tingkah: bertamu saat hanya ada wanita di rumah (Pasal 11), mengajak gadis perawan tanpa izin keluarga (Pasal 12), serta tindakan mempermalukan / merusak nama baik (Pasal 13). Pelanggar didenda 15-30 kati ramu serta biaya Tékap Bau Maté (penutup rasa malu).", 
+                significance: "Menjunjung tinggi etika, kesopanan, dan kehormatan kaum wanita.", 
+                color: 0x059669,
+                iconType: "respect"
+            },
+            { 
+                id: 7, 
+                title: "Pasal 14-15: Pengurusan Jenazah & Tiwah", 
+                category: "Hukum Adat Kematian", 
+                desc: "Pasal 14 (Singér Paranggar Raung) menindak pria yang menikahi janda yang tulang belulang almarhum suaminya belum ditiwahkan tanpa izin waris. Pasal 15 (Palangi Pangarai) mewajibkan jaminan biaya tiwah (120-150 kati ramu) bagi wanita yang meninggal saat bersalin melalui acara manawur béhas.", 
+                significance: "Penghormatan terhadap roh leluhur dan kewajiban suci Upacara Tiwah.", 
+                color: 0x78350f,
+                iconType: "tiwah"
+            },
+            { 
+                id: 8, 
+                title: "Pasal 16-20: Pembunuhan (Singér Sahiring)", 
+                category: "Hukum Kriminal Adat", 
+                desc: "Pembunuhan berencana dikenakan Singér Sahiring berat (375-750 kati ramu) beserta denda turunan: Singér Bangunan (Pasal 17), Timbal-Timbalan/Pembantu (Pasal 18), Tétéks Uyat/Potong Leher (Pasal 19), dan Selém Balai (Pasal 20: penawaran damai dengan kerbau & lamiang untuk cegah balas dendam/asang).", 
+                significance: "Mencegah perang antar suku/keluarga (habunu) dan menegakkan harga diri kehidupan.", 
+                color: 0x991b1b,
+                iconType: "shield"
+            },
+            { 
+                id: 9, 
+                title: "Pasal 21-22: Paramun Hantu & Tipuk Danum", 
+                category: "Ritual Perlengkapan", 
+                desc: "Pasal 21 mengatur 37 jenis Paramun Hantu (sarana kelengkapan jenazah seperti sipét, talawang, lamiang, garantung, arut) yang wajib disediakan pelaku pembunuhan (atau diganti 75 kati ramu). Pasal 22 (Tipuk Danum) adalah ritual basuh kaki saling memaafkan dengan korban.", 
+                significance: "Restorasi hubungan kemanusiaan dan penyediaan bekal alam baka.", 
+                color: 0xd97706,
+                iconType: "beads"
+            },
+            { 
+                id: 10, 
+                title: "Pasal 23 & 27: Tétés Hinting Bunu (Damai Sakral)", 
+                category: "Perdamaian Abadi", 
+                desc: "Pasal 23 mengatur denda luka berdarah (Biat Himang). Pasal 27 adalah ritual menghentikan permusuhan abadi (bunu) antar manusia, maupun dendam musibah flora/fauna/gaib. Dilakukan dengan manawur béhas, potong kerbau, sumpah adat malabuh batu & mamapak baji pada kayu baha.", 
+                significance: "Memutus mata rantai dendam keturunan dan menyelaraskan alam semesta.", 
+                color: 0x047857,
+                iconType: "peace"
+            },
+            { 
+                id: 11, 
+                title: "Pasal 28-34: Perlindungan Hak Milik & Pencurian", 
+                category: "Hukum Kebendaan", 
+                desc: "Mengatur denda pencurian di dalam rumah (Pasal 28: 15-30 kati ramu), luar rumah (Pasal 29), ternak babi/ayam (Pasal 30), pencurian dayung/galah/perahu pencarian nafkah (Pasal 31-32), hingga pencurian buah kebun (Pasal 33). Pelanggar wajib mengembalikan barang + denda makan bersama.", 
+                significance: "Menjamin keamanan sarana pencarian nafkah dan ketentraman pemukiman.", 
+                color: 0x2563eb,
+                iconType: "canoe"
+            },
+            { 
+                id: 12, 
+                title: "Pasal 48, 49 & 87: Kebakaran & Kerusakan Situs Keramat", 
+                category: "Perlindungan Lingkungan", 
+                desc: "Pasal 48 mengatur denda membakar rumah (15-200 kati ramu). Pasal 49 & 87 menindak pemusnahan/perusakan kuburan tua, Sandung Pantar, Pahéwan, Karamat, dan Tajahan. Pelanggar didenda 15-45 kati ramu, wajib memberi ayam/lilis/sanaman pangkit dan potong babi minta maaf pada arwah.", 
+                significance: "Perlindungan terhadap lingkungan hidup sakral dan tempat perlindungan adat.", 
+                color: 0xd97706,
+                iconType: "fire"
+            },
+            { 
+                id: 13, 
+                title: "Pasal 50, 51 & 58: Fitnah Hantuén & Hinting Pali", 
+                category: "Hukum Nama Baik & Ritual", 
+                desc: "Pasal 50 menindak fitnah serampangan. Pasal 51 (Tandahan Hantuén) menindak tuduhan ilmu hitam/kuyang tanpa bukti (denda 45-90 kati ramu & ritual hapalas). Pasal 58 (Pali Karusak Hinting) menindak perusakan tanda batas ritual penangkal hama/kematian (Hinting Pali).", 
+                significance: "Menjaga stabilitas sosial masyarakat dari gosip menyesatkan dan kesucian ritual.", 
+                color: 0x7c3aed,
+                iconType: "warning"
+            },
+            { 
+                id: 14, 
+                title: "Pasal 89-91: Sengketa Batas Tanah & Warisan", 
+                category: "Hukum Agraria & Waris", 
+                desc: "Mengatur sengketa batas ladang/kebun warisan (Pasal 89-90) diselesaikan via sistem padu/manénung & sumpah adat. Pasal 91 mengatur pembagian harta bersama (Barang Rupa Tangan) & warisan: cadangan tiwah orang tua, biaya kematian, dan perlindungan anak yang merawat orang tua hingga akhir hayat.", 
+                significance: "Mencegah perselisihan batas tanah antar keluarga dan menjamin hari tua orang tua.", 
+                color: 0x059669,
+                iconType: "land"
+            },
+            { 
+                id: 15, 
+                title: "Bélum Bahadat, Sapan Pahuni & Hasumpah", 
+                category: "Falsafah Kehidupan Dayak", 
+                desc: "Falsafah Bélum Bahadat (Hidup Beradat & Bermoral Tinggi). Hadat Sapan Pahuni mewajibkan mencicipi/menyentuh makanan yang ditawarkan (minjuk) agar selamat dari musibah. Hadat Hasumpah adalah ritual sumpah adat (beras ketan diludah ke dulang, raba air pasu, telur berdiri di ujung sumpit). Pasal 96 menutup seluruh kelengkapan hukum adat.", 
+                significance: "Puncak keharmonisan hidup antara Manusia, Alam Semesta, dan Tuhan Pencipta (Ranying Hatalla).", 
+                color: 0xf59e0b,
+                iconType: "tree"
+            }
+        ];
+
+        /* ----------------------------------------------------
+         * GLOBAL STATE & VARIABLES
+         * ---------------------------------------------------- */
+        let scene, camera, renderer;
+        let playerGroup, playerTorso, playerHead, playerLawung, playerArmLeft, playerArmRight, playerLegLeft, playerLegRight;
+        let clock = new THREE.Clock();
+
+        // Control Inputs
+        const keys = { w: false, a: false, s: false, d: false, ArrowUp: false, ArrowDown: false, ArrowLeft: false, ArrowRight: false, e: false };
+        let joystickVector = { x: 0, y: 0 };
+        
+        // Camera Orbit
+        let cameraYaw = 0;
+        let cameraPitch = 0.25;
+        let isMouseDown = false;
+        let previousMouseX = 0, previousMouseY = 0;
+
+        // Interactive States
+        const artifactMeshes = [];
+        let activeNearbyArtifact = null;
+        let isModalOpen = false;
+        let isOutsideBetang = true;
+
+        // Audio State
+        let audioCtx = null;
+
+        /* ----------------------------------------------------
+         * INITIALIZATION
+         * ---------------------------------------------------- */
+        window.addEventListener('load', () => {
+            initThreeJS();
+            createOutdoorEnvironment();
+            createBetangArchitecture();
+            createPlayer();
+            spawnMuseumArtifacts();
+            setupEventListeners();
+            setupTouchJoystick();
+            setupTouchCameraPan();
+
+            animate();
+        });
+
+        /* ----------------------------------------------------
+         * THREE.JS ENGINE SETUP
+         * ---------------------------------------------------- */
+        function initThreeJS() {
+            const container = document.getElementById('webgl-container');
+
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x1a2e1a); // Natural outdoor sky ambience
+            scene.fog = new THREE.FogExp2(0x1a2e1a, 0.018);
+
+            camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 120);
+
+            renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            renderer.outputEncoding = THREE.sRGBEncoding;
+            container.appendChild(renderer.domElement);
+
+            // Vibrant Warm Lighting (Sunlight + Ambient)
+            const ambientLight = new THREE.AmbientLight(0xffedd5, 0.85);
+            scene.add(ambientLight);
+
+            const sunLight = new THREE.DirectionalLight(0xfef08a, 1.4);
+            sunLight.position.set(25, 45, 20);
+            sunLight.castShadow = true;
+            sunLight.shadow.mapSize.width = 1024;
+            sunLight.shadow.mapSize.height = 1024;
+            scene.add(sunLight);
+
+            window.addEventListener('resize', onWindowResize);
+        }
+
+        /* ----------------------------------------------------
+         * OUTDOOR ENVIRONMENT (HALAMAN LUAR & HUTAN KALIMANTAN)
+         * ---------------------------------------------------- */
+        function createOutdoorEnvironment() {
+            // Ground Grass / Terrain Outside
+            const groundGeo = new THREE.PlaneGeometry(160, 160);
+            const groundMat = new THREE.MeshStandardMaterial({ color: 0x22381e, roughness: 0.9 });
+            const ground = new THREE.Mesh(groundGeo, groundMat);
+            ground.rotation.x = -Math.PI / 2;
+            ground.receiveShadow = true;
+            scene.add(ground);
+
+            // Tropical Rainforest Trees around the Yard
+            for (let i = 0; i < 40; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const radius = 28 + Math.random() * 45;
+                const tx = Math.sin(angle) * radius;
+                const tz = Math.cos(angle) * radius;
+
+                // Don't place tree in front of the stairs entrance (Z: 20 to 45)
+                if (Math.abs(tx) < 12 && tz > 15) continue;
+
+                createTropicalTree(tx, tz);
+            }
+        }
+
+        function createTropicalTree(x, z) {
+            const treeGroup = new THREE.Group();
+            treeGroup.position.set(x, 0, z);
+
+            const trunkGeo = new THREE.CylinderGeometry(0.3, 0.5, 7 + Math.random() * 3, 8);
+            const trunkMat = new THREE.MeshStandardMaterial({ color: 0x3d2514, roughness: 0.9 });
+            const trunk = new THREE.Mesh(trunkGeo, trunkMat);
+            trunk.position.y = 3.5;
+            trunk.castShadow = true;
+            treeGroup.add(trunk);
+
+            const leavesGeo = new THREE.ConeGeometry(2.5 + Math.random(), 6, 7);
+            const leavesMat = new THREE.MeshStandardMaterial({ color: 0x155e2b, roughness: 0.7 });
+            const leaves = new THREE.Mesh(leavesGeo, leavesMat);
+            leaves.position.y = 7.5;
+            leaves.castShadow = true;
+            treeGroup.add(leaves);
+
+            scene.add(treeGroup);
+        }
+
+        /* ----------------------------------------------------
+         * FLOATING TOUCH CONTROLS (FIXED MOBILE JOYSTICK BUG)
+         * ---------------------------------------------------- */
+        function setupTouchJoystick() {
+            const joystickBase = document.getElementById('joystick-base');
+            const joystickThumb = document.getElementById('joystick-thumb');
+            if (!joystickBase || !joystickThumb) return;
+
+            let touchId = null;
+            const maxRadius = 45;
+
+            joystickBase.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                if (touchId !== null) return;
+
+                const touch = e.changedTouches[0];
+                touchId = touch.identifier;
+
+                const baseRect = joystickBase.getBoundingClientRect();
+                const centerX = baseRect.left + baseRect.width / 2;
+                const centerY = baseRect.top + baseRect.height / 2;
+
+                updateJoystick(touch.clientX, touch.clientY, centerX, centerY);
+            }, { passive: false });
+
+            window.addEventListener('touchmove', (e) => {
+                if (touchId === null) return;
+                for (let i = 0; i < e.touches.length; i++) {
+                    if (e.touches[i].identifier === touchId) {
+                        const baseRect = joystickBase.getBoundingClientRect();
+                        const centerX = baseRect.left + baseRect.width / 2;
+                        const centerY = baseRect.top + baseRect.height / 2;
+
+                        updateJoystick(e.touches[i].clientX, e.touches[i].clientY, centerX, centerY);
+                        break;
+                    }
+                }
+            }, { passive: false });
+
+            const resetJoystick = (e) => {
+                if (touchId === null) return;
+                for (let i = 0; i < e.changedTouches.length; i++) {
+                    if (e.changedTouches[i].identifier === touchId) {
+                        joystickThumb.style.transform = `translate(0px, 0px)`;
+                        joystickVector = { x: 0, y: 0 };
+                        touchId = null;
+                        break;
+                    }
+                }
+            };
+
+            window.addEventListener('touchend', resetJoystick);
+            window.addEventListener('touchcancel', resetJoystick);
+
+            function updateJoystick(clientX, clientY, centerX, centerY) {
+                let dx = clientX - centerX;
+                let dy = clientY - centerY;
+                let dist = Math.hypot(dx, dy);
+
+                if (dist > maxRadius) {
+                    dx = (dx / dist) * maxRadius;
+                    dy = (dy / dist) * maxRadius;
+                }
+
+                joystickThumb.style.transform = `translate(${dx}px, ${dy}px)`;
+                joystickVector.x = dx / maxRadius;
+                joystickVector.y = dy / maxRadius;
+            }
+        }
+
+        function setupTouchCameraPan() {
+            const lookZone = document.getElementById('touch-look-zone');
+            let lookTouchId = null;
+            let lastTouchX = 0, lastTouchY = 0;
+
+            lookZone.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                const touch = e.changedTouches[0];
+                lookTouchId = touch.identifier;
+                lastTouchX = touch.clientX;
+                lastTouchY = touch.clientY;
+            }, { passive: false });
+
+            lookZone.addEventListener('touchmove', (e) => {
+                if (isModalOpen || lookTouchId === null) return;
+                for (let i = 0; i < e.touches.length; i++) {
+                    const touch = e.touches[i];
+                    if (touch.identifier === lookTouchId) {
+                        const deltaX = touch.clientX - lastTouchX;
+                        const deltaY = touch.clientY - lastTouchY;
+
+                        cameraYaw -= deltaX * 0.006;
+                        cameraPitch += deltaY * 0.006;
+                        cameraPitch = Math.max(-0.2, Math.min(0.7, cameraPitch));
+
+                        lastTouchX = touch.clientX;
+                        lastTouchY = touch.clientY;
+                        break;
+                    }
+                }
+            }, { passive: false });
+
+            const endLook = (e) => {
+                if (lookTouchId === null) return;
+                for (let i = 0; i < e.changedTouches.length; i++) {
+                    if (e.changedTouches[i].identifier === lookTouchId) {
+                        lookTouchId = null;
+                        break;
+                    }
+                }
+            };
+
+            window.addEventListener('touchend', endLook);
+            window.addEventListener('touchcancel', endLook);
+        }
+
+        /* ----------------------------------------------------
+         * RUMAH BETANG DAYAK ARCHITECTURE (BANGUNAN MUSEUM 3D)
+         * ---------------------------------------------------- */
+        function createBetangArchitecture() {
+            const stiltHeight = 3.0;
+            const wallHeight = 4.5;
+            const width = 32;
+            const length = 44;
+
+            const woodTexture = createWoodTextureCanvas();
+            const wallTexture = createWallTextureCanvas();
+
+            // 1. TIANG PANGGUNG KAYU ULIN (STILTS)
+            for (let x = -width / 2 + 2; x <= width / 2 - 2; x += 7) {
+                for (let z = -length / 2 + 2; z <= length / 2 + 4; z += 7) {
+                    const stiltGeo = new THREE.CylinderGeometry(0.35, 0.45, stiltHeight, 8);
+                    const stiltMat = new THREE.MeshStandardMaterial({ map: woodTexture, roughness: 0.9 });
+                    const stilt = new THREE.Mesh(stiltGeo, stiltMat);
+                    stilt.position.set(x, stiltHeight / 2, z);
+                    stilt.castShadow = true;
+                    stilt.receiveShadow = true;
+                    scene.add(stilt);
+                }
+            }
+
+            // 2. BETANG MAIN FLOOR (Lantai Kayu Museum)
+            const floorGeo = new THREE.BoxGeometry(width, 0.4, length);
+            const floorMat = new THREE.MeshStandardMaterial({ map: woodTexture, roughness: 0.4 });
+            const floor = new THREE.Mesh(floorGeo, floorMat);
+            floor.position.set(0, stiltHeight + 0.2, 0);
+            floor.receiveShadow = true;
+            scene.add(floor);
+
+            // 3. ENTRANCE STAIRS (Tangga Kayu Ulin / Tangka Hejen dari Halaman)
+            const stairWidth = 6;
+            const stepsCount = 10;
+            for (let i = 0; i < stepsCount; i++) {
+                const stepGeo = new THREE.BoxGeometry(stairWidth, 0.3, 0.8);
+                const stepMat = new THREE.MeshStandardMaterial({ map: woodTexture, roughness: 0.5 });
+                const step = new THREE.Mesh(stepGeo, stepMat);
+                
+                const stepY = (stiltHeight / stepsCount) * i + 0.15;
+                const stepZ = (length / 2) + 0.8 + (stepsCount - i) * 0.55;
+                
+                step.position.set(0, stepY, stepZ);
+                step.receiveShadow = true;
+                step.castShadow = true;
+                scene.add(step);
+            }
+
+            // 4. FRONT PORCH / SELASAR TERAS
+            const porchGeo = new THREE.BoxGeometry(width, 0.3, 6);
+            const porch = new THREE.Mesh(porchGeo, floorMat);
+            porch.position.set(0, stiltHeight + 0.15, (length / 2) + 3);
+            porch.receiveShadow = true;
+            scene.add(porch);
+
+            // 5. WALLS (Dinding Museum dengan Pintu Masuk Depan)
+            const wallMat = new THREE.MeshStandardMaterial({ map: wallTexture, roughness: 0.8 });
+            const museumYPos = stiltHeight + (wallHeight / 2);
+
+            // Back Wall
+            const backWall = new THREE.Mesh(new THREE.BoxGeometry(width, wallHeight, 0.4), wallMat);
+            backWall.position.set(0, museumYPos, -length / 2);
+            scene.add(backWall);
+
+            // Left Wall
+            const leftWall = new THREE.Mesh(new THREE.BoxGeometry(0.4, wallHeight, length), wallMat);
+            leftWall.position.set(-width / 2, museumYPos, 0);
+            scene.add(leftWall);
+
+            // Right Wall
+            const rightWall = new THREE.Mesh(new THREE.BoxGeometry(0.4, wallHeight, length), wallMat);
+            rightWall.position.set(width / 2, museumYPos, 0);
+            scene.add(rightWall);
+
+            // Front Wall with Doorway
+            const frontWallLeft = new THREE.Mesh(new THREE.BoxGeometry((width / 2) - 3, wallHeight, 0.4), wallMat);
+            frontWallLeft.position.set(-(width / 4) - 1.5, museumYPos, length / 2);
+            scene.add(frontWallLeft);
+
+            const frontWallRight = new THREE.Mesh(new THREE.BoxGeometry((width / 2) - 3, wallHeight, 0.4), wallMat);
+            frontWallRight.position.set((width / 4) + 1.5, museumYPos, length / 2);
+            scene.add(frontWallRight);
+
+            // Door Frame Top Beam
+            const doorTop = new THREE.Mesh(new THREE.BoxGeometry(6, 3, 0.4), wallMat);
+            doorTop.position.set(0, stiltHeight + wallHeight - 1.5, length / 2);
+            scene.add(doorTop);
+
+            // 6. TRADITIONAL BETANG ROOF (Atap Pelana Kayu Tinggi)
+            const roofGroup = new THREE.Group();
+            const roofGeo = new THREE.ConeGeometry(width * 0.75, 7, 4);
+            const roofMat = new THREE.MeshStandardMaterial({ color: 0x2b180d, roughness: 0.9 });
+            const roof = new THREE.Mesh(roofGeo, roofMat);
+            roof.rotation.y = Math.PI / 4;
+            roof.scale.set(1, 1, 1.3);
+            roof.position.set(0, stiltHeight + wallHeight + 3.5, 0);
+            roofGroup.add(roof);
+            scene.add(roofGroup);
+
+            // 7. INTERIOR PILLARS & LIGHTING
+            for (let z = -14; z <= 14; z += 14) {
+                [-8, 8].forEach(x => {
+                    const pillarGeo = new THREE.CylinderGeometry(0.4, 0.4, wallHeight, 12);
+                    const pillar = new THREE.Mesh(pillarGeo, floorMat);
+                    pillar.position.set(x, museumYPos, z);
+                    pillar.castShadow = true;
+                    scene.add(pillar);
+                });
+            }
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            const delta = clock.getDelta();
+            const time = clock.getElapsedTime();
+
+            if (!isModalOpen) {
+                updatePlayerMovement(delta, time);
+                updateCameraPosition();
+            }
+
+            // Rotate artifacts inside cases
+            artifactMeshes.forEach(group => {
+                if (group.userData && group.userData.itemMesh) {
+                    group.userData.itemMesh.rotation.y += 0.015;
+                }
+            });
+
+            checkProximityToArtifacts();
+            renderer.render(scene, camera);
+        }
+
+        function updatePlayerMovement(delta, time) {
+            let moveX = 0;
+            let moveZ = 0;
+
+            if (keys.w || keys.ArrowUp) moveZ -= 1;
+            if (keys.s || keys.ArrowDown) moveZ += 1;
+            if (keys.a || keys.ArrowLeft) moveX -= 1;
+            if (keys.d || keys.ArrowRight) moveX += 1;
+
+            if (Math.abs(joystickVector.x) > 0.1 || Math.abs(joystickVector.y) > 0.1) {
+                moveX = joystickVector.x;
+                moveZ = joystickVector.y;
+            }
+
+            const inputLen = Math.hypot(moveX, moveZ);
+            if (inputLen > 0.1) {
+                const dirX = moveX / inputLen;
+                const dirZ = moveZ / inputLen;
+
+                const moveAngle = Math.atan2(dirX, dirZ) + cameraYaw;
+                const speed = 5.5 * delta;
+
+                const nextX = playerGroup.position.x + Math.sin(moveAngle) * speed;
+                const nextZ = playerGroup.position.z + Math.cos(moveAngle) * speed;
+
+                playerGroup.position.x = nextX;
+                playerGroup.position.z = nextZ;
+
+                // Smooth Rotation
+                playerGroup.rotation.y = THREE.MathUtils.lerp(playerGroup.rotation.y, moveAngle, 0.15);
+
+                // Walking Animation for Arms and Legs
+                const walkCycle = Math.sin(time * 12);
+                playerLegLeft.rotation.x = walkCycle * 0.6;
+                playerLegRight.rotation.x = -walkCycle * 0.6;
+
+                // Arms swing opposite to legs
+                if (playerArmLeft && playerArmRight) {
+                    playerArmLeft.rotation.x = -walkCycle * 0.5;
+                    playerArmRight.rotation.x = walkCycle * 0.5;
+                }
+            } else {
+                playerLegLeft.rotation.x = THREE.MathUtils.lerp(playerLegLeft.rotation.x, 0, 0.2);
+                playerLegRight.rotation.x = THREE.MathUtils.lerp(playerLegRight.rotation.x, 0, 0.2);
+                if (playerArmLeft && playerArmRight) {
+                    playerArmLeft.rotation.x = THREE.MathUtils.lerp(playerArmLeft.rotation.x, 0, 0.2);
+                    playerArmRight.rotation.x = THREE.MathUtils.lerp(playerArmRight.rotation.x, 0, 0.2);
+                }
+            }
+
+            // DYNAMIC HEIGHT ADJUSTMENT (STAIRS & ELEVATED BETANG FLOOR)
+            updateCharacterElevation();
+        }
+
+        function updateCharacterElevation() {
+            const pX = playerGroup.position.x;
+            const pZ = playerGroup.position.z;
+
+            const betangStiltHeight = 3.0;
+            const betangLengthHalf = 22.0;
+            const betangWidthHalf = 16.0;
+
+            // Inside Betang Hall or Front Porch
+            if (Math.abs(pX) < betangWidthHalf && pZ < (betangLengthHalf + 6) && pZ > -betangLengthHalf) {
+                
+                // On Stairs Ramp Entrance
+                if (Math.abs(pX) < 3.5 && pZ >= betangLengthHalf && pZ <= (betangLengthHalf + 6)) {
+                    const stairProgress = ( (betangLengthHalf + 6) - pZ ) / 6;
+                    playerGroup.position.y = THREE.MathUtils.lerp(0, betangStiltHeight, stairProgress);
+                } else {
+                    playerGroup.position.y = betangStiltHeight;
+                }
+
+                if (isOutsideBetang) {
+                    isOutsideBetang = false;
+                    document.getElementById('location-tag').textContent = "Area: Dalam Museum Betang";
+                }
+            } else {
+                // Outdoor Ground Level
+                playerGroup.position.y = 0;
+                if (!isOutsideBetang) {
+                    isOutsideBetang = true;
+                    document.getElementById('location-tag').textContent = "Area: Halaman Luar Betang";
+                }
+            }
+        }
+
+        function updateCameraPosition() {
+            const cameraDistance = 4.5;
+            const targetOffset = new THREE.Vector3(0, 1.6, 0);
+            const targetPos = playerGroup.position.clone().add(targetOffset);
+
+            const cx = targetPos.x + cameraDistance * Math.sin(cameraYaw) * Math.cos(cameraPitch);
+            const cy = targetPos.y + cameraDistance * Math.sin(cameraPitch) + 0.4;
+            const cz = targetPos.z + cameraDistance * Math.cos(cameraYaw) * Math.cos(cameraPitch);
+
+            camera.position.set(cx, cy, cz);
+            camera.lookAt(targetPos);
+        }
+
+        /* ----------------------------------------------------
+         * ARTIFACT PROXIMITY & INTERACTION UI
+         * ---------------------------------------------------- */
+        function checkProximityToArtifacts() {
+            const promptUI = document.getElementById('interaction-prompt');
+            const promptText = document.getElementById('prompt-artifact-name');
+            const floatingBtn = document.getElementById('btn-floating-interact');
+            const interactionDistance = 3.2;
+
+            let closest = null;
+            let minDistance = Infinity;
+
+            artifactMeshes.forEach(group => {
+                const dist = playerGroup.position.distanceTo(group.position);
+                if (dist < interactionDistance && dist < minDistance) {
+                    minDistance = dist;
+                    closest = group.userData;
+                }
+            });
+
+            if (closest) {
+                activeNearbyArtifact = closest;
+                promptText.textContent = closest.data.title;
+                promptUI.classList.remove('opacity-0', 'translate-y-4', 'pointer-events-none');
+                promptUI.classList.add('opacity-100', 'translate-y-0');
+
+                // Activate Floating Action Button Glow
+                floatingBtn.classList.remove('opacity-60');
+                floatingBtn.classList.add('opacity-100', 'scale-110');
+            } else {
+                activeNearbyArtifact = null;
+                promptUI.classList.add('opacity-0', 'translate-y-4', 'pointer-events-none');
+                promptUI.classList.remove('opacity-100', 'translate-y-0');
+
+                floatingBtn.classList.add('opacity-60');
+                floatingBtn.classList.remove('opacity-100', 'scale-110');
+            }
+        }
+
+        /* ----------------------------------------------------
+         * MODAL SYSTEM & DYNAMIC ILLUSTRATION ICONS
+         * ---------------------------------------------------- */
+        function openArtifactModal(data) {
+            isModalOpen = true;
+            const modal = document.getElementById('artifact-modal');
+
+            document.getElementById('modal-title').textContent = data.title;
+            document.getElementById('modal-category').textContent = data.category;
+            document.getElementById('modal-description').textContent = data.desc;
+            document.getElementById('modal-significance').textContent = data.significance;
+
+            // Render Dynamic SVG Illustration Header
+            const svgContainer = document.getElementById('illustration-svg-container');
+            svgContainer.innerHTML = getArtifactIllustrationSVG(data.iconType);
+            document.getElementById('illustration-caption').textContent = data.title.toUpperCase();
+
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+            modal.classList.add('opacity-100');
+        }
+
+        function getArtifactIllustrationSVG(type) {
+            const svgHeader = '<svg class="w-20 h-20 text-amber-400 drop-shadow-[0_0_12px_rgba(245,158,11,0.6)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">';
+            
+            switch(type) {
+                case 'justice':
+                    return svgHeader + '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 6l9-4 9 4v6c0 5.55-3.84 10.74-9 12-5.16-1.26-9-6.45-9-12V6z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v8m-4-4h8"></path></svg>';
+                case 'coins':
+                    return svgHeader + '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>';
+                case 'family':
+                    return svgHeader + '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>';
+                case 'ring':
+                    return svgHeader + '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.684a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>';
+                case 'taboo':
+                    return svgHeader + '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>';
+                case 'respect':
+                    return svgHeader + '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>';
+                case 'tiwah':
+                    return svgHeader + '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5m0 0h4m-4 0V11m0 0l-3-3m3 3l3-3"></path></svg>';
+                case 'shield':
+                    return svgHeader + '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>';
+                case 'beads':
+                    return svgHeader + '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path></svg>';
+                case 'peace':
+                    return svgHeader + '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>';
+                case 'canoe':
+                    return svgHeader + '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>';
+                case 'fire':
+                    return svgHeader + '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 1-4 4-6 1.286 1.286 3 4 3 6 0 1 1 2 2.657 2.657z"></path></svg>';
+                case 'warning':
+                    return svgHeader + '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>';
+                case 'land':
+                    return svgHeader + '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2v1a2 2 0 002 2h2.945M11 20.055V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>';
+                case 'tree':
+                default:
+                    return svgHeader + '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>';
+            }
+        }
+
+        function closeModal() {
+            isModalOpen = false;
+            const modal = document.getElementById('artifact-modal');
+            modal.classList.add('opacity-0', 'pointer-events-none');
+            modal.classList.remove('opacity-100');
+        }
+
+        /* ----------------------------------------------------
+         * AUDIO & START SETUP
+         * ---------------------------------------------------- */
+        function startExperience() {
+            document.getElementById('start-screen').classList.add('opacity-0', 'pointer-events-none');
+            document.getElementById('ui-hud').classList.remove('opacity-0');
+            initAudio();
+        }
+
+        function initAudio() {
+            try {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(146.83, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.04, audioCtx.currentTime);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+            } catch (e) {}
+        }
+
+        function toggleAudio() {
+            if (!audioCtx) { initAudio(); return; }
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            else if (audioCtx.state === 'running') audioCtx.suspend();
+        }
+
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        /* ----------------------------------------------------
+         * TEXTURE GENERATORS (CANVAS PROCEDURAL TEXTURES)
+         * ---------------------------------------------------- */
+        function createWoodTextureCanvas() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 512;
+            canvas.height = 512;
+            const ctx = canvas.getContext('2d');
+
+            ctx.fillStyle = '#4a2810';
+            ctx.fillRect(0, 0, 512, 512);
+
+            ctx.strokeStyle = '#2d1607';
+            ctx.lineWidth = 2;
+            for (let i = 0; i < 50; i++) {
+                ctx.beginPath();
+                ctx.moveTo(0, Math.random() * 512);
+                ctx.bezierCurveTo(170, Math.random() * 512, 340, Math.random() * 512, 512, Math.random() * 512);
+                ctx.stroke();
+            }
+
+            const texture = new THREE.CanvasTexture(canvas);
+            texture.wrapS = THREE.RepeatWrapping;
+            texture.wrapT = THREE.RepeatWrapping;
+            texture.repeat.set(4, 4);
+            return texture;
+        }
+
+        function createWallTextureCanvas() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 512;
+            canvas.height = 512;
+            const ctx = canvas.getContext('2d');
+
+            ctx.fillStyle = '#361c0c';
+            ctx.fillRect(0, 0, 512, 512);
+
+            ctx.fillStyle = '#542d13';
+            for (let y = 0; y < 512; y += 32) {
+                ctx.fillRect(0, y, 512, 2);
+            }
+
+            const texture = new THREE.CanvasTexture(canvas);
+            texture.wrapS = THREE.RepeatWrapping;
+            texture.wrapT = THREE.RepeatWrapping;
+            texture.repeat.set(6, 2);
+            return texture;
+        }
+
+        /* ----------------------------------------------------
+         * CHARACTER & ARTIFACT CREATION
+         * ---------------------------------------------------- */
+        function createPlayer() {
+            playerGroup = new THREE.Group();
+            
+            // Start at outdoor yard facing entrance stairs
+            playerGroup.position.set(0, 0, 36);
+
+            // Skin Tone Material
+            const skinMat = new THREE.MeshStandardMaterial({ color: 0xf3a87c, roughness: 0.7 });
+            
+            // Dayak Vest / King Baba Clothes Material (Red Crimson & Golden Motifs)
+            const vestMat = new THREE.MeshStandardMaterial({ color: 0x991b1b, roughness: 0.5 });
+            const goldDecorMat = new THREE.MeshStandardMaterial({ color: 0xf59e0b, roughness: 0.3, metalness: 0.5 });
+            const clothBeltMat = new THREE.MeshStandardMaterial({ color: 0x78350f, roughness: 0.8 });
+
+            // 1. TORSO (Baju Adat Dayak / Vest King Baba)
+            const torsoGeo = new THREE.CylinderGeometry(0.32, 0.28, 1.1, 10);
+            playerTorso = new THREE.Mesh(torsoGeo, vestMat);
+            playerTorso.position.y = 1.05;
+            playerTorso.castShadow = true;
+            playerGroup.add(playerTorso);
+
+            // Decorative Belt (Ewah / Sabut Pinggang Adat)
+            const beltGeo = new THREE.CylinderGeometry(0.33, 0.33, 0.18, 10);
+            const belt = new THREE.Mesh(beltGeo, goldDecorMat);
+            belt.position.y = 0.65;
+            playerGroup.add(belt);
+
+            // 2. HEAD (Kepala Avatar)
+            const headGeo = new THREE.SphereGeometry(0.24, 16, 16);
+            playerHead = new THREE.Mesh(headGeo, skinMat);
+            playerHead.position.y = 1.8;
+            playerHead.castShadow = true;
+            playerGroup.add(playerHead);
+
+            // 3. LAWUNG DAYAK (Ikat Kepala Adat Khas Dayak Kalteng)
+            const lawungGroup = new THREE.Group();
+            
+            // Base Band Lawung (Ikat Kepala Merah-Kuning)
+            const lawungBandGeo = new THREE.CylinderGeometry(0.26, 0.26, 0.12, 16);
+            const lawungBandMat = new THREE.MeshStandardMaterial({ color: 0xd97706, roughness: 0.4 });
+            const lawungBand = new THREE.Mesh(lawungBandGeo, lawungBandMat);
+            lawungBand.position.set(0, 1.94, 0);
+            lawungGroup.add(lawungBand);
+
+            // Front Emblem / Motif Lawung
+            const emblemGeo = new THREE.BoxGeometry(0.1, 0.1, 0.04);
+            const emblem = new THREE.Mesh(emblemGeo, goldDecorMat);
+            emblem.position.set(0, 1.96, -0.25);
+            lawungGroup.add(emblem);
+
+            // Feathers of Hornbird / Enggang (Bulu Burung Enggang Adat)
+            const featherMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.5 });
+            const featherTipMat = new THREE.MeshStandardMaterial({ color: 0x1c1917, roughness: 0.5 });
+
+            // Feather 1 (Center Top)
+            const featherGeo = new THREE.ConeGeometry(0.06, 0.6, 5);
+            const feather = new THREE.Mesh(featherGeo, featherMat);
+            feather.position.set(0, 2.3, 0);
+            feather.rotation.z = -0.1;
+            lawungGroup.add(feather);
+
+            const featherTip = new THREE.Mesh(new THREE.ConeGeometry(0.04, 0.2, 5), featherTipMat);
+            featherTip.position.set(0, 2.5, 0);
+            featherTip.rotation.z = -0.1;
+            lawungGroup.add(featherTip);
+
+            // Feather 2 (Side Wing)
+            const featherSide = new THREE.Mesh(featherGeo, featherMat);
+            featherSide.position.set(-0.08, 2.25, 0.05);
+            featherSide.rotation.z = 0.25;
+            lawungGroup.add(featherSide);
+
+            playerGroup.add(lawungGroup);
+
+            // 4. ARMS WITH HANDS (Tangan & Lengan Karakter)
+            const armGeo = new THREE.CylinderGeometry(0.07, 0.06, 0.65, 8);
+            const handGeo = new THREE.SphereGeometry(0.075, 8, 8);
+
+            // Left Arm
+            playerArmLeft = new THREE.Group();
+            playerArmLeft.position.set(-0.38, 1.45, 0);
+            const armLMesh = new THREE.Mesh(armGeo, vestMat);
+            armLMesh.position.y = -0.3;
+            armLMesh.castShadow = true;
+            playerArmLeft.add(armLMesh);
+
+            const handLMesh = new THREE.Mesh(handGeo, skinMat);
+            handLMesh.position.y = -0.65;
+            playerArmLeft.add(handLMesh);
+            playerGroup.add(playerArmLeft);
+
+            // Right Arm
+            playerArmRight = new THREE.Group();
+            playerArmRight.position.set(0.38, 1.45, 0);
+            const armRMesh = new THREE.Mesh(armGeo, vestMat);
+            armRMesh.position.y = -0.3;
+            armRMesh.castShadow = true;
+            playerArmRight.add(armRMesh);
+
+            const handRMesh = new THREE.Mesh(handGeo, skinMat);
+            handRMesh.position.y = -0.65;
+            playerArmRight.add(handRMesh);
+            playerGroup.add(playerArmRight);
+
+            // 5. LEGS & FEET (Kaki & Celana Pendek Adat)
+            const legGeo = new THREE.CylinderGeometry(0.09, 0.08, 0.75, 8);
+            const legMat = new THREE.MeshStandardMaterial({ color: 0x1c1917 });
+
+            playerLegLeft = new THREE.Mesh(legGeo, legMat);
+            playerLegLeft.position.set(-0.14, 0.38, 0);
+            playerLegLeft.castShadow = true;
+            playerGroup.add(playerLegLeft);
+
+            playerLegRight = new THREE.Mesh(legGeo, legMat);
+            playerLegRight.position.set(0.14, 0.38, 0);
+            playerLegRight.castShadow = true;
+            playerGroup.add(playerLegRight);
+
+            scene.add(playerGroup);
+        }
+
+        function spawnMuseumArtifacts() {
+            const betangStiltHeight = 3.0;
+            const positions = [
+                { x: -12, z: -18 }, { x: -6, z: -18 }, { x: 0, z: -18 }, { x: 6, z: -18 }, { x: 12, z: -18 },
+                { x: -12, z: -6 },  { x: -6, z: -6 },  { x: 0, z: -6 },  { x: 6, z: -6 },  { x: 12, z: -6 },
+                { x: -12, z: 6 },   { x: -6, z: 6 },   { x: 0, z: 6 },   { x: 6, z: 6 },   { x: 12, z: 6 }
+            ];
+
+            ARTIFACTS_DATA.forEach((data, idx) => {
+                const pos = positions[idx];
+                const group = new THREE.Group();
+                group.position.set(pos.x, betangStiltHeight + 0.2, pos.z);
+
+                // Display Pedestal Stand
+                const standGeo = new THREE.CylinderGeometry(0.6, 0.7, 1.1, 12);
+                const standMat = new THREE.MeshStandardMaterial({ color: 0x451a03, roughness: 0.5 });
+                const stand = new THREE.Mesh(standGeo, standMat);
+                stand.position.y = 0.55;
+                stand.castShadow = true;
+                stand.receiveShadow = true;
+                group.add(stand);
+
+                // Glass Case
+                const glassGeo = new THREE.BoxGeometry(1.2, 1.4, 1.2);
+                const glassMat = new THREE.MeshPhysicalMaterial({
+                    color: 0xffffff,
+                    transparent: true,
+                    opacity: 0.3,
+                    roughness: 0.1,
+                    transmission: 0.9,
+                    thickness: 0.5
+                });
+                const glass = new THREE.Mesh(glassGeo, glassMat);
+                glass.position.y = 1.8;
+                group.add(glass);
+
+                // Inner 3D Artifact Object Placeholder
+                const itemGeo = new THREE.OctahedronGeometry(0.35, 0);
+                const itemMat = new THREE.MeshStandardMaterial({ color: data.color, roughness: 0.3, metalness: 0.6 });
+                const itemMesh = new THREE.Mesh(itemGeo, itemMat);
+                itemMesh.position.y = 1.7;
+                itemMesh.castShadow = true;
+                group.add(itemMesh);
+
+                // Spotlight above artifact
+                const spot = new THREE.SpotLight(0xfef08a, 2.5, 8, Math.PI / 6, 0.5);
+                spot.position.set(pos.x, betangStiltHeight + 4.0, pos.z);
+                spot.target = stand;
+                scene.add(spot);
+
+                group.userData = { data: data, itemMesh: itemMesh };
+                artifactMeshes.push(group);
+                scene.add(group);
+            });
+        }
+
+        /* ----------------------------------------------------
+         * EVENT LISTENERS & INPUT HANDLERS
+         * ---------------------------------------------------- */
+        function setupEventListeners() {
+            // Start Button
+            document.getElementById('btn-start').addEventListener('click', startExperience);
+
+            // Audio Toggle
+            document.getElementById('btn-audio').addEventListener('click', toggleAudio);
+
+            // Modal Interactions
+            document.getElementById('btn-close-modal').addEventListener('click', closeModal);
+            document.getElementById('btn-modal-ok').addEventListener('click', closeModal);
+
+            const triggerInteraction = () => {
+                if (activeNearbyArtifact) {
+                    openArtifactModal(activeNearbyArtifact.data);
+                }
+            };
+
+            document.getElementById('btn-interact-action').addEventListener('click', triggerInteraction);
+            document.getElementById('btn-floating-interact').addEventListener('click', triggerInteraction);
+
+            // Keyboard Listeners
+            window.addEventListener('keydown', (e) => {
+                if (keys.hasOwnProperty(e.key)) keys[e.key] = true;
+                if (e.key.toLowerCase() === 'e') triggerInteraction();
+            });
+
+            window.addEventListener('keyup', (e) => {
+                if (keys.hasOwnProperty(e.key)) keys[e.key] = false;
+            });
+
+            // Mouse Look Controls (Desktop)
+            window.addEventListener('mousedown', (e) => {
+                if (e.target.closest('#ui-hud') || e.target.closest('#artifact-modal') || e.target.closest('#start-screen')) return;
+                isMouseDown = true;
+                previousMouseX = e.clientX;
+                previousMouseY = e.clientY;
+            });
+
+            window.addEventListener('mouseup', () => isMouseDown = false);
+
+            window.addEventListener('mousemove', (e) => {
+                if (!isMouseDown || isModalOpen) return;
+                const deltaX = e.clientX - previousMouseX;
+                const deltaY = e.clientY - previousMouseY;
+
+                cameraYaw -= deltaX * 0.004;
+                cameraPitch += deltaY * 0.004;
+                cameraPitch = Math.max(-0.2, Math.min(0.7, cameraPitch));
+
+                previousMouseX = e.clientX;
+                previousMouseY = e.clientY;
+            });
+        }
+    </script>
+</body>
+</html>
